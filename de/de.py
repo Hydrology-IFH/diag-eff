@@ -12,8 +12,6 @@
     :license: GNU GPLv3, see LICENSE for more details.
 """
 
-import os
-import datetime as dt
 import numpy as np
 import matplotlib
 from matplotlib import cm
@@ -21,9 +19,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import scipy as sp
 from sklearn import linear_model
-#from oct2py import octave
-from scipy.signal import find_peaks_cwt
-import numpy as np
 import seaborn as sns
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})  # controlling figure aesthetics
 
@@ -69,7 +64,7 @@ def plot_ts(ts):
         dataframe with time series
     """
     fig, ax = plt.subplots()
-    ax.plot(df_ts.index, df_ts['Qobs'], color='blue')
+    ax.plot(df_ts.index, df_ts.iloc[:, 0].values, color='blue')
     ax.set(ylabel='[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]',
            xlabel='Time [Days]')
 
@@ -111,7 +106,7 @@ def fdc(Q):
     ax.set(ylabel='[mm $\mathregular{d^{-1}}$]',
            xlabel='Exceedence probabilty [%]', yscale='log')
 
-def fdc_obs_sim(df_Q):
+def fdc_obs_sim(Q):
     """
     Plotting the flow duration curves of observed and simulated runoff.
 
@@ -430,7 +425,7 @@ def smooth_obs(obs):
     
     return smoothed_obs
 
-def disaggregate_obs():
+def disaggregate_obs(ts, max_peaks_ind, min_peaks_ind):
     """
     Overestimate high flows - Underestimate low flows.
 
@@ -439,35 +434,36 @@ def disaggregate_obs():
 
     Args
     ----------
-    path : str
-        path to file with meta informations on the catchments
-
-    sep : str, default ‘,’
-        delimeter to use
+    ts : dataframe
+        dataframe with time series
+        
+    max_peaks_ind : list
+        index where max. peaks occur
+        
+    min_peaks_ind : list
+        index where min. peaks occur
 
     Returns
     ----------
-    df_ts : dataframe
-        imported time series
+    ts_disagg : dataframe
+        disaggregated time series
     """
     pass
 
-def sort_obs(df_Q):
+def sort_obs(Q):
     """
     Sort observed streamflow time series.
 
     Args
     ----------
-    path : str
-        path to file with meta informations on the catchments
-
-    sep : str, default ‘,’
-        delimeter to use
+    Q : dataframe
+        dataframe with two time series (observed and simulated)
 
     Returns
     ----------
-    df_ts : dataframe
-        imported time series
+    obs_sort : dataframe
+        dataframe with two time series sorted by the observed values
+        in ascending order
     """
     df_Q = pd.DataFrame(data=Q)
     obs_sort = df_Q.sort_values(by=['Qobs'], ascending=True)
@@ -475,12 +471,28 @@ def sort_obs(df_Q):
     return obs_sort
 
 def _datacheck_peakdetect(x_axis, y_axis):
+    """
+    Check input data for peak detection.
+
+    Args
+    ----------
+    x_axis : str
+        path to file with meta informations on the catchments
+
+    y_axis : str, default ‘,’
+        delimeter to use
+
+    Returns
+    ----------
+    x_axis : dataframe
+        imported time series
+    """
+    
     if x_axis is None:
         x_axis = range(len(y_axis))
     
     if len(y_axis) != len(x_axis):
-        raise ValueError( 
-                "Input vectors y_axis and x_axis must have same length")
+        raise ValueError("Input vectors y_axis and x_axis must have same length")
     
     #needs to be a numpy array
     y_axis = np.array(y_axis)
@@ -488,7 +500,7 @@ def _datacheck_peakdetect(x_axis, y_axis):
     
     return x_axis, y_axis
 
-def peakdetect(y_axis, x_axis = None, lookahead = 200, delta=0):
+def peakdetect(y_axis, x_axis = None, lookahead=200, delta=0):
     """
     Converted from/based on a MATLAB script at: 
     http://billauer.co.il/peakdet.html
@@ -501,38 +513,39 @@ def peakdetect(y_axis, x_axis = None, lookahead = 200, delta=0):
     
     Args
     ----------
-    y_axis : A list containing the signal over which to find peaks
+    y_axis : array_like
+        contains the signal over which to find peaks
     
-    x_axis : A x-axis whose values correspond to the y_axis list and is used
+    x_axis : array_like, optional
+        values correspond to the y_axis list and is used
         in the return to specify the position of the peaks. If omitted an
         index of the y_axis is used.
         (default: None)
     
     lookahead : distance to look ahead from a peak candidate to determine if
-        it is the actual peak
-        (default: 200) 
+        it is the actual peak (default: 200) 
         '(samples / period) / f' where '4 >= f >= 1.25' might be a good value
     
-    delta : this specifies a minimum difference between a peak and
+    delta : int
+        this specifies a minimum difference between a peak and
         the following points, before a peak may be considered a peak. Useful
         to hinder the function from picking up false peaks towards to end of
-        the signal. To work well delta should be set to delta >= RMSnoise * 5.
-        (default: 0)
-            When omitted delta function causes a 20% decrease in speed.
-            When used Correctly it can double the speed of the function
+        the signal. It is recommended that delta should be set to
+        delta >= RMSnoise * 5. (default: 0)
+        When omitted delta function causes a 20% decrease in speed.
+        When used correctly it can double the speed of the function.
     
     Returns
-    ----------
-    
-    max_peaks : two lists [max_peaks, min_peaks] containing the positive and
-        negative peaks respectively. Each cell of the lists contains a tuple
+    ----------    
+    max_peaks : list
+        containing the positive peaks. Each cell of the list contains a tuple
         of: (position, peak_value) 
         to get the average peak value do: np.mean(max_peaks, 0)[1] on the
         results to unpack one of the lists into x, y coordinates do: 
         x, y = zip(*max_peaks)
         
-    min_peaks : two lists [max_peaks, min_peaks] containing the positive and
-        negative peaks respectively. Each cell of the lists contains a tuple
+    min_peaks : list
+        containing the negative peaks. Each cell of the list contains a tuple
         of: (position, peak_value) 
         to get the average peak value do: np.mean(max_peaks, 0)[1] on the
         results to unpack one of the lists into x, y coordinates do: 
@@ -540,26 +553,25 @@ def peakdetect(y_axis, x_axis = None, lookahead = 200, delta=0):
     """
     max_peaks = []
     min_peaks = []
-    dump = []   #Used to pop the first hit which almost always is false
+    dump = []  # Used to pop the first hit which is false
        
     # check input data
     x_axis, y_axis = _datacheck_peakdetect(x_axis, y_axis)
     # store data length for later use
     length = len(y_axis)
     
-    #perform some checks
+    # perform some checks
     if lookahead < 1:
         raise ValueError("Lookahead must be '1' or above in value")
     if not (np.isscalar(delta) and delta >= 0):
         raise ValueError("delta must be a positive number")
     
-    #maxima and minima candidates are temporarily stored in
-    #mx and mn respectively
+    # maxima and minima candidates are temporarily stored in
+    # mx and mn respectively
     mn, mx = np.Inf, -np.Inf
     
-    #Only detect peak if there is 'lookahead' amount of points after it
-    for index, (x, y) in enumerate(zip(x_axis[:-lookahead], 
-                                        y_axis[:-lookahead])):
+    # Only detect peak if there is 'lookahead' amount of points after it
+    for index, (x, y) in enumerate(zip(x_axis[:-lookahead], y_axis[:-lookahead])):
         if y > mx:
             mx = y
             mxpos = x
@@ -567,10 +579,10 @@ def peakdetect(y_axis, x_axis = None, lookahead = 200, delta=0):
             mn = y
             mnpos = x
         
-        ####look for max####
+        #### look for max ####
         if y < mx-delta and mx != np.Inf:
-            #Maxima peak candidate found
-            #look ahead in signal to ensure that this is a peak and not jitter
+            # Maxima peak candidate found
+            # look ahead in signal to ensure that this is a peak and not jitter
             if y_axis[index:index+lookahead].max() < mx:
                 max_peaks.append([mxpos, mx])
                 dump.append(True)
@@ -578,21 +590,21 @@ def peakdetect(y_axis, x_axis = None, lookahead = 200, delta=0):
                 mx = np.Inf
                 mn = np.Inf
                 if index+lookahead >= length:
-                    #end is within lookahead no more peaks can be found
+                    # end is within lookahead no more peaks can be found
                     break
                 continue
             #else:  #slows shit down this does
             #    mx = ahead
             #    mxpos = x_axis[np.where(y_axis[index:index+lookahead]==mx)]
         
-        ####look for min####
+        #### look for min ####
         if y > mn+delta and mn != -np.Inf:
-            #Minima peak candidate found 
-            #look ahead in signal to ensure that this is a peak and not jitter
+            # Minima peak candidate found 
+            # look ahead in signal to ensure that this is a peak and not jitter
             if y_axis[index:index+lookahead].min() > mn:
                 min_peaks.append([mnpos, mn])
                 dump.append(False)
-                #set algorithm to only find maxima now
+                # set algorithm to only find maxima now
                 mn = -np.Inf
                 mx = -np.Inf
                 if index+lookahead >= length:
@@ -611,19 +623,45 @@ def peakdetect(y_axis, x_axis = None, lookahead = 200, delta=0):
             min_peaks.pop(0)
         del dump
     except IndexError:
-        #no peaks were found, should the function return empty lists?
+        # no peaks were found, should the function return empty lists?
         pass
         
     return max_peaks, min_peaks
 
+def plot_peaks(ts, max_peak_ts, min_peak_ts):
+    """
+    Plot time series.
+
+    Args
+    ----------
+    ts : dataframe
+        dataframe with time series
+        
+    max_peak_ts : dataframe
+        dataframe with max. peaks of time series
+        
+    min_peak_ts : dataframe
+        dataframe with min. peaks of time series
+    """
+    fig, ax = plt.subplots()
+    ax.plot(ts.index, ts.iloc[:, 0].values, color='blue')
+    ax.plot(max_peak_ts.index, max_peak_ts.iloc[:, 0].values, 'r.')
+    ax.plot(min_peak_ts.index, min_peak_ts.iloc[:, 0].values, 'g.')
+    ax.set(ylabel='[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]',
+           xlabel='Time [Days]')
+
 
 if __name__ == "__main__":
-    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/9960682_Q_1970_2012.csv'
+    #path = '/Users/robinschwemmle/Desktop/PhD/de/data/9960682_Q_1970_2012.csv'
+    path = '/Users/robo/Desktop/PhD/de/data/9960682_Q_1970_2012.csv'
     df_ts = import_ts(path, sep=';')
-    ax = sns.lineplot(data=df_ts, x=df_ts.index, y='Qobs')
-    test = df_ts['Qobs'].rolling(window=5).mean()
-    test2 = df_ts['Qobs'].rolling(window=5).max()
-    test3 = df_ts['Qobs'].rolling(window=5).min()
-    test1 = test.interpolate(method='slinear', axis=0).ffill().bfill()
+    plot_ts(df_ts)
+    # peak detection
     arr = df_ts['Qobs'].values
-    max_peaks, min_peaks = peakdetect(arr, lookahead=100)
+    ll_ind = df_ts.index.tolist()
+    max_peaks, min_peaks = peakdetect(arr, x_axis=ll_ind, lookahead=100)
+    max_peaks_ind, max_peaks_val = zip(*max_peaks)
+    min_peaks_ind, min_peaks_val = zip(*min_peaks)
+    df_max_peaks = pd.DataFrame(index=max_peaks_ind, data=max_peaks_val, columns=['max_peaks'])
+    df_min_peaks = pd.DataFrame(index=min_peaks_ind, data=min_peaks_val, columns=['min_peaks'])
+    plot_peaks(df_ts, df_max_peaks, df_min_peaks)
