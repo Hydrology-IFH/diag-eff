@@ -12,11 +12,14 @@
     :license: GNU GPLv3, see LICENSE for more details.
 """
 
+import datetime as dt
 import numpy as np
 import matplotlib
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import pandas as pd
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 import scipy as sp
 from sklearn import linear_model
 import seaborn as sns
@@ -51,6 +54,8 @@ def import_ts(path, sep=','):
         imported time series
     """
     df_ts = pd.read_csv(path, sep=sep, na_values=-9999, parse_dates=True, index_col=0, dayfirst=True)
+    
+    df_ts = df_ts.dropna()
 
     return df_ts
 
@@ -81,8 +86,8 @@ def plot_obs_sim(obs, sim):
         simulated time series
     """
     fig, ax = plt.subplots()
-    ax.plot(obs.index, obs, color='blue')
     ax.plot(sim.index, sim, color='red')
+    ax.plot(obs.index, obs, color='blue')
     ax.set(ylabel='[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]',
            xlabel='Time [Days]')
 
@@ -97,7 +102,7 @@ def fdc(Q):
     """
     data = Q.dropna()
     data = np.sort(data.values)
-    ranks = sp.rankdata(data, method='ordinal')
+    ranks = sp.stats.rankdata(data, method='ordinal')
     ranks = ranks[::-1]
     prob = [100*(ranks[i]/(len(data)+1)) for i in range(len(data))]
 
@@ -120,11 +125,11 @@ def fdc_obs_sim(Q):
     q_sim = df_Q.sort_values(by=['Qsim'], ascending=True)
 
     # calculate exceedence probability
-    ranks_obs = sp.rankdata(q_obs['Qobs'], method='ordinal')
+    ranks_obs = sp.stats.rankdata(q_obs['Qobs'], method='ordinal')
     ranks_obs = ranks_obs[::-1]
     prob_obs = [100*(ranks_obs[i]/(len(q_obs['Qobs'])+1)) for i in range(len(q_obs['Qobs']))]
 
-    ranks_sim = sp.rankdata(q_sim['Qsim'], method='ordinal')
+    ranks_sim = sp.stats.rankdata(q_sim['Qsim'], method='ordinal')
     ranks_sim = ranks_sim[::-1]
     prob_sim = [100*(ranks_sim[i]/(len(q_sim['Qsim'])+1)) for i in range(len(q_sim['Qsim']))]
 
@@ -152,9 +157,11 @@ def calc_fdc_bias_balance(obs, sim):
     sum_diff : float
         bias balance
     """
-    sim_obs_diff = sim - obs
+    obs = np.sort(obs)[::-1]
+    sim = np.sort(sim)[::-1]
+    sim_obs_diff = np.subtract(sim, obs)
     sum_diff = np.sum(sim_obs_diff)
-
+    
     return sum_diff
 
 def calc_fdc_bias_slope(obs, sim):
@@ -177,8 +184,10 @@ def calc_fdc_bias_slope(obs, sim):
     score : float
         score of linear regression model
     """
-    y = sim - obs
-    x = np.arange(len(y))
+    obs = np.sort(obs)[::-1]
+    sim = np.sort(sim)[::-1]
+    y = np.subtract(sim, obs)
+    x = np.arange(len(y)).reshape((-1, 1))
 
     lm = linear_model.LinearRegression()
     reg = lm.fit(x, y)
@@ -187,10 +196,10 @@ def calc_fdc_bias_slope(obs, sim):
     score = reg.score(x, y)
 
     fig, ax = plt.subplots()
-    ax.plot(x, y, 'b.', markersize=12)
+    ax.plot(x, y, 'b.', markersize=8)
     ax.plot(x, y_reg, 'r-')
     ax.set(ylabel='[mm $\mathregular{d^{-1}}$]',
-           xlabel='Exceedence probabilty [%]', yscale='log')
+           xlabel='')
 
     return bias_slope, score
 
@@ -212,7 +221,7 @@ def calc_temp_cor(obs, sim):
     temp_cor : float
         rank correlation between observed and simulated time series
     """
-    r = sp.spearmanr(obs, sim)
+    r = sp.stats.spearmanr(obs, sim)
     temp_cor = r[0]
 
     return temp_cor
@@ -237,7 +246,7 @@ def calc_de(obs, sim):
     bias_bal = calc_fdc_bias_balance(obs, sim)
     bias_slope, _ = calc_fdc_bias_slope(obs, sim)
     temp_cor = calc_temp_cor(obs, sim)
-    sig = 1 - np.sqrt((bias_bal - 1)**2 + (bias_slope - 1)**2  + (temp_cor - 1)**2)
+    sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2  + (temp_cor - 1)**2)
 
     return sig
 
@@ -313,7 +322,7 @@ def vis2d_de(obs, sim):
     bias_bal = calc_fdc_bias_balance(obs, sim)
     bias_slope, _ = calc_fdc_bias_slope(obs, sim)
     temp_cor = calc_temp_cor(obs, sim)
-    sig = 1 - np.sqrt((bias_bal - 1)**2 + (bias_slope - 1)**2  + (temp_cor - 1)**2)
+    sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2  + (temp_cor - 1)**2)
 
     y = np.array([0, bias_bal])
     x = np.array([0, bias_slope])
@@ -406,7 +415,7 @@ def neg_shift_obs(obs):
     
     return shift_neg
 
-def smooth_obs(obs):
+def smooth_obs(obs, win=5):
     """
     Underestimate high flows - Overestimate low flows
 
@@ -420,35 +429,10 @@ def smooth_obs(obs):
     smoothed_obs : series
         smoothed time series
     """
-    smoothed_obs = obs.rolling(window=5).mean()
+    smoothed_obs = obs.rolling(window=win).mean()
     smoothed_obs.fillna(method='bfill', inplace=True)
     
     return smoothed_obs
-
-def disaggregate_obs(ts, max_peaks_ind, min_peaks_ind):
-    """
-    Overestimate high flows - Underestimate low flows.
-
-    Increase max values and decrease min values by maintaining balance within
-    rolling window.
-
-    Args
-    ----------
-    ts : dataframe
-        dataframe with time series
-        
-    max_peaks_ind : list
-        index where max. peaks occur
-        
-    min_peaks_ind : list
-        index where min. peaks occur
-
-    Returns
-    ----------
-    ts_disagg : dataframe
-        disaggregated time series
-    """
-    pass
 
 def sort_obs(Q):
     """
@@ -628,6 +612,76 @@ def peakdetect(y_axis, x_axis = None, lookahead=200, delta=0):
         
     return max_peaks, min_peaks
 
+def disaggregate_obs(ts, max_peaks_ind, min_peaks_ind):
+    """
+    Overestimate high flows - Underestimate low flows.
+
+    Increase max values and decrease min values by maintaining balance within
+    rolling window.
+
+    Args
+    ----------
+    ts : dataframe
+        dataframe with time series
+        
+    max_peaks_ind : list
+        index where max. peaks occur
+        
+    min_peaks_ind : list
+        index where min. peaks occur
+
+    Returns
+    ----------
+    ts : dataframe
+        disaggregated time series
+    """
+    idx_max = max_peaks_ind - dt.timedelta(days=1)
+    idxu_max = max_peaks_ind.union(idx_max)
+    idx1_max = max_peaks_ind - dt.timedelta(days=2)
+#    idxu1_max = idxu_max.union(idx1_max)
+    
+    idx_min = min_peaks_ind + dt.timedelta(days=1)
+    idxu_min = min_peaks_ind.union(idx_min)
+    idx1_min = min_peaks_ind + dt.timedelta(days=2)
+#    idxu1_min = idxu_min.union(idx1_min)
+    
+    ts.loc[idx1_max, 'Qobs'] = ts.loc[idx1_max, 'Qobs'] * 1.1
+    ts.loc[idx_max, 'Qobs'] = ts.loc[idx_max, 'Qobs'] * 1.2
+    ts.loc[max_peaks_ind, 'Qobs'] = ts.loc[max_peaks_ind, 'Qobs'] * 1.3
+    
+    ts.loc[idx1_min, 'Qobs'] = ts.loc[idx1_min, 'Qobs'] * 0.5
+    ts.loc[idx_min, 'Qobs'] = ts.loc[idx_min, 'Qobs'] * 0.5
+    ts.loc[min_peaks_ind, 'Qobs'] = ts.loc[min_peaks_ind, 'Qobs'] * 0.5
+    
+#    ts.loc[idxu1_max, 'Qobs'] = ts.loc[idxu1_max, 'Qobs'] * 1.01
+#    ts.loc[idxu1_min, 'Qobs'] = ts.loc[idxu1_min, 'Qobs'] * 0.99
+    
+    return ts
+
+def time_shift(ts, tshift=5):
+    """
+    Timing errors
+
+    Args
+    ----------
+    ts : dataframe
+        dataframe with time series
+        
+
+    Returns
+    ----------
+    ts_shift : dataframe
+        disaggregated time series
+    """
+    ts_shift = ts.shift(periods=tshift, fill_value=0)
+    if tshift > 0:
+        ts_shift.iloc[:tshift, 0] = ts.iloc[:, 0].values[-tshift:]
+        
+    elif tshift < 0:
+        ts_shift.iloc[tshift:, 0] = ts.iloc[:, 0].values[:-tshift]
+        
+    return ts_shift
+
 def plot_peaks(ts, max_peak_ts, min_peak_ts):
     """
     Plot time series.
@@ -659,9 +713,29 @@ if __name__ == "__main__":
     # peak detection
     arr = df_ts['Qobs'].values
     ll_ind = df_ts.index.tolist()
-    max_peaks, min_peaks = peakdetect(arr, x_axis=ll_ind, lookahead=100)
+    max_peaks, min_peaks = peakdetect(arr, x_axis=ll_ind, lookahead=7)
     max_peaks_ind, max_peaks_val = zip(*max_peaks)
     min_peaks_ind, min_peaks_val = zip(*min_peaks)
     df_max_peaks = pd.DataFrame(index=max_peaks_ind, data=max_peaks_val, columns=['max_peaks'])
     df_min_peaks = pd.DataFrame(index=min_peaks_ind, data=min_peaks_val, columns=['min_peaks'])
     plot_peaks(df_ts, df_max_peaks, df_min_peaks)
+    
+    tsd = disaggregate_obs(df_ts.copy(), df_max_peaks.index, df_min_peaks.index)
+    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
+    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
+#    obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qobs']
+    obs_sim.loc[:, 'Qsim'] = smooth_obs(df_ts['Qobs'])
+    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
+    fdc_obs_sim(obs_sim)
+    
+    arr = obs_sim['Qobs'].values
+    arr1 = obs_sim['Qsim'].values
+    
+    bbal = calc_fdc_bias_balance(arr, arr1)
+    bsl = calc_fdc_bias_slope(arr, arr1)
+    rr = calc_temp_cor(arr, arr1)
+    
+    sig_de = calc_de(arr, arr1)
+    sig_kge = calc_kge(arr, arr1)
+    sig_nse = calc_nse(arr, arr1)
+    
