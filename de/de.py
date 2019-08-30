@@ -17,6 +17,7 @@ import numpy as np
 import matplotlib
 from matplotlib import cm
 import matplotlib.pyplot as plt
+from matplotlib.patches import Polygon
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
@@ -36,6 +37,10 @@ __license__ = 'GNU GPLv3'
 #TODO: comparison to NSE and KGE
 #TODO: match Qsim to Qobs
 #TODO: normalize/standardize bias balance and slope
+
+_mmd = '[mm $\mathregular{d^{-1}}$]'
+_m3s = '[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]'
+_q_lab = '[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]'
 
 def import_ts(path, sep=','):
     """
@@ -71,7 +76,7 @@ def plot_ts(ts):
     """
     fig, ax = plt.subplots()
     ax.plot(df_ts.index, df_ts.iloc[:, 0].values, color='blue')
-    ax.set(ylabel='[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]',
+    ax.set(ylabel=_q_lab,
            xlabel='Time [Days]')
 
 def plot_obs_sim(obs, sim):
@@ -89,7 +94,7 @@ def plot_obs_sim(obs, sim):
     fig, ax = plt.subplots()
     ax.plot(sim.index, sim, color='red')
     ax.plot(obs.index, obs, color='blue')
-    ax.set(ylabel='[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]',
+    ax.set(ylabel=_q_lab,
            xlabel='Time [Days]')
 
 def fdc(Q):
@@ -109,7 +114,7 @@ def fdc(Q):
 
     fig, ax = plt.subplots()
     ax.plot(prob, data, color='blue')
-    ax.set(ylabel='[mm $\mathregular{d^{-1}}$]',
+    ax.set(ylabel=_q_lab,
            xlabel='Exceedence probabilty [%]', yscale='log')
 
 def fdc_obs_sim(Q):
@@ -137,7 +142,7 @@ def fdc_obs_sim(Q):
     fig, ax = plt.subplots()
     ax.plot(prob_obs, q_obs['Qobs'], color='blue', label='Observed')
     ax.plot(prob_sim, q_sim['Qsim'], color='red', label='Simulated')
-    ax.set(ylabel='[mm $\mathregular{d^{-1}}$]',
+    ax.set(ylabel=_q_lab,
            xlabel='Exceedence probabilty [%]', yscale='log')
     ax.legend(loc=1)
     
@@ -163,7 +168,7 @@ def fdc_obs_sort(Q):
     fig, ax = plt.subplots()
     ax.plot(prob_obs, df_Q_sort['Qsim'], color='red', label='Simulated')
     ax.plot(prob_obs, df_Q_sort['Qobs'], color='blue', label='Observed')
-    ax.set(ylabel='[mm $\mathregular{d^{-1}}$]',
+    ax.set(ylabel=_q_lab,
            xlabel='Exceedence probabilty [%]', yscale='log')
     ax.legend(loc=1)
 
@@ -220,7 +225,8 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
     if sort:
         obs = np.sort(obs)[::-1]
         sim = np.sort(sim)[::-1]
-    y = np.subtract(sim, obs)
+    sim_obs_diff = np.subtract(sim, obs)
+    y = np.divide(sim_obs_diff, obs)
     x = np.arange(len(y))
     ranks = x[::-1]
     prob = [100*(ranks[i]/(len(y)+1)) for i in range(len(y))]
@@ -230,14 +236,14 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
     lm = linear_model.LinearRegression()
     reg = lm.fit(xx, y)
     y_reg = reg.predict(xx)
-    bias_slope = reg.coef_[0]
+    bias_slope = reg.coef_[0]*100
     score = r2_score(y, y_reg)
 
     if plot:
         fig, ax = plt.subplots()
         ax.plot(prob_arr, y, 'b.', markersize=8)
         ax.plot(prob_arr, y_reg, 'r-')
-        ax.set(ylabel='[mm $\mathregular{d^{-1}}$]',
+        ax.set(ylabel='$\mathregular{B_{rel}}$ [-]',
                xlabel='Exceedence probabilty [%]')
 
     return bias_slope, score
@@ -268,9 +274,9 @@ def calc_temp_cor(obs, sim):
 
     return temp_cor
 
-def calc_de(obs, sim):
+def calc_de(obs, sim, sort=True):
     """
-    Calculate Diagnostic-Efficiency (KGE).
+    Calculate Diagnostic-Efficiency (DE).
 
     Args
     ----------
@@ -285,10 +291,33 @@ def calc_de(obs, sim):
     sig : float
         diagnostic efficiency measure
     """
-    bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim)
-    bias_slope, _ = calc_fdc_bias_slope(obs, sim)
+    bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim, sort=sort)
+    bias_slope, _ = calc_fdc_bias_slope(obs, sim, sort=sort)
     temp_cor = calc_temp_cor(obs, sim)
     sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2  + (temp_cor - 1)**2)
+
+    return sig
+
+def calc_de_sort(obs, sim):
+    """
+    Calculate Diagnostic-Efficiency (DE).
+
+    Args
+    ----------
+    obs : array_like
+        observed time series
+
+    sim : array_like
+        simulated time series
+
+    Returns
+    ----------
+    sig : float
+        diagnostic efficiency measure
+    """
+    bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim, sort=False)
+    bias_slope, _ = calc_fdc_bias_slope(obs, sim, sort=False)
+    sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2)
 
     return sig
 
@@ -349,7 +378,7 @@ def calc_nse(obs, sim):
 
     return sig
 
-def vis2d_de(obs, sim):
+def vis2d_de(obs, sim, sort=True):
     """
     2-D visualization of Diagnostic-Efficiency (DE)
 
@@ -361,8 +390,8 @@ def vis2d_de(obs, sim):
     sim : array_like
         simulated time series
     """
-    bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim)
-    bias_slope, _ = calc_fdc_bias_slope(obs, sim, plot=False)
+    bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim, sort=sort)
+    bias_slope, _ = calc_fdc_bias_slope(obs, sim, sort=sort, plot=False)
     temp_cor = calc_temp_cor(obs, sim)
     sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2  + (temp_cor - 1)**2)
     sig = np.round(sig, decimals=2)
@@ -374,8 +403,11 @@ def vis2d_de(obs, sim):
     norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
     rgba_color = cm.RdYlGn(norm(temp_cor))
 
-    x_lim = np.round(bias_slope, decimals=1) + .1
-    y_lim = 1
+    x_lim = abs(np.round(bias_slope, decimals=0)) + .1
+    if x_lim < 1:
+        x_lim = 1.1
+        
+    y_lim = 1.1
 
     fig, ax = plt.subplots()
     # Make dummie mappable
@@ -383,6 +415,32 @@ def vis2d_de(obs, sim):
     dummie_cax = ax.scatter(c, c, c=c, cmap=cm.RdYlGn)
     # Clear axis
     ax.cla()
+    
+    # make the shaded regions for input errors
+    ix = [0, -x_lim, x_lim, 0]
+    iy = [0, y_lim, y_lim, 0]
+    verts = [(0, 0), *zip(ix, iy), (0, 0)]
+    poly = Polygon(verts, facecolor='plum', edgecolor=None, alpha=.3)
+    ax.add_patch(poly)
+    
+    ix = [0, -x_lim, x_lim, 0]
+    iy = [0, -y_lim, -y_lim, 0]
+    verts = [(0, 0), *zip(ix, iy), (0, 0)]
+    poly1 = Polygon(verts, facecolor='plum', edgecolor=None, alpha=.3)
+    ax.add_patch(poly1)
+    
+    # make the shaded regions for model errors
+    ix = [0, -x_lim, -x_lim, 0]
+    iy = [0, y_lim, -y_lim, 0]
+    verts = [(0, 0), *zip(ix, iy), (0, 0)]
+    poly2 = Polygon(verts, facecolor='0.9', edgecolor=None, alpha=.3)
+    ax.add_patch(poly2)
+    
+    ix = [0, x_lim, x_lim, 0]
+    iy = [0, -y_lim, y_lim, 0]
+    verts = [(0, 0), *zip(ix, iy), (0, 0)]
+    poly3 = Polygon(verts, facecolor='0.9', edgecolor=None, alpha=.3)
+    ax.add_patch(poly3)
 
     im = ax.plot(x, y, c=rgba_color, linewidth=3)
     ax.set_xlim([-x_lim , x_lim ])
@@ -535,7 +593,7 @@ def smooth_obs(obs, win=5):
 
     return smoothed_obs
 
-def highunder_lowover(ts):
+def highunder_lowover(ts, prop=0.5):
     """
     Underestimate high flows - Overestimate low flows
     
@@ -559,9 +617,9 @@ def highunder_lowover(ts):
     obs_sort = obs_sim.sort_values(by='Qobs', ascending=False)
     mid = int(len(obs_sim.index)/2)
     # factors to decrease runoff
-    pdown = np.linspace(0.7, 1.0, mid)
+    pdown = np.linspace(1.0-prop, 1.0, mid)
     # factors to increase runoff
-    lup = np.linspace(1.0, 1.3, mid)
+    lup = np.linspace(1.0, 1.0+prop, mid)
     # decrease runoff (Q_1 - Q_50; high to medium flow)
     obs_sort.iloc[:mid, 1] = np.multiply(obs_sort.iloc[:mid, 0].values, pdown)
     # increase runoff (Q_50 - Q_99; medium to low flow)
@@ -796,7 +854,7 @@ def disaggregate_obs(ts, max_peaks_ind, min_peaks_ind):
 
     return ts
 
-def highover_lowunder(ts):
+def highover_lowunder(ts, prop=0.5):
     """
     Overestimate high flows - Underestimate low flows.
 
@@ -822,9 +880,9 @@ def highover_lowunder(ts):
     obs_sort = obs_sim.sort_values(by='Qobs', ascending=False)
     mid = int(len(obs_sim.index)/2)
     # factors to increase runoff
-    pup = np.linspace(1.3, 1.0, mid)
+    pup = np.linspace(1.0+prop, 1.0, mid)
     # factors to decrease runoff
-    ldown = np.linspace(1.0, 0.7, mid)
+    ldown = np.linspace(1.0, 1.001-prop, mid)
     # increase runoff (Q_1 - Q_50; high to medium flow)
     obs_sort.iloc[:mid, 1] = np.multiply(obs_sort.iloc[:mid, 0].values, pup)
     # decrease runoff (Q_50 - Q_99; medium to low flow)
@@ -886,11 +944,11 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
 
 
 if __name__ == "__main__":
-#    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/9960682_Q_1970_2012.csv'
+    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/9960682_Q_1970_2012.csv'
 ##    path = '/Users/robo/Desktop/PhD/de/data/9960682_Q_1970_2012.csv'
 
     # import observed time series
-#    df_ts = import_ts(path, sep=';')
+    df_ts = import_ts(path, sep=';')
 #    plot_ts(df_ts)
 
 #    # peak detection
@@ -921,23 +979,32 @@ if __name__ == "__main__":
 #    vis2d_de(obs_arr, sim_arr)
 #    vis2d_kge(obs_arr, sim_arr)
     
-#    ### increase high flows - decrease low flows ###
-#    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-#    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    tsd = highover_lowunder(df_ts.copy())
-#    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0]  # disaggregated time series
-#    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim)
-#
-#    obs_arr = obs_sim['Qobs'].values
-#    sim_arr = obs_sim['Qsim'].values
-#
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
+    ### increase high flows - decrease low flows ###
+    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
+    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
+    tsd = highover_lowunder(df_ts.copy(), prop=0.5)
+    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0]  # disaggregated time series
+    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
+    fdc_obs_sim(obs_sim)
+
+    obs_arr = obs_sim['Qobs'].values
+    sim_arr = obs_sim['Qsim'].values
+
+    sig_de = calc_de(obs_arr, sim_arr)
+    sig_kge = calc_kge(obs_arr, sim_arr)
+    sig_nse = calc_nse(obs_arr, sim_arr)
+
+    vis2d_de(obs_arr, sim_arr)
+    vis2d_kge(obs_arr, sim_arr)
+    
+    obs_sim_sort = sort_obs(obs_sim)
+    obs_arr_sort = obs_sim_sort['Qobs'].values
+    sim_arr_sort = obs_sim_sort['Qsim'].values
+    sig_der_sort = calc_de_sort(obs_arr_sort, sim_arr_sort)
+    sig_de_sort = calc_de(obs_arr_sort, sim_arr_sort, sort=False)
+    fdc_obs_sort(obs_sim_sort)
+    vis2d_de(obs_arr_sort, sim_arr_sort, sort=False)
+
 
 #    ### decrease high flows - increase low flows ###
 #    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -959,7 +1026,7 @@ if __name__ == "__main__":
 #    ### decrease high flows - increase low flows ###
 #    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
 #    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    tss = highunder_lowover((df_ts.copy())  # smoothed time series
+#    tss = highunder_lowover(df_ts.copy())  # smoothed time series
 #    obs_sim.loc[:, 'Qsim'] = tss.iloc[:, 0]  # smoothed time series
 #    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #    fdc_obs_sim(obs_sim)
@@ -990,7 +1057,7 @@ if __name__ == "__main__":
 #
 #    vis2d_de(obs_arr, sim_arr)
 #    vis2d_kge(obs_arr, sim_arr)
-#
+
 #    ### precipitation shortage ###
 #    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
 #    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
@@ -1007,9 +1074,9 @@ if __name__ == "__main__":
 #
 #    vis2d_de(obs_arr, sim_arr)
 #    vis2d_kge(obs_arr, sim_arr)
-#
 
-     ### averaged time series ###
+
+#    ### averaged time series ###
 #    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
 #    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
 #    obs_mean = np.mean(obs_sim['Qobs'].values)
@@ -1019,7 +1086,14 @@ if __name__ == "__main__":
 #
 #    obs_arr = obs_sim['Qobs'].values
 #    sim_arr = obs_sim['Qsim'].values
+#     
+#    sig_de = calc_de(obs_arr, sim_arr)
+#    sig_kge = calc_kge(obs_arr, sim_arr)
+#    sig_nse = calc_nse(obs_arr, sim_arr)
 #
+#    vis2d_de(obs_arr, sim_arr)
+#    vis2d_kge(obs_arr, sim_arr)
+
 
     ### Tier-1 ###
 #    path_wrr1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/GRDC_4103631_wrr1.csv'
@@ -1037,24 +1111,18 @@ if __name__ == "__main__":
 #    vis2d_de(obs_arr, sim_arr)
 #    vis2d_kge(obs_arr, sim_arr)
 
-    ### Tier-2 ###
-    path_wrr2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/GRDC_4103631_wrr2.csv'
-    df_wrr2 = import_ts(path_wrr2, sep=';')
-    df_wrr2_sort = sort_obs(df_wrr2)
+#    ### Tier-2 ###
+#    path_wrr2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/GRDC_4103631_wrr2.csv'
+#    df_wrr2 = import_ts(path_wrr2, sep=';')
+#    df_wrr2_sort = sort_obs(df_wrr2)
+#    obs_arr_sort = df_wrr2_sort['Qobs'].values
+#    sim_arr_sort = df_wrr2_sort['Qsim'].values
+#    sig_der_sort = calc_de_sort(obs_arr_sort, sim_arr_sort)
+#    sig_de_sort = calc_de(obs_arr_sort, sim_arr_sort, sort=False)
 #    plot_obs_sim(df_wrr2['Qobs'], df_wrr2['Qsim'])
-    fdc_obs_sim(df_wrr2)
-    fdc_obs_sort(df_wrr2)
-#
-#    obs_arr = df_wrr2['Qobs'].values
-#    sim_arr = df_wrr2['Qsim'].values
-#
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
-    
+#    fdc_obs_sim(df_wrr2)
+#    fdc_obs_sort(df_wrr2)
+#    vis2d_de(obs_arr_sort, sim_arr_sort, sort=False)
 #
 #    obs_arr = df_wrr2['Qobs'].values
 #    sim_arr = df_wrr2['Qsim'].values
