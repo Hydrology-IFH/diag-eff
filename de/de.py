@@ -34,9 +34,8 @@ __author__ = 'Robin Schwemmle'
 __license__ = 'GNU GPLv3'
 #__docformat__ = 'markdown'
 
-#TODO: comparison to NSE and KGE
 #TODO: match Qsim to Qobs
-#TODO: normalize/standardize bias balance and slope
+#TODO: zero values in Qobs calculating rel. bias
 
 _mmd = '[mm $\mathregular{d^{-1}}$]'
 _m3s = '[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]'
@@ -60,7 +59,7 @@ def import_ts(path, sep=','):
         imported time series
     """
     df_ts = pd.read_csv(path, sep=sep, na_values=-9999, parse_dates=True, index_col=0, dayfirst=True)
-
+    # drop nan values
     df_ts = df_ts.dropna()
 
     return df_ts
@@ -75,7 +74,7 @@ def plot_ts(ts):
         dataframe with time series
     """
     fig, ax = plt.subplots()
-    ax.plot(df_ts.index, df_ts.iloc[:, 0].values, color='blue')
+    ax.plot(ts.index, ts.iloc[:, 0].values, color='blue')
     ax.set(ylabel=_q_lab,
            xlabel='Time [Days]')
 
@@ -92,24 +91,24 @@ def plot_obs_sim(obs, sim):
         simulated time series
     """
     fig, ax = plt.subplots()
-    ax.plot(sim.index, sim, color='red')
-    ax.plot(obs.index, obs, color='blue')
-    ax.set(ylabel=_q_lab,
-           xlabel='Time [Days]')
+    ax.plot(sim.index, sim, color='red')  # simulated time series
+    ax.plot(obs.index, obs, color='blue')  # observed time series
+    ax.set(ylabel=_q_lab, xlabel='Time')
 
-def fdc(Q):
+def fdc(ts):
     """
-    Generate a flow duration curve for an observed hydrologic time series.
+    Generate a flow duration curve for a single hydrologic time series.
 
     Args
     ----------
-    Q : dataframe
-        containing an observed hydrologic time series
+    ts : dataframe
+        containing a hydrologic time series
     """
-    data = Q.dropna()
-    data = np.sort(data.values)
-    ranks = sp.stats.rankdata(data, method='ordinal')
+    data = ts.dropna()
+    data = np.sort(data.values)  # sort values by ascending order
+    ranks = sp.stats.rankdata(data, method='ordinal')  # rank data
     ranks = ranks[::-1]
+    # calculate exceedence probability
     prob = [100*(ranks[i]/(len(data)+1)) for i in range(len(data))]
 
     fig, ax = plt.subplots()
@@ -117,35 +116,40 @@ def fdc(Q):
     ax.set(ylabel=_q_lab,
            xlabel='Exceedence probabilty [%]', yscale='log')
 
-def fdc_obs_sim(Q):
+def fdc_obs_sim(obs, sim):
     """
-    Plotting the flow duration curves of observed and simulated runoff.
+    Plotting the flow duration curves of two hydrologic time series (e.g.
+    observed streamflow and simulated streamflow).
 
     Args
     ----------
-    Q : dataframe
-        containing time series of Qobs and Qsim
+    obs : series
+        observed time series
+    sim : series
+        simulated time series
     """
-    df_Q = pd.DataFrame(data=Q)
-    q_obs = df_Q.sort_values(by=['Qobs'], ascending=True)
-    q_sim = df_Q.sort_values(by=['Qsim'], ascending=True)
+    obs_sim = pd.DataFrame(index=obs.index, columns=['obs', 'sim'])
+    obs_sim.loc[:, 'obs'] = obs.values
+    obs_sim.loc[:, 'sim'] = sim.values
+    obs = obs_sim.sort_values(by=['obs'], ascending=True)
+    sim = obs_sim.sort_values(by=['sim'], ascending=True)
 
     # calculate exceedence probability
-    ranks_obs = sp.stats.rankdata(q_obs['Qobs'], method='ordinal')
+    ranks_obs = sp.stats.rankdata(obs['obs'], method='ordinal')
     ranks_obs = ranks_obs[::-1]
-    prob_obs = [100*(ranks_obs[i]/(len(q_obs['Qobs'])+1)) for i in range(len(q_obs['Qobs']))]
+    prob_obs = [100*(ranks_obs[i]/(len(obs['obs'])+1)) for i in range(len(obs['obs']))]
 
-    ranks_sim = sp.stats.rankdata(q_sim['Qsim'], method='ordinal')
+    ranks_sim = sp.stats.rankdata(sim['sim'], method='ordinal')
     ranks_sim = ranks_sim[::-1]
-    prob_sim = [100*(ranks_sim[i]/(len(q_sim['Qsim'])+1)) for i in range(len(q_sim['Qsim']))]
+    prob_sim = [100*(ranks_sim[i]/(len(sim['sim'])+1)) for i in range(len(sim['sim']))]
 
     fig, ax = plt.subplots()
-    ax.plot(prob_obs, q_obs['Qobs'], color='blue', label='Observed')
-    ax.plot(prob_sim, q_sim['Qsim'], color='red', label='Simulated')
+    ax.plot(prob_obs, obs['obs'], color='blue', label='Observed')
+    ax.plot(prob_sim, sim['sim'], color='red', label='Simulated')
     ax.set(ylabel=_q_lab,
            xlabel='Exceedence probabilty [%]', yscale='log')
     ax.legend(loc=1)
-    
+
 def fdc_obs_sort(Q):
     """
     Plotting the flow duration curves of observed and simulated runoff.
@@ -184,11 +188,14 @@ def calc_fdc_bias_balance(obs, sim, sort=True):
     sim : series
         simulated time series
 
+    sort : boolean, default True
+        if True time series are sorted by ascending order
+
     Returns
     ----------
     mean_brel : float
         average relative bias
-        
+
     sum_diff : float
         relative bias balance
     """
@@ -213,6 +220,12 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
 
     sim : array_like
         simulated time series
+
+    sort : boolean, default True
+        if True time series are sorted by ascending order
+
+    plot : boolean, default True
+        if True plot for linear regression is displayed
 
     Returns
     ----------
@@ -285,6 +298,9 @@ def calc_de(obs, sim, sort=True):
 
     sim : array_like
         simulated time series
+
+    sort : boolean, default True
+        if True time series are sorted by ascending order
 
     Returns
     ----------
@@ -389,6 +405,9 @@ def vis2d_de(obs, sim, sort=True):
 
     sim : array_like
         simulated time series
+
+    sort : boolean, default True
+        if True time series are sorted by ascending order
     """
     bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim, sort=sort)
     bias_slope, _ = calc_fdc_bias_slope(obs, sim, sort=sort, plot=False)
@@ -406,7 +425,7 @@ def vis2d_de(obs, sim, sort=True):
     x_lim = abs(np.round(bias_slope, decimals=0)) + .1
     if x_lim < 1:
         x_lim = 1.1
-        
+
     y_lim = 1.1
 
     fig, ax = plt.subplots()
@@ -415,27 +434,27 @@ def vis2d_de(obs, sim, sort=True):
     dummie_cax = ax.scatter(c, c, c=c, cmap=cm.RdYlGn)
     # Clear axis
     ax.cla()
-    
+
     # make the shaded regions for input errors
     ix = [0, -x_lim, x_lim, 0]
     iy = [0, y_lim, y_lim, 0]
     verts = [(0, 0), *zip(ix, iy), (0, 0)]
     poly = Polygon(verts, facecolor='plum', edgecolor=None, alpha=.3)
     ax.add_patch(poly)
-    
+
     ix = [0, -x_lim, x_lim, 0]
     iy = [0, -y_lim, -y_lim, 0]
     verts = [(0, 0), *zip(ix, iy), (0, 0)]
     poly1 = Polygon(verts, facecolor='plum', edgecolor=None, alpha=.3)
     ax.add_patch(poly1)
-    
+
     # make the shaded regions for model errors
     ix = [0, -x_lim, -x_lim, 0]
     iy = [0, y_lim, -y_lim, 0]
     verts = [(0, 0), *zip(ix, iy), (0, 0)]
     poly2 = Polygon(verts, facecolor='0.9', edgecolor=None, alpha=.3)
     ax.add_patch(poly2)
-    
+
     ix = [0, x_lim, x_lim, 0]
     iy = [0, -y_lim, y_lim, 0]
     verts = [(0, 0), *zip(ix, iy), (0, 0)]
@@ -510,96 +529,96 @@ def vis2d_kge(obs, sim):
     ax.text((kge_gamma - 1)/2, (kge_beta - 1)/2, 'KGE = {}'.format(sig))
     fig.colorbar(dummie_cax, orientation='vertical', label='Temporal correlation [-]')
 
-def pos_shift_obs(obs, offset=1.5, multi=True):
+def pos_shift_ts(obs, offset=1.5, multi=True):
     """
     Precipitation overestimation.
-    
+
     Mimicking input errors by multiplying/adding with constant offset.
 
     Args
     ----------
-    obs : array_like
+    ts : array_like
         observed time series
-        
+
     offset : float, int, default 1.5
-        offset multiplied/added to time series. If multi true, offset 
+        offset multiplied/added to time series. If multi true, offset
         has to be greater than 1.
 
     Returns
     ----------
-    shift_obs : dataframe
+    shift_pos : array_like
         time series with positve offset
     """
     if multi:
-        shift_obs = obs * offset
+        shift_pos = ts * offset
     else:
-        shift_obs = obs + offset
-        
-    return shift_obs
+        shift_pos = ts + offset
 
-def neg_shift_obs(obs, offset=0.5, multi=True):
+    return shift_ps
+
+def neg_shift_obs(ts, offset=0.5, multi=True):
     """
     Precipitation underestimation.
-    
+
     Mimicking input errors by multiplying/subtracting with constant offset.
 
     Args
     ----------
-    obs : array_like
-        observed time series
-        
+    ts : array_like
+        time series
+
     offset : float, int, default 0.5
-        offset multiplied/subtracted to time series. If multi true, offset 
+        offset multiplied/subtracted to time series. If multi true, offset
         has to be less than 1.
-        
+
     multi : boolean, default True
-        whether offset is multiplied or not. If false, then 
+        whether offset is multiplied or not. If false, then
 
     Returns
     ----------
-    shift_neg : dataframe
+    shift_neg : array_like
         time series with negative offset
     """
     if multi:
-        shift_neg = obs * offset
+        shift_neg = ts * offset
     else:
-        shift_neg = obs - offset
+        shift_neg = ts - offset
         shift_neg[shift_neg < 0] = 0
 
     return shift_neg
 
-def smooth_obs(obs, win=5):
+def smooth_ts(ts, win=5):
     """
     Underestimate high flows - Overestimate low flows.
-    
+
     Time series is smoothed by rolling average. Maxima decrease and minima
     decrease.
 
     Args
     ----------
-    obs : array_like
-        observed time series
-        
+    ts : array_like
+        time series
+
     win : int, default 5
         size of window used to apply rolling mean
 
     Returns
     ----------
-    smoothed_obs : series
+    smoothed_ts : series
         smoothed time series
     """
-    smoothed_obs = obs.rolling(window=win).mean()
-    smoothed_obs.fillna(method='bfill', inplace=True)
+    smoothed_ts = ts.rolling(window=win).mean()
+    smoothed_ts.fillna(method='bfill', inplace=True)
 
-    return smoothed_obs
+    return smoothed_ts
 
 def highunder_lowover(ts, prop=0.5):
     """
     Underestimate high flows - Overestimate low flows
-    
+
     Mimicking model errors. High to medium flows are decreased by linear
     increasing factors. Medium to low flows are increased by linear
-    increasing factors. 
+    increasing factors.
 
     Args
     ----------
@@ -615,29 +634,25 @@ def highunder_lowover(ts, prop=0.5):
     obs_sim.iloc[:, 0] = ts.iloc[:, 0]
     # sort values by descending order
     obs_sort = obs_sim.sort_values(by='Qobs', ascending=False)
-    mid = int(len(obs_sim.index)/2)
-    # factors to decrease runoff
-    pdown = np.linspace(1.0-prop, 1.0, mid)
-    # factors to increase runoff
-    lup = np.linspace(1.0, 1.0+prop, mid)
-    # decrease runoff (Q_1 - Q_50; high to medium flow)
-    obs_sort.iloc[:mid, 1] = np.multiply(obs_sort.iloc[:mid, 0].values, pdown)
-    # increase runoff (Q_50 - Q_99; medium to low flow)
-    obs_sort.iloc[mid:, 1] = np.multiply(obs_sort.iloc[mid:, 0].values, lup)
+    nn = len(obs_sim.index)
+    # factors to decrease/increase runoff
+    downup = np.linspace(1.0-prop, 1.0+prop, nn)
+    # tilting the fdc at median
+    obs_sort.iloc[:, 1] = np.multiply(obs_sort.iloc[:, 0].values, downup)
     # sort by index
     obs_sim = obs_sort.sort_index()
     ts_smoothed = obs_sim.iloc[:, 1].copy().to_frame()
 
     return ts_smoothed
 
-def sort_obs(Q):
+def sort_obs(ts):
     """
-    Sort observed streamflow time series.
+    Sort time series by observed values.
 
     Args
     ----------
-    Q : dataframe
-        dataframe with two time series (observed and simulated)
+    ts : dataframe
+        dataframe with two time series (e.g. observed and simulated)
 
     Returns
     ----------
@@ -645,8 +660,8 @@ def sort_obs(Q):
         dataframe with two time series sorted by the observed values
         in ascending order
     """
-    df_Q = pd.DataFrame(data=Q)
-    obs_sort = df_Q.sort_values(by=['Qobs'], ascending=False)
+    df_ts = pd.DataFrame(data=ts)
+    obs_sort = df_ts.sort_values(by=['Qobs'], ascending=False)
 
     return obs_sort
 
@@ -682,9 +697,8 @@ def _datacheck_peakdetect(x_axis, y_axis):
 
 def peakdetect(y_axis, x_axis = None, lookahead=200, delta=0):
     """
-    Converted from/based on a MATLAB script at:
+    Converted from/based on a MATLAB scripts at:
     http://billauer.co.il/peakdet.html
-
     https://gist.github.com/sixtenbe/1178136
 
     Function for detecting local maxima and minima in a signal.
@@ -702,16 +716,17 @@ def peakdetect(y_axis, x_axis = None, lookahead=200, delta=0):
         index of the y_axis is used.
         (default: None)
 
-    lookahead : distance to look ahead from a peak candidate to determine if
-        it is the actual peak (default: 200)
+    lookahead : int, default 200
+        distance to look ahead from a peak candidate to determine if
+        it is the actual peak
         '(samples / period) / f' where '4 >= f >= 1.25' might be a good value
 
-    delta : int
+    delta : int, default 0
         this specifies a minimum difference between a peak and
         the following points, before a peak may be considered a peak. Useful
         to hinder the function from picking up false peaks towards to end of
         the signal. It is recommended that delta should be set to
-        delta >= RMSnoise * 5. (default: 0)
+        delta >= RMSnoise * 5.
         When omitted delta function causes a 20% decrease in speed.
         When used correctly it can double the speed of the function.
 
@@ -811,7 +826,7 @@ def peakdetect(y_axis, x_axis = None, lookahead=200, delta=0):
 def disaggregate_obs(ts, max_peaks_ind, min_peaks_ind):
     """
     Overestimate high flows - Underestimate low flows.
-    
+
     Increase max values and decrease min values.
 
 
@@ -859,10 +874,10 @@ def highover_lowunder(ts, prop=0.5):
     Overestimate high flows - Underestimate low flows.
 
     Increase max values and decrease min values.
-    
+
     Mimicking model errors. High to medium flows are increased by linear
     decreasing factors. Medium to low flows are decreased by linear
-    decreasing factors. 
+    decreasing factors.
 
     Args
     ----------
@@ -878,15 +893,11 @@ def highover_lowunder(ts, prop=0.5):
     obs_sim.iloc[:, 0] = ts.iloc[:, 0]
     # sort values by descending order
     obs_sort = obs_sim.sort_values(by='Qobs', ascending=False)
-    mid = int(len(obs_sim.index)/2)
-    # factors to increase runoff
-    pup = np.linspace(1.0+prop, 1.0, mid)
-    # factors to decrease runoff
-    ldown = np.linspace(1.0, 1.001-prop, mid)
-    # increase runoff (Q_1 - Q_50; high to medium flow)
-    obs_sort.iloc[:mid, 1] = np.multiply(obs_sort.iloc[:mid, 0].values, pup)
-    # decrease runoff (Q_50 - Q_99; medium to low flow)
-    obs_sort.iloc[mid:, 1] = np.multiply(obs_sort.iloc[mid:, 0].values, ldown)
+    nn = len(obs_sim.index)
+    # factors to decrease/increase runoff
+    updown = np.linspace(1.0+prop, 1.0-prop, nn)
+    # tilting the fdc at median
+    obs_sort.iloc[:, 1] = np.multiply(obs_sort.iloc[:, 0].values, updown)
     # sort by index
     obs_sim = obs_sort.sort_index()
     ts_disagg = obs_sim.iloc[:, 1].copy().to_frame()
@@ -901,7 +912,7 @@ def time_shift(ts, tshift=5):
     ----------
     ts : dataframe
         dataframe with time series
-        
+
     tshift : int, default 5
         days by which time series is shifted. Both positive and negative
         time shift are possible.
@@ -943,12 +954,12 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
            xlabel='Time [Days]')
 
 
-if __name__ == "__main__":
-    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/9960682_Q_1970_2012.csv'
-##    path = '/Users/robo/Desktop/PhD/de/data/9960682_Q_1970_2012.csv'
+# if __name__ == "__main__":
+    # path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/9960682_Q_1970_2012.csv'
+##    path = '/Users/robo/Desktop/PhD/de/examples/data/9960682_Q_1970_2012.csv'
 
     # import observed time series
-    df_ts = import_ts(path, sep=';')
+    # df_ts = import_ts(path, sep=';')
 #    plot_ts(df_ts)
 
 #    # peak detection
@@ -967,7 +978,7 @@ if __name__ == "__main__":
 #    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
 #    obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qobs']  # disaggregated time series
 #    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim)
+#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #
 #    obs_arr = obs_sim['Qobs'].values
 #    sim_arr = obs_sim['Qsim'].values
@@ -978,40 +989,39 @@ if __name__ == "__main__":
 #
 #    vis2d_de(obs_arr, sim_arr)
 #    vis2d_kge(obs_arr, sim_arr)
-    
-    ### increase high flows - decrease low flows ###
-    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = highover_lowunder(df_ts.copy(), prop=0.5)
-    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0]  # disaggregated time series
-    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-    fdc_obs_sim(obs_sim)
-
-    obs_arr = obs_sim['Qobs'].values
-    sim_arr = obs_sim['Qsim'].values
-
-    sig_de = calc_de(obs_arr, sim_arr)
-    sig_kge = calc_kge(obs_arr, sim_arr)
-    sig_nse = calc_nse(obs_arr, sim_arr)
-
-    vis2d_de(obs_arr, sim_arr)
-    vis2d_kge(obs_arr, sim_arr)
-    
-    obs_sim_sort = sort_obs(obs_sim)
-    obs_arr_sort = obs_sim_sort['Qobs'].values
-    sim_arr_sort = obs_sim_sort['Qsim'].values
-    sig_der_sort = calc_de_sort(obs_arr_sort, sim_arr_sort)
-    sig_de_sort = calc_de(obs_arr_sort, sim_arr_sort, sort=False)
-    fdc_obs_sort(obs_sim_sort)
-    vis2d_de(obs_arr_sort, sim_arr_sort, sort=False)
-
+    #
+    # ### increase high flows - decrease low flows ###
+    # obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
+    # obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
+    # tsd = highover_lowunder(df_ts.copy(), prop=0.5)
+    # obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0]  # disaggregated time series
+    # plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
+    # fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
+    #
+    # obs_arr = obs_sim['Qobs'].values
+    # sim_arr = obs_sim['Qsim'].values
+    #
+    # sig_de = calc_de(obs_arr, sim_arr)
+    # sig_kge = calc_kge(obs_arr, sim_arr)
+    # sig_nse = calc_nse(obs_arr, sim_arr)
+    #
+    # vis2d_de(obs_arr, sim_arr)
+    # vis2d_kge(obs_arr, sim_arr)
+    #
+    # obs_sim_sort = sort_obs(obs_sim)
+    # obs_arr_sort = obs_sim_sort['Qobs'].values
+    # sim_arr_sort = obs_sim_sort['Qsim'].values
+    # sig_der_sort = calc_de_sort(obs_arr_sort, sim_arr_sort)
+    # sig_de_sort = calc_de(obs_arr_sort, sim_arr_sort, sort=False)
+    # fdc_obs_sort(obs_sim_sort)
+    # vis2d_de(obs_arr_sort, sim_arr_sort, sort=False)
 
 #    ### decrease high flows - increase low flows ###
 #    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
 #    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    obs_sim.loc[:, 'Qsim'] = smooth_obs(df_ts['Qobs'], win=5)  # smoothed time series
+#    obs_sim.loc[:, 'Qsim'] = smooth_ts(df_ts['Qobs'], win=5)  # smoothed time series
 #    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim)
+#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #
 #    obs_arr = obs_sim['Qobs'].values
 #    sim_arr = obs_sim['Qsim'].values
@@ -1022,14 +1032,14 @@ if __name__ == "__main__":
 #
 #    vis2d_de(obs_arr, sim_arr)
 #    vis2d_kge(obs_arr, sim_arr)
-#    
+#
 #    ### decrease high flows - increase low flows ###
 #    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
 #    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
 #    tss = highunder_lowover(df_ts.copy())  # smoothed time series
 #    obs_sim.loc[:, 'Qsim'] = tss.iloc[:, 0]  # smoothed time series
 #    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim)
+#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #
 #    obs_arr = obs_sim['Qobs'].values
 #    sim_arr = obs_sim['Qsim'].values
@@ -1046,7 +1056,7 @@ if __name__ == "__main__":
 #    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
 #    obs_sim.loc[:, 'Qsim'] = pos_shift_obs(df_ts['Qobs'].values)  # positive offset
 #    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim)
+#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #
 #    obs_arr = obs_sim['Qobs'].values
 #    sim_arr = obs_sim['Qsim'].values
@@ -1063,7 +1073,7 @@ if __name__ == "__main__":
 #    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
 #    obs_sim.loc[:, 'Qsim'] = neg_shift_obs(df_ts['Qobs'].values)  # negative offset
 #    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim)
+#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #
 #    obs_arr = obs_sim['Qobs'].values
 #    sim_arr = obs_sim['Qsim'].values
@@ -1082,11 +1092,11 @@ if __name__ == "__main__":
 #    obs_mean = np.mean(obs_sim['Qobs'].values)
 #    obs_sim.loc[:, 'Qsim'] = np.repeat(obs_mean, len(obs_sim['Qobs'].values))
 #    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim)
+#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #
 #    obs_arr = obs_sim['Qobs'].values
 #    sim_arr = obs_sim['Qsim'].values
-#     
+#
 #    sig_de = calc_de(obs_arr, sim_arr)
 #    sig_kge = calc_kge(obs_arr, sim_arr)
 #    sig_nse = calc_nse(obs_arr, sim_arr)
@@ -1096,10 +1106,10 @@ if __name__ == "__main__":
 
 
     ### Tier-1 ###
-#    path_wrr1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/GRDC_4103631_wrr1.csv'
+#    path_wrr1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/examples/GRDC_4103631_wrr1.csv'
 #    df_wrr1 = import_ts(path_wrr1, sep=';')
 #    plot_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
-#    fdc_obs_sim(df_wrr1)
+#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #
 #    obs_arr = df_wrr1['Qobs'].values
 #    sim_arr = df_wrr1['Qsim'].values
@@ -1112,7 +1122,7 @@ if __name__ == "__main__":
 #    vis2d_kge(obs_arr, sim_arr)
 
 #    ### Tier-2 ###
-#    path_wrr2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/GRDC_4103631_wrr2.csv'
+#    path_wrr2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/examples/GRDC_4103631_wrr2.csv'
 #    df_wrr2 = import_ts(path_wrr2, sep=';')
 #    df_wrr2_sort = sort_obs(df_wrr2)
 #    obs_arr_sort = df_wrr2_sort['Qobs'].values
@@ -1120,7 +1130,7 @@ if __name__ == "__main__":
 #    sig_der_sort = calc_de_sort(obs_arr_sort, sim_arr_sort)
 #    sig_de_sort = calc_de(obs_arr_sort, sim_arr_sort, sort=False)
 #    plot_obs_sim(df_wrr2['Qobs'], df_wrr2['Qsim'])
-#    fdc_obs_sim(df_wrr2)
+#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #    fdc_obs_sort(df_wrr2)
 #    vis2d_de(obs_arr_sort, sim_arr_sort, sort=False)
 #

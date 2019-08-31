@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-diagnostic_model_efficiency module init code
+DE - Diagnosing model Efficiency
 """
+
+from __future__ import print_function, division, absolute_import
+from . import de
