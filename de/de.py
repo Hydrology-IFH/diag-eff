@@ -18,6 +18,7 @@ import matplotlib
 from matplotlib import cm
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
+import matplotlib.patches as mpatches
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
@@ -239,6 +240,8 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
         obs = np.sort(obs)[::-1]
         sim = np.sort(sim)[::-1]
     sim_obs_diff = np.subtract(sim, obs)
+    brel = np.divide(sim_obs_diff, obs)
+    mean_brel = np.mean(brel)
     y = np.divide(sim_obs_diff, obs)
     x = np.arange(len(y))
     ranks = x[::-1]
@@ -256,6 +259,7 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
         fig, ax = plt.subplots()
         ax.plot(prob_arr, y, 'b.', markersize=8)
         ax.plot(prob_arr, y_reg, 'r-')
+        ax.axhline(y=mean_brel, ls='--', color='blue', alpha=.8)
         ax.set(ylabel='$\mathregular{B_{rel}}$ [-]',
                xlabel='Exceedence probabilty [%]')
 
@@ -436,42 +440,38 @@ def vis2d_de(obs, sim, sort=True):
     ax.cla()
 
     # make the shaded regions for input errors
-    ix = [0, -x_lim, x_lim, 0]
-    iy = [0, y_lim, y_lim, 0]
+    ix = [0, -x_lim, x_lim, 0, -x_lim, x_lim, 0]
+    iy = [0, y_lim, y_lim, 0, -y_lim, -y_lim, 0]
     verts = [(0, 0), *zip(ix, iy), (0, 0)]
     poly = Polygon(verts, facecolor='plum', edgecolor=None, alpha=.3)
     ax.add_patch(poly)
 
-    ix = [0, -x_lim, x_lim, 0]
-    iy = [0, -y_lim, -y_lim, 0]
+    # make the shaded regions for model errors
+    ix = [0, -x_lim, -x_lim, 0, x_lim, x_lim, 0]
+    iy = [0, y_lim, -y_lim, 0, -y_lim, y_lim, 0]
     verts = [(0, 0), *zip(ix, iy), (0, 0)]
-    poly1 = Polygon(verts, facecolor='plum', edgecolor=None, alpha=.3)
+    poly1 = Polygon(verts, facecolor='silver', edgecolor=None, alpha=.3)
     ax.add_patch(poly1)
 
-    # make the shaded regions for model errors
-    ix = [0, -x_lim, -x_lim, 0]
-    iy = [0, y_lim, -y_lim, 0]
-    verts = [(0, 0), *zip(ix, iy), (0, 0)]
-    poly2 = Polygon(verts, facecolor='0.9', edgecolor=None, alpha=.3)
-    ax.add_patch(poly2)
+    # im = ax.plot(x, y, c=rgba_color, linewidth=3)
+    im = ax.quiver(0, 0, bias_slope, bias_bal, color=rgba_color, scale=1, units='xy')
+    # arrow = mpatches.FancyArrowPatch((0, 0), (bias_slope, bias_bal),
+    #                                 color=rgba_color, mutation_scale=100,
+    #                                 arrowstyle='fancy')
 
-    ix = [0, x_lim, x_lim, 0]
-    iy = [0, -y_lim, y_lim, 0]
-    verts = [(0, 0), *zip(ix, iy), (0, 0)]
-    poly3 = Polygon(verts, facecolor='0.9', edgecolor=None, alpha=.3)
-    ax.add_patch(poly3)
-
-    im = ax.plot(x, y, c=rgba_color, linewidth=3)
-    ax.set_xlim([-x_lim , x_lim ])
+    # arrow = plt.Arrow(0, 0, bias_slope, bias_bal, facecolor=rgba_color,
+    #                   edgecolor='white', width=.5)
+    # ax.add_patch(arrow)
+    ax.set_xlim([-x_lim , x_lim])
     ax.set_ylim([-y_lim, y_lim])
     ax.axhline(y=0, ls="-", c=".1", alpha=.5)
     ax.axvline(x=0, ls="-", c=".1", alpha=.5)
-    ax.plot([-x_lim , x_lim], [-y_lim, y_lim], ls="--", c=".3")
-    ax.plot([-x_lim , x_lim ], [y_lim, -y_lim], ls="--", c=".3")
-    ax.set(ylabel='Bias balance [-]',
-           xlabel='Bias slope [-]')
-    ax.text(bias_slope/2, bias_bal/2, 'DE = {}'.format(sig))
-    fig.colorbar(dummie_cax, orientation='vertical', label='Temporal correlation [-]')
+    # ax.plot([-x_lim , x_lim], [-y_lim, y_lim], ls="--", c=".3")
+    # ax.plot([-x_lim , x_lim ], [y_lim, -y_lim], ls="--", c=".3")
+    ax.set(ylabel='$B_{bal}$ [-]',
+           xlabel='$B_{slope}$  [-]')
+    ax.text(bias_slope*.5, (bias_bal*.3), 'DE = {}'.format(sig))
+    fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
 
 def vis2d_kge(obs, sim):
     """
@@ -517,19 +517,26 @@ def vis2d_kge(obs, sim):
     # Clear axis
     ax.cla()
 
-    im = ax.plot(x, y, c=rgba_color, linewidth=3)
+    # im = ax.plot(x, y, c=rgba_color, linewidth=3)
+    # arrow = mpatches.FancyArrowPatch((0, 0), (kge_gamma - 1, kge_beta - 1),
+    #                                 color=rgba_color, mutation_scale=100,
+    #                                 arrowstyle='fancy')
+    # arrow = mpatches.FancyArrow(0, 0, kge_gamma - 1, kge_beta - 1, facecolor=rgba_color,
+    #                   edgecolor='white', width=.01)
+    # ax.add_patch(arrow)
+    im = ax.quiver(0, 0, kge_gamma - 1, kge_beta - 1, color=rgba_color, scale=1, units='xy')
     ax.set_xlim([-x_lim , x_lim ])
     ax.set_ylim([-y_lim , y_lim ])
     ax.axhline(y=0, ls="-", c=".1", alpha=.5)
     ax.axvline(x=0, ls="-", c=".1", alpha=.5)
     ax.plot([-x_lim , x_lim], [-y_lim , y_lim], ls="--", c=".3")
     ax.plot([-x_lim , x_lim ], [y_lim , -y_lim], ls="--", c=".3")
-    ax.set(ylabel=r'$KGE_{\beta}$ [-]',
-           xlabel=r'$KGE_{\gamma}$ [-]')
-    ax.text((kge_gamma - 1)/2, (kge_beta - 1)/2, 'KGE = {}'.format(sig))
-    fig.colorbar(dummie_cax, orientation='vertical', label='Temporal correlation [-]')
+    ax.set(ylabel=r'$\beta$ [-]',
+           xlabel=r'$\gamma$ [-]')
+    ax.text((kge_gamma - 1)*.5, ((kge_beta - 1)/2)*.3, 'KGE = {}'.format(sig))
+    fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
 
-def pos_shift_ts(obs, offset=1.5, multi=True):
+def pos_shift_ts(ts, offset=1.5, multi=True):
     """
     Precipitation overestimation.
 
@@ -554,9 +561,9 @@ def pos_shift_ts(obs, offset=1.5, multi=True):
     else:
         shift_pos = ts + offset
 
-    return shift_ps
+    return shift_pos
 
-def neg_shift_obs(ts, offset=0.5, multi=True):
+def neg_shift_ts(ts, offset=0.5, multi=True):
     """
     Precipitation underestimation.
 
