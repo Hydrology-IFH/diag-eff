@@ -37,6 +37,8 @@ __license__ = 'GNU GPLv3'
 
 #TODO: match Qsim to Qobs
 #TODO: zero values in Qobs calculating rel. bias
+#TODO: std and pearson for KGE
+#TODO: conversion to angles
 
 _mmd = '[mm $\mathregular{d^{-1}}$]'
 _m3s = '[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]'
@@ -265,7 +267,7 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
 
     return bias_slope, score
 
-def calc_temp_cor(obs, sim):
+def calc_temp_cor(obs, sim, r='spearman'):
     """
     Calculate temporal correlation between observed and simulated
     time series.
@@ -278,16 +280,29 @@ def calc_temp_cor(obs, sim):
     sim : array_like
         simulated time series
 
+    r : str, default 'spearman'
+        either spearman correlation coefficient ('spearman') or pearson
+        correlation coefficient ('pearson') can be used to describe temporal
+        correlation
+
     Returns
     ----------
     temp_cor : float
         rank correlation between observed and simulated time series
     """
-    r = sp.stats.spearmanr(obs, sim)
-    temp_cor = r[0]
+    if r == 'spearman':
+        r = sp.stats.spearmanr(obs, sim)
+        temp_cor = r[0]
 
-    if np.isnan(temp_cor):
-        temp_cor = 0
+        if np.isnan(temp_cor):
+            temp_cor = 0
+
+    elif r == 'pearson':
+        r = sp.stats.spearmanr(obs, sim)
+        temp_cor = r[0]
+
+        if np.isnan(temp_cor):
+            temp_cor = 0
 
     return temp_cor
 
@@ -341,7 +356,7 @@ def calc_de_sort(obs, sim):
 
     return sig
 
-def calc_kge(obs, sim):
+def calc_kge(obs, sim, r='spearman', gamma='cv'):
     """
     Calculate Kling-Gupta-Efficiency (KGE).
 
@@ -353,22 +368,53 @@ def calc_kge(obs, sim):
     sim : array_like
         simulated time series
 
+    r : str, default 'spearman'
+        either spearman correlation coefficient ('spearman', Pool et al. 2018)
+        or pearson correlation coefficient ('pearson'; Gupta et al. 2009,
+        Kling et al. 2012) can be used to describe temporal correlation
+
+    gamma : str, default 'cv'
+        either coefficient of variation ('cv'; Kling et al. 2012) or standard
+        deviation ('std'; Gupta et al. 2009, Pool et al. 2018) to describe the
+        gamma term
+
     Returns
     ----------
     sig : float
         Kling-Gupta-Efficiency measure
+
+    References
+    ----------
+    Gupta, H. V., Kling, H., Yilmaz, K. K., and Martinez, G. F.: Decomposition
+    of the mean squared error and NSE performance criteria: Implications for
+    improving hydrological modelling, Journal of Hydrology, 377, 80-91,
+    10.1016/j.jhydrol.2009.08.003, 2009.
+
+    Kling, H., Fuchs, M., and Paulin, M.: Runoff conditions in the upper
+    Danube basin under an ensemble of climate change scenarios, Journal of
+    Hydrology, 424-425, 264-277, 10.1016/j.jhydrol.2012.01.011, 2012.
+
+    Pool, S., Vis, M., and Seibert, J.: Evaluating model performance: towards a
+    non-parametric variant of the Kling-Gupta efficiency, Hydrological Sciences
+    Journal, 63, 1941-1953, 10.1080/02626667.2018.1552002, 2018.
     """
     obs_mean = np.mean(obs)
     sim_mean = np.mean(sim)
     kge_beta = sim_mean/obs_mean
 
-    obs_std = np.std(obs)
-    sim_std = np.std(sim)
-    obs_cv = obs_std/obs_mean
-    sim_cv = sim_std/sim_mean
-    kge_gamma = sim_cv/obs_cv
+    if gamma == 'cv':
+        obs_std = np.std(obs)
+        sim_std = np.std(sim)
+        obs_cv = obs_std/obs_mean
+        sim_cv = sim_std/sim_mean
+        kge_gamma = sim_cv/obs_cv
 
-    temp_cor = calc_temp_cor(obs, sim)
+    elif gamma == 'std':
+        obs_std = np.std(obs)
+        sim_std = np.std(sim)
+        kge_gamma = sim_std/obs_std
+
+    temp_cor = calc_temp_cor(obs, sim, r=r)
 
     sig = 1 - np.sqrt((kge_beta - 1)**2 + (kge_gamma- 1)**2  + (temp_cor - 1)**2)
 
