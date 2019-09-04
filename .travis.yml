@@ -28,6 +28,8 @@ matrix:
         - pip3 install -U pip
         - pip3 install -U pytest
         - pip3 install codecov
+      install:
+        - pip3 install ".[test]"
       script: python3 -m pytest --cov=./  # run tests
       # -t only for private repos
       after_success: python3 -m codecov -t cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76
@@ -46,7 +48,6 @@ before_install:
   - python --version
   - pip install --upgrade pip
 install:
-  - pip install pytest pytest-cov codecov wheel
   - pip install ".[test]"   # install package + test dependencies
 script:
   - pytest --cov=./  # run tests
