@@ -49,6 +49,6 @@ setup(
         'matplotlib',
         'seaborn',
         'sklearn',
-        'pandas>=0.18.0',
+        'pandas',
     ],
 )
