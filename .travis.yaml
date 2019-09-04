@@ -11,11 +11,11 @@ matrix:
       osx_image: xcode10.3  # Python 3.7.4 running on macOS 10.14.6
       language: shell       # 'language: python' is an error on Travis CI macOS
       before_install:
-        - python3 --version
-        - pip3 install -U pip
-        - pip3 install -U pytest
-        - pip3 install codecov
-      script: python3 -m pytest
+        - python --version
+        - pip install -U pip
+        - pip install -U pytest
+        - pip install codecov
+      script: python -m pytest
       env:
         - CODECOV_TOKEN=cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76  #IF ONLY YOU HAVE A PRIVATE REPOSITORY
       after_success:
