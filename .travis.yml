@@ -15,9 +15,9 @@ matrix:
         - pip3 install -U pip
         - pip3 install -U pytest
         - pip3 install codecov
-      script: python -m pytest
+      script: python 3 -m pytest
       env:
-        - CODECOV_TOKEN=cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76  #IF ONLY YOU HAVE A PRIVATE REPOSITORY
+        - CODECOV_TOKEN=<cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76>  # ONLY YOU HAVE A PRIVATE REPOSITORY
       after_success:
         - codecov
       #  ====== WINDOWS ========
@@ -41,6 +41,6 @@ install:
 script:
   - pytest  # run tests
 env:
-  - CODECOV_TOKEN=cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76  #IF ONLY YOU HAVE A PRIVATE REPOSITORY
+  - CODECOV_TOKEN=<cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76>  # ONLY YOU HAVE A PRIVATE REPOSITORY
 after_success:
   - codecov  # submit coverage
