@@ -14,13 +14,11 @@ matrix:
       before_install:
         - python --version
         - pip3 install -U pip
-        - pip3 install -U pytest
-        - pip3 install codecov
+      install:
+        - pip3 install -U pytest pytest-cov codecov wheel
       script: python3 -m pytest
-      env:
-        - CODECOV_TOKEN=<cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76>  # ONLY YOU HAVE A PRIVATE REPOSITORY
       after_success:
-        - codecov
+        - codecov -t cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76  # submit coverage
       #  ====== WINDOWS ========
     - name: "Python 3.7.4 on Windows"
       os: windows           # Windows 10.0.17134 N/A Build 17134
@@ -35,13 +33,12 @@ matrix:
 before_install:
   - python --version
   - pip3 install --upgrade pip
-  - pip3 install --upgrade pytest
-  - pip3 install codecov
 install:
+  - pip3 install -U pytest pytest-cov codecov wheel
   - pip3 install ".[test]"   # install package + test dependencies
 script:
   - pytest  # run tests
 env:
   - CODECOV_TOKEN=<cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76>  # ONLY YOU HAVE A PRIVATE REPOSITORY
 after_success:
-  - codecov  # submit coverage
+  - codecov -t cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76  # submit coverage
