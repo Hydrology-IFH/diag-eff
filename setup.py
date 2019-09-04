@@ -66,5 +66,5 @@ setup(
     install_requires=INSTALL_REQUIRES,
     extras_require={
         'test': TEST_REQUIRES + INSTALL_REQUIRES,
-    }
+    },
 )
