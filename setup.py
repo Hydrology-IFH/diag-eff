@@ -3,7 +3,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
-import versioneer
 
 long_description = """DE is an open-source toolbox written in Python to diagnose
 model performance. The toolbox provides functions to calculate the Diagnostic
