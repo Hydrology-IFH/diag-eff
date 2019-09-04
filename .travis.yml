@@ -1,24 +1,26 @@
 sudo: false
 language: python
+# ===== Linux =====
 dist: xenial
 python:
   - "3.6"
   - "3.7"
 matrix:
+  fast_finish: true
   include:
     # ======= OSX ========
-    - name: "Python 3.7.4 on macOS 10.14"
-      os: osx
-      osx_image: xcode10.3  # Python 3.7.4 running on macOS 10.14.6
-      language: shell       # 'language: python' is an error on Travis CI macOS
-      before_install:
-        - python3 --version
-        - pip3 install -U pip
-        - pip3 install -U pytest
-        - pip3 install codecov
-      script: python3 -m pytest --cov=./  # run tests
-      # -t only for private repos
-      after_success: python3 -m codecov -t cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76
+    # - name: "Python 3.7.4 on macOS 10.14"
+    #   os: osx
+    #   osx_image: xcode10.3  # Python 3.7.4 running on macOS 10.14.6
+    #   language: shell       # 'language: python' is an error on Travis CI macOS
+    #   before_install:
+    #     - python3 --version
+    #     - pip3 install -U pip
+    #     - pip3 install -U pytest
+    #     - pip3 install codecov
+    #   script: python3 -m pytest --cov=./  # run tests
+    #   # -t only for private repos
+    #   after_success: python3 -m codecov -t cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76
     - name: "Python 3.7.0 on macOS 10.13"
       os: osx
       osx_image: xcode10.1  # Python 3.7.4 running on macOS 10.13.6
@@ -47,6 +49,8 @@ matrix:
 before_install:
   - python --version
   - pip install --upgrade pip
+  - pip3 install --upgrade pytest
+  - pip3 install codecov
 install:
   - pip install ".[test]"   # install package + test dependencies
 script:
