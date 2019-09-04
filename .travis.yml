@@ -29,6 +29,7 @@ matrix:
         - python3 --version
         - pip3 install -U pip
         - pip3 install -U pytest
+        - pip3 install -U numpy
         - pip3 install codecov
       install:
         - pip3 install ".[test]"
@@ -48,7 +49,7 @@ matrix:
       env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 before_install:
   - python --version
-  - pip install --upgrade pip
+  - pip3 install --upgrade pip
   - pip3 install --upgrade pytest
   - pip3 install codecov
 install:
