@@ -30,10 +30,10 @@ matrix:
       env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 before_install:
   - python --version
-  - pip3 install --upgrade pip
+  - pip install --upgrade pip
 install:
-  - pip3 install -U pytest pytest-cov codecov wheel
-  - pip3 install ".[test]"   # install package + test dependencies
+  - pip install -U pytest pytest-cov codecov wheel
+  - pip install ".[test]"   # install package + test dependencies
 script:
   - pytest  # run tests
 after_success:
