@@ -37,7 +37,6 @@ install:
   - pip3 install ".[test]"   # install package + test dependencies
 script:
   - pytest  # run tests
-  # - codecov # submit coverage
 after success:
   - codecov # submit coverage
 # env:
