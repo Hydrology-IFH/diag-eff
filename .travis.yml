@@ -37,7 +37,4 @@ install:
   - pip3 install ".[test]"   # install package + test dependencies
 script:
   - pytest  # run tests
-after success:
   - codecov # submit coverage
-# env:
-#   - CODECOV_TOKEN="cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76"
