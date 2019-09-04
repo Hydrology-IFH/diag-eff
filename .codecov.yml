@@ -1,0 +1,9 @@
+codecov:
+  token: cd2a45f8-9f2d-4c5e-8a0e-187be9a91c76
+  notify:
+    require_ci_to_pass: yes
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
