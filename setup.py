@@ -60,9 +60,9 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-
+    python_requires=">=3.6",
     packages=find_packages(exclude=['docs']),
-
+    include_package_data=True,
     install_requires=INSTALL_REQUIRES,
     extras_require={
         'test': TEST_REQUIRES + INSTALL_REQUIRES,

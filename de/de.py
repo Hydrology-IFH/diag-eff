@@ -40,9 +40,9 @@ __license__ = 'GNU GPLv3'
 #TODO: std and pearson for KGE
 #TODO: conversion to angles
 
-_mmd = '[mm $\mathregular{d^{-1}}$]'
-_m3s = '[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]'
-_q_lab = '[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]'
+_mmd = r'[mm $d^{-1}$]'
+_m3s = r'[$m^{3}$ $s^{-1}$]'
+_q_lab = r'[$m^{3}$ $s^{-1}$]'
 
 def import_ts(path, sep=','):
     """
@@ -262,7 +262,7 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
         ax.plot(prob_arr, y, 'b.', markersize=8)
         ax.plot(prob_arr, y_reg, 'r-')
         ax.axhline(y=mean_brel, ls='--', color='blue', alpha=.8)
-        ax.set(ylabel='$\mathregular{B_{rel}}$ [-]',
+        ax.set(ylabel=r'$B_{rel}$ [-]',
                xlabel='Exceedence probabilty [%]')
 
     return bias_slope, score
@@ -514,8 +514,8 @@ def vis2d_de(obs, sim, sort=True):
     ax.axvline(x=0, ls="-", c=".1", alpha=.5)
     # ax.plot([-x_lim , x_lim], [-y_lim, y_lim], ls="--", c=".3")
     # ax.plot([-x_lim , x_lim ], [y_lim, -y_lim], ls="--", c=".3")
-    ax.set(ylabel='$B_{bal}$ [-]',
-           xlabel='$B_{slope}$  [-]')
+    ax.set(ylabel=r'$B_{bal}$ [-]',
+           xlabel=r'$B_{slope}$  [-]')
     ax.text(bias_slope*.5, (bias_bal*.3), 'DE = {}'.format(sig))
     fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
 
@@ -1003,7 +1003,7 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
     ax.plot(ts.index, ts.iloc[:, 0].values, color='blue')
     ax.plot(max_peak_ts.index, max_peak_ts.iloc[:, 0].values, 'r.')
     ax.plot(min_peak_ts.index, min_peak_ts.iloc[:, 0].values, 'g.')
-    ax.set(ylabel='[$\mathregular{m^{3}}$ $\mathregular{s^{-1}}$]',
+    ax.set(ylabel=r'[$m^{3}$ $s^{-1}$]',
            xlabel='Time [Days]')
 
 
