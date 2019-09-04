@@ -1,5 +1,9 @@
+"""Setup for the de package."""
+
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
+import versioneer
 
 long_description = """DE is an open-source toolbox written in Python to diagnose
 model performance. The toolbox provides functions to calculate the Diagnostic
@@ -12,6 +16,23 @@ hydrologic time series. These manipulations either mimick model errors or input
 data errors. Hence, deliver a proof of concept. Note that the data
 management of time series is handled using pandas data frame objects.
 """
+
+INSTALL_REQUIRES = [
+    'numpy',
+    'scipy',
+    'scikit-learn',
+    'matplotlib',
+    'seaborn',
+    'pandas',
+]
+TEST_REQUIRES = [
+    # testing and coverage
+    'pytest', 'coverage', 'pytest-cov',
+    # unmandatory dependencies of the package itself
+    'numpy',
+    # to be able to run `python setup.py checkdocs`
+    'collective.checkdocs', 'pygments',
+]
 
 setup(
     name='de',
@@ -43,12 +64,8 @@ setup(
 
     packages=find_packages(exclude=['docs']),
 
-    install_requires=[
-        'numpy',
-        'scipy',
-        'matplotlib',
-        'seaborn',
-        'sklearn',
-        'pandas',
-    ],
+    install_requires=INSTALL_REQUIRES,
+    extras_require={
+        'test': TEST_REQUIRES + INSTALL_REQUIRES,
+    }
 )
