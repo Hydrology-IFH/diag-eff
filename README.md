@@ -1,8 +1,8 @@
 # Diagnostic model efficiency
 
 ##### Development branch
-[![Build Status](https://travis-ci.org/schwemro/de.svg?branch=master)](https://travis-ci.org/schwemro/de)
-[![codecov](https://codecov.io/gh/schwemro/de/branch/master/graph/badge.svg)](https://codecov.io/gh/schwemro/de)
+[![Build Status](https://travis-ci.com/schwemro/de.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master)](https://travis-ci.com/schwemro/de)
+[![codecov](https://codecov.io/gh/schwemro/de.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master/graph/badge.svg)](https://codecov.io/gh/schwemro/de)
 
 This is a repository which contains the corresponding Python modules to diagnose
 model performance.
