@@ -24,6 +24,7 @@ from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 import scipy as sp
 from sklearn import linear_model
+from sklearn.utils import shuffle
 from sklearn.metrics import r2_score
 import seaborn as sns
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})  # controlling figure aesthetics
@@ -499,21 +500,14 @@ def vis2d_de(obs, sim, sort=True):
     poly1 = Polygon(verts, facecolor='silver', edgecolor=None, alpha=.3)
     ax.add_patch(poly1)
 
-    # im = ax.plot(x, y, c=rgba_color, linewidth=3)
-    im = ax.quiver(0, 0, bias_slope, bias_bal, color=rgba_color, scale=1, units='xy')
-    # arrow = mpatches.FancyArrowPatch((0, 0), (bias_slope, bias_bal),
-    #                                 color=rgba_color, mutation_scale=100,
-    #                                 arrowstyle='fancy')
-
-    # arrow = plt.Arrow(0, 0, bias_slope, bias_bal, facecolor=rgba_color,
-    #                   edgecolor='white', width=.5)
-    # ax.add_patch(arrow)
+    if (abs(bias_bal) > 0.05) or (abs(bias_slope) > 0.05):
+        im = ax.quiver(0, 0, bias_slope, bias_bal, color=rgba_color, scale=1, units='xy')
+    elif (abs(bias_bal) <= 0.05) and (abs(bias_slope) <= 0.05):
+        im = ax.plot(bias_slope, bias_bal, color=rgba_color, marker='.', markersize=25)
     ax.set_xlim([-x_lim , x_lim])
     ax.set_ylim([-y_lim, y_lim])
     ax.axhline(y=0, ls="-", c=".1", alpha=.5)
     ax.axvline(x=0, ls="-", c=".1", alpha=.5)
-    # ax.plot([-x_lim , x_lim], [-y_lim, y_lim], ls="--", c=".3")
-    # ax.plot([-x_lim , x_lim ], [y_lim, -y_lim], ls="--", c=".3")
     ax.set(ylabel=r'$B_{bal}$ [-]',
            xlabel=r'$B_{slope}$  [-]')
     ax.text(bias_slope*.5, (bias_bal*.3), 'DE = {}'.format(sig))
@@ -563,22 +557,18 @@ def vis2d_kge(obs, sim):
     # Clear axis
     ax.cla()
 
-    # im = ax.plot(x, y, c=rgba_color, linewidth=3)
-    # arrow = mpatches.FancyArrowPatch((0, 0), (kge_gamma - 1, kge_beta - 1),
-    #                                 color=rgba_color, mutation_scale=100,
-    #                                 arrowstyle='fancy')
-    # arrow = mpatches.FancyArrow(0, 0, kge_gamma - 1, kge_beta - 1, facecolor=rgba_color,
-    #                   edgecolor='white', width=.01)
-    # ax.add_patch(arrow)
-    im = ax.quiver(0, 0, kge_gamma - 1, kge_beta - 1, color=rgba_color, scale=1, units='xy')
+    if (abs(kge_gamma - 1) > 0.05) or (abs(kge_beta - 1) > 0.05):
+        im = ax.quiver(0, 0, kge_gamma - 1, kge_beta - 1, color=rgba_color, scale=1, units='xy')
+    elif (abs(kge_gamma - 1) <= 0.05) and (abs(kge_beta - 1) <= 0.05):
+        im = ax.plot(kge_gamma - 1, kge_beta - 1, color=rgba_color, marker='.', markersize=25)
     ax.set_xlim([-x_lim , x_lim ])
     ax.set_ylim([-y_lim , y_lim ])
     ax.axhline(y=0, ls="-", c=".1", alpha=.5)
     ax.axvline(x=0, ls="-", c=".1", alpha=.5)
     ax.plot([-x_lim , x_lim], [-y_lim , y_lim], ls="--", c=".3")
     ax.plot([-x_lim , x_lim ], [y_lim , -y_lim], ls="--", c=".3")
-    ax.set(ylabel=r'$\beta$ [-]',
-           xlabel=r'$\gamma$ [-]')
+    ax.set(ylabel=r'$\beta$ - 1 [-]',
+           xlabel=r'$\gamma$ - 1 [-]')
     ax.text((kge_gamma - 1)*.5, ((kge_beta - 1)/2)*.3, 'KGE = {}'.format(sig))
     fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
 
@@ -957,7 +947,7 @@ def highover_lowunder(ts, prop=0.5):
 
     return ts_disagg
 
-def time_shift(ts, tshift=5):
+def time_shift(ts, tshift=3, random=False):
     """
     Timing errors
 
@@ -970,17 +960,27 @@ def time_shift(ts, tshift=5):
         days by which time series is shifted. Both positive and negative
         time shift are possible.
 
+    random : boolean, default False
+        whether time series is shuffled or not.
+
     Returns
     ----------
     ts_shift : dataframe
         disaggregated time series
     """
-    ts_shift = ts.shift(periods=tshift, fill_value=0)
-    if tshift > 0:
-        ts_shift.iloc[:tshift, 0] = ts.iloc[:, 0].values[-tshift:]
+    if not random:
+        ts_shift = ts.shift(periods=tshift, fill_value=0)
+        if tshift > 0:
+            ts_shift.iloc[:tshift, 0] = ts.iloc[:, 0].values[-tshift:]
 
-    elif tshift < 0:
-        ts_shift.iloc[tshift:, 0] = ts.iloc[:, 0].values[:-tshift]
+        elif tshift < 0:
+            ts_shift.iloc[tshift:, 0] = ts.iloc[:, 0].values[:-tshift]
+
+    if random:
+        ts_shift = ts
+        y = ts_shift.iloc[:, 0].values
+        ys = shuffle(y, random_state=0)
+        ts_shift.iloc[:, 0] = ys
 
     return ts_shift
 
