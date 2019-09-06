@@ -16,6 +16,7 @@ import datetime as dt
 import numpy as np
 import matplotlib
 from matplotlib import cm
+from matplotlib.colors import ListedColormap
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 import matplotlib.patches as mpatches
@@ -23,23 +24,25 @@ import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 import scipy as sp
+import scipy.integrate as integrate
 from sklearn import linear_model
 from sklearn.utils import shuffle
 from sklearn.metrics import r2_score
 import seaborn as sns
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})  # controlling figure aesthetics
 
-__title__ = 'diagnostic_model_efficiency'
+__title__ = 'de'
 __version__ = '0.1'
 #__build__ = 0x001201
 __author__ = 'Robin Schwemmle'
 __license__ = 'GNU GPLv3'
 #__docformat__ = 'markdown'
 
+#TODO: consistent datatype
 #TODO: match Qsim to Qobs
 #TODO: zero values in Qobs calculating rel. bias
-#TODO: std and pearson for KGE
-#TODO: conversion to angles
+#TODO: colormap r
+#TODO: DE vs KGE, B_bal vs beta, B_slope vs gamma
 
 _mmd = r'[mm $d^{-1}$]'
 _m3s = r'[$m^{3}$ $s^{-1}$]'
@@ -248,14 +251,14 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
     y = np.divide(sim_obs_diff, obs)
     x = np.arange(len(y))
     ranks = x[::-1]
-    prob = [100*(ranks[i]/(len(y)+1)) for i in range(len(y))]
+    prob = [(ranks[i]/(len(y)+1)) for i in range(len(y))]
     prob_arr = np.asarray(prob[::-1])
     xx = prob_arr.reshape((-1, 1))
 
     lm = linear_model.LinearRegression()
     reg = lm.fit(xx, y)
     y_reg = reg.predict(xx)
-    bias_slope = reg.coef_[0]*100
+    bias_slope = reg.coef_[0]
     score = r2_score(y, y_reg)
 
     if plot:
@@ -264,11 +267,72 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
         ax.plot(prob_arr, y_reg, 'r-')
         ax.axhline(y=mean_brel, ls='--', color='blue', alpha=.8)
         ax.set(ylabel=r'$B_{rel}$ [-]',
-               xlabel='Exceedence probabilty [%]')
+               xlabel='Exceedence probabilty [-]')
 
     return bias_slope, score
 
-def calc_temp_cor(obs, sim, r='spearman'):
+def integrand(y, x):
+    """
+    Function to intergrate bias.
+
+    f(x)
+
+    Args
+    ----------
+    y : array_like
+        time series
+
+    x : float
+
+    Returns
+    ----------
+    y[i] : float
+
+    """
+    i = int(x * len(y))  # convert to index
+    return y[i]
+
+def calc_bias_slope(obs, sim, sort=True):
+    """
+    Calculate slope of bias balance.
+
+    Args
+    ----------
+    obs : array_like
+        observed time series
+
+    sim : array_like
+        simulated time series
+
+    sort : boolean, default True
+        if True time series are sorted by ascending order
+
+    Returns
+    ----------
+    b_slope : float
+        slope of linear regression
+    """
+    if sort:
+        obs = np.sort(obs)[::-1]
+        sim = np.sort(sim)[::-1]
+    # area below observed high flows
+    hf_obs_area = integrate.quad(lambda x: integrand(obs, x), 0, .25)
+    # area below simulated high flows
+    hf_sim_area = integrate.quad(lambda x: integrand(sim, x), 0, .25)
+    # area below observed low flows
+    lf_obs_area = integrate.quad(lambda x: integrand(obs, x), .75, 1)
+    # area below simulated low flows
+    lf_sim_area = integrate.quad(lambda x: integrand(sim, x), .75, 1)
+    # high flow ratio
+    hf_ratio = hf_sim_area[0]/hf_obs_area[0]
+    # low flow ratio
+    lf_ratio = lf_sim_area[0]/lf_obs_area[0]
+    # slope between high flow ratio and low flow ratio
+    b_slope = (hf_ratio - lf_ratio) * (-1)
+
+    return b_slope
+
+def calc_temp_cor(obs, sim, r='pearson'):
     """
     Calculate temporal correlation between observed and simulated
     time series.
@@ -281,7 +345,7 @@ def calc_temp_cor(obs, sim, r='spearman'):
     sim : array_like
         simulated time series
 
-    r : str, default 'spearman'
+    r : str, default 'pearson'
         either spearman correlation coefficient ('spearman') or pearson
         correlation coefficient ('pearson') can be used to describe temporal
         correlation
@@ -299,7 +363,7 @@ def calc_temp_cor(obs, sim, r='spearman'):
             temp_cor = 0
 
     elif r == 'pearson':
-        r = sp.stats.spearmanr(obs, sim)
+        r = sp.stats.pearsonr(obs, sim)
         temp_cor = r[0]
 
         if np.isnan(temp_cor):
@@ -328,7 +392,7 @@ def calc_de(obs, sim, sort=True):
         diagnostic efficiency measure
     """
     bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim, sort=sort)
-    bias_slope, _ = calc_fdc_bias_slope(obs, sim, sort=sort)
+    bias_slope = calc_bias_slope(obs, sim, sort=sort)
     temp_cor = calc_temp_cor(obs, sim)
     sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2  + (temp_cor - 1)**2)
 
@@ -352,12 +416,12 @@ def calc_de_sort(obs, sim):
         diagnostic efficiency measure
     """
     bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim, sort=False)
-    bias_slope, _ = calc_fdc_bias_slope(obs, sim, sort=False)
+    bias_slope = calc_bias_slope(obs, sim, sort=False)
     sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2)
 
     return sig
 
-def calc_kge(obs, sim, r='spearman', gamma='cv'):
+def calc_kge(obs, sim, r='pearson', var='std'):
     """
     Calculate Kling-Gupta-Efficiency (KGE).
 
@@ -369,12 +433,12 @@ def calc_kge(obs, sim, r='spearman', gamma='cv'):
     sim : array_like
         simulated time series
 
-    r : str, default 'spearman'
+    r : str, default 'pearson'
         either spearman correlation coefficient ('spearman', Pool et al. 2018)
         or pearson correlation coefficient ('pearson'; Gupta et al. 2009,
         Kling et al. 2012) can be used to describe temporal correlation
 
-    gamma : str, default 'cv'
+    var : str, default 'std'
         either coefficient of variation ('cv'; Kling et al. 2012) or standard
         deviation ('std'; Gupta et al. 2009, Pool et al. 2018) to describe the
         gamma term
@@ -401,23 +465,25 @@ def calc_kge(obs, sim, r='spearman', gamma='cv'):
     """
     obs_mean = np.mean(obs)
     sim_mean = np.mean(sim)
-    kge_beta = sim_mean/obs_mean
+    kge_alpha = sim_mean/obs_mean
 
-    if gamma == 'cv':
+    if var == 'cv':
         obs_std = np.std(obs)
         sim_std = np.std(sim)
         obs_cv = obs_std/obs_mean
         sim_cv = sim_std/sim_mean
         kge_gamma = sim_cv/obs_cv
+        temp_cor = calc_temp_cor(obs, sim, r=r)
 
-    elif gamma == 'std':
+        sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma - 1)**2  + (temp_cor - 1)**2)
+
+    elif var == 'std':
         obs_std = np.std(obs)
         sim_std = np.std(sim)
-        kge_gamma = sim_std/obs_std
+        kge_beta = sim_std/obs_std
+        temp_cor = calc_temp_cor(obs, sim, r=r)
 
-    temp_cor = calc_temp_cor(obs, sim, r=r)
-
-    sig = 1 - np.sqrt((kge_beta - 1)**2 + (kge_gamma- 1)**2  + (temp_cor - 1)**2)
+        sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta - 1)**2  + (temp_cor - 1)**2)
 
     return sig
 
@@ -461,7 +527,7 @@ def vis2d_de(obs, sim, sort=True):
         if True time series are sorted by ascending order
     """
     bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim, sort=sort)
-    bias_slope, _ = calc_fdc_bias_slope(obs, sim, sort=sort, plot=False)
+    bias_slope = calc_bias_slope(obs, sim, sort=sort)
     temp_cor = calc_temp_cor(obs, sim)
     sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2  + (temp_cor - 1)**2)
     sig = np.round(sig, decimals=2)
@@ -469,51 +535,65 @@ def vis2d_de(obs, sim, sort=True):
     y = np.array([0, bias_bal])
     x = np.array([0, bias_slope])
 
+    # create new colormap
+    top = cm.get_cmap('Oranges_r', 128)
+    bottom = cm.get_cmap('Greens', 128)
+
+    newcolors = np.vstack((top(np.linspace(0, 1, 128)),
+                           bottom(np.linspace(0, 1, 128))))
+    ogcmp = ListedColormap(newcolors, name='OrangeGreen')
+
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
-    rgba_color = cm.RdYlGn(norm(temp_cor))
+    rgba_color = ogcmp(norm(temp_cor))
 
-    x_lim = abs(np.round(bias_slope, decimals=0)) + .1
-    if x_lim < 1:
-        x_lim = 1.1
-
-    y_lim = 1.1
+    ax_lim = abs(np.round(bias_slope, decimals=0)) + .1
+    if ax_lim < 1:
+        ax_lim = 1.1
 
     fig, ax = plt.subplots()
     # Make dummie mappable
     c = np.arange(-1, 1.1, 0.1)
-    dummie_cax = ax.scatter(c, c, c=c, cmap=cm.RdYlGn)
+    dummie_cax = ax.scatter(c, c, c=c, cmap=ogcmp)
     # Clear axis
     ax.cla()
 
     # make the shaded regions for input errors
-    ix = [0, -x_lim, x_lim, 0, -x_lim, x_lim, 0]
-    iy = [0, y_lim, y_lim, 0, -y_lim, -y_lim, 0]
+    ix = [0, -ax_lim, ax_lim, 0, -ax_lim, ax_lim, 0]
+    iy = [0, ax_lim, ax_lim, 0, -ax_lim, -ax_lim, 0]
     verts = [(0, 0), *zip(ix, iy), (0, 0)]
     poly = Polygon(verts, facecolor='plum', edgecolor=None, alpha=.3)
     ax.add_patch(poly)
 
     # make the shaded regions for model errors
-    ix = [0, -x_lim, -x_lim, 0, x_lim, x_lim, 0]
-    iy = [0, y_lim, -y_lim, 0, -y_lim, y_lim, 0]
+    ix = [0, -ax_lim, -ax_lim, 0, ax_lim, ax_lim, 0]
+    iy = [0, ax_lim, -ax_lim, 0, -ax_lim, ax_lim, 0]
     verts = [(0, 0), *zip(ix, iy), (0, 0)]
     poly1 = Polygon(verts, facecolor='silver', edgecolor=None, alpha=.3)
     ax.add_patch(poly1)
 
+    # make contours for efficiency measure
+    delta = 0.05
+    xx = np.arange(-ax_lim+.1, ax_lim, delta)
+    yy = np.arange(-ax_lim+.1, ax_lim, delta)
+    XX, YY = np.meshgrid(xx, yy)
+    ZZ = 1 - np.sqrt((XX)**2 + (YY)**2)
+    cp = ax.contour(XX, YY, ZZ, colors='black', alpha=.5)
+    ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
+
     if (abs(bias_bal) > 0.05) or (abs(bias_slope) > 0.05):
         im = ax.quiver(0, 0, bias_slope, bias_bal, color=rgba_color, scale=1, units='xy')
     elif (abs(bias_bal) <= 0.05) and (abs(bias_slope) <= 0.05):
-        im = ax.plot(bias_slope, bias_bal, color=rgba_color, marker='.', markersize=25)
-    ax.set_xlim([-x_lim , x_lim])
-    ax.set_ylim([-y_lim, y_lim])
+        im = ax.plot(bias_slope, bias_bal, color=rgba_color, marker='.', markersize=20)
+    ax.set_xlim([-ax_lim , ax_lim])
+    ax.set_ylim([-ax_lim, ax_lim])
     ax.axhline(y=0, ls="-", c=".1", alpha=.5)
     ax.axvline(x=0, ls="-", c=".1", alpha=.5)
     ax.set(ylabel=r'$B_{bal}$ [-]',
            xlabel=r'$B_{slope}$  [-]')
-    ax.text(bias_slope*.5, (bias_bal*.3), 'DE = {}'.format(sig))
     fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
 
-def vis2d_kge(obs, sim):
+def vis2d_kge(obs, sim, r='pearson', var='std'):
     """
     2-D visualization of Kling-Gupta-Efficiency (KGE)
 
@@ -527,52 +607,109 @@ def vis2d_kge(obs, sim):
     """
     obs_mean = np.mean(obs)
     sim_mean = np.mean(sim)
-    kge_beta = sim_mean/obs_mean
+    kge_alpha = sim_mean/obs_mean
 
-    obs_std = np.std(obs)
-    sim_std = np.std(sim)
-    obs_cv = obs_std/obs_mean
-    sim_cv = sim_std/sim_mean
-    kge_gamma = sim_cv/obs_cv
+    if var == 'cv':
+        obs_std = np.std(obs)
+        sim_std = np.std(sim)
+        obs_cv = obs_std/obs_mean
+        sim_cv = sim_std/sim_mean
+        kge_gamma = sim_cv/obs_cv
+        temp_cor = calc_temp_cor(obs, sim, r=r)
 
-    temp_cor = calc_temp_cor(obs, sim)
+        sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma- 1)**2  + (temp_cor - 1)**2)
+        sig = np.round(sig, decimals=2)
 
-    sig = 1 - np.sqrt((kge_beta - 1)**2 + (kge_gamma- 1)**2  + (temp_cor - 1)**2)
-    sig = np.round(sig, decimals=2)
+        y = np.array([0, kge_alpha - 1])
+        x = np.array([0, kge_gamma - 1])
 
-    y = np.array([0, kge_beta - 1])
-    x = np.array([0, kge_gamma - 1])
+        # convert temporal correlation to color
+        norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
+        rgba_color = cm.RdYlGn(norm(temp_cor))
 
-    # convert temporal correlation to color
-    norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
-    rgba_color = cm.RdYlGn(norm(temp_cor))
+        x_lim = 1.1
+        y_lim = 1.1
 
-    x_lim = 1.1
-    y_lim = 1.1
+        fig, ax = plt.subplots()
+        # Make dummie mappable
+        c = np.arange(-1, 1.1, 0.1)
+        dummie_cax = ax.scatter(c, c, c=c, cmap=cm.RdYlGn)
+        # Clear axis
+        ax.cla()
 
-    fig, ax = plt.subplots()
-    # Make dummie mappable
-    c = np.arange(-1, 1.1, 0.1)
-    dummie_cax = ax.scatter(c, c, c=c, cmap=cm.RdYlGn)
-    # Clear axis
-    ax.cla()
+        # make contours for efficiency measure
+        delta = 0.05
+        xx = np.arange(-x_lim+.1, x_lim, delta)
+        yy = np.arange(-y_lim+.1, y_lim, delta)
+        XX, YY = np.meshgrid(xx, yy)
+        ZZ = 1 - np.sqrt((XX)**2 + (YY)**2)
+        cp = ax.contour(XX, YY, ZZ, colors='black', alpha=.5)
+        ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
 
-    if (abs(kge_gamma - 1) > 0.05) or (abs(kge_beta - 1) > 0.05):
-        im = ax.quiver(0, 0, kge_gamma - 1, kge_beta - 1, color=rgba_color, scale=1, units='xy')
-    elif (abs(kge_gamma - 1) <= 0.05) and (abs(kge_beta - 1) <= 0.05):
-        im = ax.plot(kge_gamma - 1, kge_beta - 1, color=rgba_color, marker='.', markersize=25)
-    ax.set_xlim([-x_lim , x_lim ])
-    ax.set_ylim([-y_lim , y_lim ])
-    ax.axhline(y=0, ls="-", c=".1", alpha=.5)
-    ax.axvline(x=0, ls="-", c=".1", alpha=.5)
-    ax.plot([-x_lim , x_lim], [-y_lim , y_lim], ls="--", c=".3")
-    ax.plot([-x_lim , x_lim ], [y_lim , -y_lim], ls="--", c=".3")
-    ax.set(ylabel=r'$\beta$ - 1 [-]',
-           xlabel=r'$\gamma$ - 1 [-]')
-    ax.text((kge_gamma - 1)*.5, ((kge_beta - 1)/2)*.3, 'KGE = {}'.format(sig))
-    fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
+        if (abs(kge_alpha - 1) > 0.05) or (abs(kge_gamma- 1) > 0.05):
+            im = ax.quiver(0, 0, kge_gamma - 1, kge_alpha - 1, color=rgba_color, scale=1, units='xy')
+        elif (abs(kge_alpha - 1) <= 0.05) and (abs(kge_gamma - 1) <= 0.05):
+            im = ax.plot(kge_gamma - 1, kge_alpha - 1, color=rgba_color, marker='.', markersize=20)
+        ax.set_xlim([-x_lim , x_lim ])
+        ax.set_ylim([-y_lim , y_lim ])
+        ax.axhline(y=0, ls="-", c=".1", alpha=.5)
+        ax.axvline(x=0, ls="-", c=".1", alpha=.5)
+        # ax.plot([-x_lim , x_lim], [-y_lim , y_lim], ls="--", c=".3")
+        # ax.plot([-x_lim , x_lim ], [y_lim , -y_lim], ls="--", c=".3")
+        ax.set(ylabel=r'$\alpha$ - 1 [-]',
+               xlabel=r'$\gamma$ - 1 [-]')
+        fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
 
-def pos_shift_ts(ts, offset=1.5, multi=True):
+    elif var == 'std':
+        obs_std = np.std(obs)
+        sim_std = np.std(sim)
+        kge_beta = sim_std/obs_std
+        temp_cor = calc_temp_cor(obs, sim, r=r)
+
+        sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta- 1)**2  + (temp_cor - 1)**2)
+        sig = np.round(sig, decimals=2)
+
+        y = np.array([0, kge_alpha - 1])
+        x = np.array([0, kge_beta - 1])
+
+        # convert temporal correlation to color
+        norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
+        rgba_color = cm.RdYlGn(norm(temp_cor))
+
+        x_lim = 1.1
+        y_lim = 1.1
+
+        fig, ax = plt.subplots()
+        # Make dummie mappable
+        c = np.arange(-1, 1.1, 0.1)
+        dummie_cax = ax.scatter(c, c, c=c, cmap=cm.RdYlGn)
+        # Clear axis
+        ax.cla()
+
+        # make contours for efficiency measure
+        delta = 0.05
+        xx = np.arange(-x_lim+.1, x_lim, delta)
+        yy = np.arange(-y_lim+.1, y_lim, delta)
+        XX, YY = np.meshgrid(xx, yy)
+        ZZ = 1 - np.sqrt((XX)**2 + (YY)**2)
+        cp = ax.contour(XX, YY, ZZ, colors='black', alpha=.5)
+        ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
+
+        if (abs(kge_alpha - 1) > 0.05) or (abs(kge_beta - 1) > 0.05):
+            im = ax.quiver(0, 0, kge_beta - 1, kge_alpha - 1, color=rgba_color, scale=1, units='xy')
+        elif (abs(kge_alpha - 1) <= 0.05) and (abs(kge_beta - 1) <= 0.05):
+            im = ax.plot(kge_beta - 1, kge_alpha - 1, color=rgba_color, marker='.', markersize=20)
+        ax.set_xlim([-x_lim , x_lim ])
+        ax.set_ylim([-y_lim , y_lim ])
+        ax.axhline(y=0, ls="-", c=".1", alpha=.5)
+        ax.axvline(x=0, ls="-", c=".1", alpha=.5)
+        # ax.plot([-x_lim , x_lim], [-y_lim , y_lim], ls="--", c=".3")
+        # ax.plot([-x_lim , x_lim ], [y_lim , -y_lim], ls="--", c=".3")
+        ax.set(ylabel=r'$\alpha$ - 1 [-]',
+               xlabel=r'$\beta$ - 1 [-]')
+        fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
+
+def pos_shift_ts(ts, offset=1.25, multi=True):
     """
     Precipitation overestimation.
 
@@ -583,7 +720,7 @@ def pos_shift_ts(ts, offset=1.5, multi=True):
     ts : array_like
         observed time series
 
-    offset : float, int, default 1.5
+    offset : float, int, default 1.25
         offset multiplied/added to time series. If multi true, offset
         has to be greater than 1.
 
@@ -599,7 +736,7 @@ def pos_shift_ts(ts, offset=1.5, multi=True):
 
     return shift_pos
 
-def neg_shift_ts(ts, offset=0.5, multi=True):
+def neg_shift_ts(ts, offset=0.75, multi=True):
     """
     Precipitation underestimation.
 
@@ -610,7 +747,7 @@ def neg_shift_ts(ts, offset=0.5, multi=True):
     ts : array_like
         time series
 
-    offset : float, int, default 0.5
+    offset : float, int, default 0.75
         offset multiplied/subtracted to time series. If multi true, offset
         has to be less than 1.
 
@@ -639,7 +776,7 @@ def smooth_ts(ts, win=5):
 
     Args
     ----------
-    ts : array_like
+    ts : dataframe
         time series
 
     win : int, default 5
@@ -665,7 +802,7 @@ def highunder_lowover(ts, prop=0.5):
 
     Args
     ----------
-    ts : array_like
+    ts : dataframe
         observed time series
 
     Returns
@@ -1008,11 +1145,11 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
 
 
 # if __name__ == "__main__":
-    # path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/9960682_Q_1970_2012.csv'
+#    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/9960682_Q_1970_2012.csv'
 ##    path = '/Users/robo/Desktop/PhD/de/examples/data/9960682_Q_1970_2012.csv'
 
-    # import observed time series
-    # df_ts = import_ts(path, sep=';')
+#    # import observed time series
+#    df_ts = import_ts(path, sep=';')
 #    plot_ts(df_ts)
 
 #    # peak detection
@@ -1035,6 +1172,24 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
 #
 #    obs_arr = obs_sim['Qobs'].values
 #    sim_arr = obs_sim['Qsim'].values
+
+#    sig_de = calc_de(obs_arr, sim_arr)
+#    sig_kge = calc_kge(obs_arr, sim_arr)
+#    sig_nse = calc_nse(obs_arr, sim_arr)
+#
+#    vis2d_de(obs_arr, sim_arr)
+#    vis2d_kge(obs_arr, sim_arr)
+
+#    ### increase high flows - decrease low flows ###
+#    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
+#    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
+#    tsd = highover_lowunder(df_ts.copy(), prop=.99)
+#    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0]  # disaggregated time series
+#    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
+#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
+#
+#    obs_arr = obs_sim['Qobs'].values
+#    sim_arr = obs_sim['Qsim'].values
 #
 #    sig_de = calc_de(obs_arr, sim_arr)
 #    sig_kge = calc_kge(obs_arr, sim_arr)
@@ -1042,25 +1197,7 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
 #
 #    vis2d_de(obs_arr, sim_arr)
 #    vis2d_kge(obs_arr, sim_arr)
-    #
-    # ### increase high flows - decrease low flows ###
-    # obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-    # obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    # tsd = highover_lowunder(df_ts.copy(), prop=0.5)
-    # obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0]  # disaggregated time series
-    # plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-    # fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-    #
-    # obs_arr = obs_sim['Qobs'].values
-    # sim_arr = obs_sim['Qsim'].values
-    #
-    # sig_de = calc_de(obs_arr, sim_arr)
-    # sig_kge = calc_kge(obs_arr, sim_arr)
-    # sig_nse = calc_nse(obs_arr, sim_arr)
-    #
-    # vis2d_de(obs_arr, sim_arr)
-    # vis2d_kge(obs_arr, sim_arr)
-    #
+
     # obs_sim_sort = sort_obs(obs_sim)
     # obs_arr_sort = obs_sim_sort['Qobs'].values
     # sim_arr_sort = obs_sim_sort['Qsim'].values
@@ -1107,7 +1244,7 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
 #    ### precipitation surplus ###
 #    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
 #    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    obs_sim.loc[:, 'Qsim'] = pos_shift_obs(df_ts['Qobs'].values)  # positive offset
+#    obs_sim.loc[:, 'Qsim'] = pos_shift_ts(df_ts['Qobs'].values)  # positive offset
 #    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #
@@ -1124,7 +1261,7 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
 #    ### precipitation shortage ###
 #    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
 #    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    obs_sim.loc[:, 'Qsim'] = neg_shift_obs(df_ts['Qobs'].values)  # negative offset
+#    obs_sim.loc[:, 'Qsim'] = neg_shift_ts(df_ts['Qobs'].values)  # negative offset
 #    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #
@@ -1158,11 +1295,11 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
 #    vis2d_kge(obs_arr, sim_arr)
 
 
-    ### Tier-1 ###
-#    path_wrr1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/examples/GRDC_4103631_wrr1.csv'
+#    ### Tier-1 ###
+#    path_wrr1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/GRDC_4103631_wrr1.csv'
 #    df_wrr1 = import_ts(path_wrr1, sep=';')
+#    fdc_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
 #    plot_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
-#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
 #
 #    obs_arr = df_wrr1['Qobs'].values
 #    sim_arr = df_wrr1['Qsim'].values
@@ -1174,25 +1311,18 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
 #    vis2d_de(obs_arr, sim_arr)
 #    vis2d_kge(obs_arr, sim_arr)
 
-#    ### Tier-2 ###
-#    path_wrr2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/data/examples/GRDC_4103631_wrr2.csv'
-#    df_wrr2 = import_ts(path_wrr2, sep=';')
-#    df_wrr2_sort = sort_obs(df_wrr2)
-#    obs_arr_sort = df_wrr2_sort['Qobs'].values
-#    sim_arr_sort = df_wrr2_sort['Qsim'].values
-#    sig_der_sort = calc_de_sort(obs_arr_sort, sim_arr_sort)
-#    sig_de_sort = calc_de(obs_arr_sort, sim_arr_sort, sort=False)
-#    plot_obs_sim(df_wrr2['Qobs'], df_wrr2['Qsim'])
-#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sort(df_wrr2)
-#    vis2d_de(obs_arr_sort, sim_arr_sort, sort=False)
-#
-#    obs_arr = df_wrr2['Qobs'].values
-#    sim_arr = df_wrr2['Qsim'].values
-#
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
+   # ### Tier-2 ###
+   # path_wrr2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/GRDC_4103631_wrr2.csv'
+   # df_wrr2 = import_ts(path_wrr2, sep=';')
+   # fdc_obs_sim(df_wrr2['Qobs'], df_wrr2['Qsim'])
+   # plot_obs_sim(df_wrr2['Qobs'], df_wrr2['Qsim'])
+   #
+   # obs_arr = df_wrr2['Qobs'].values
+   # sim_arr = df_wrr2['Qsim'].values
+   #
+   # sig_de = calc_de(obs_arr, sim_arr)
+   # sig_kge = calc_kge(obs_arr, sim_arr)
+   # sig_nse = calc_nse(obs_arr, sim_arr)
+   #
+   # vis2d_de(obs_arr, sim_arr)
+   # vis2d_kge(obs_arr, sim_arr)
