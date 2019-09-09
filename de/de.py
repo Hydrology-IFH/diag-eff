@@ -183,9 +183,9 @@ def fdc_obs_sort(Q):
            xlabel='Exceedence probabilty [%]', yscale='log')
     ax.legend(loc=1)
 
-def calc_fdc_bias_balance(obs, sim, sort=True):
+def calc_brel_mean(obs, sim, sort=True):
     """
-    Calculate bias balance.
+    Calculate arithmetic mean of relative bias.
 
     Args
     ----------
@@ -236,7 +236,7 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
 
     Returns
     ----------
-    slope : float
+    b : float
         slope of linear regression
 
     score : float
@@ -258,7 +258,7 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
     lm = linear_model.LinearRegression()
     reg = lm.fit(xx, y)
     y_reg = reg.predict(xx)
-    bias_slope = reg.coef_[0]
+    b = reg.coef_[0]
     score = r2_score(y, y_reg)
 
     if plot:
@@ -269,7 +269,7 @@ def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
         ax.set(ylabel=r'$B_{rel}$ [-]',
                xlabel='Exceedence probabilty [-]')
 
-    return bias_slope, score
+    return b, score
 
 def integrand(y, x):
     """
@@ -332,6 +332,143 @@ def calc_bias_slope(obs, sim, sort=True):
 
     return b_slope
 
+def calc_hf_lf_ratio(obs, sim, sort=True):
+    """
+    Calculate high flow ratio and low flow ratio.
+
+    Args
+    ----------
+    obs : array_like
+        observed time series
+
+    sim : array_like
+        simulated time series
+
+    sort : boolean, default True
+        if True time series are sorted by ascending order
+
+    Returns
+    ----------
+    hf_ratio : float
+        high flow ratio
+
+    lf_ratio : float
+        low flow ratio
+    """
+    if sort:
+        obs = np.sort(obs)[::-1]
+        sim = np.sort(sim)[::-1]
+    # area below observed high flows
+    hf_obs_area = integrate.quad(lambda x: integrand(obs, x), 0, .25)
+    # area below simulated high flows
+    hf_sim_area = integrate.quad(lambda x: integrand(sim, x), 0, .25)
+    # area below observed low flows
+    lf_obs_area = integrate.quad(lambda x: integrand(obs, x), .75, 1)
+    # area below simulated low flows
+    lf_sim_area = integrate.quad(lambda x: integrand(sim, x), .75, 1)
+    # high flow ratio
+    hf_ratio = hf_sim_area[0]/hf_obs_area[0]
+    # low flow ratio
+    lf_ratio = lf_sim_area[0]/lf_obs_area[0]
+
+    return hf_ratio, lf_ratio
+
+def trans_hf_lf_ratio(hf_ratio, lf_ratio):
+    """
+    Transform high flow ratio and low flow ratio to make distances for
+    underestimation or overestimation, respectively, comparable.
+
+    Args
+    ----------
+    hf_ratio : float
+        high flow ratio
+
+    lf_ratio : float
+        low flow ratio
+
+    Returns
+    ----------
+    hf_trans : float
+        transformed high flow ratio
+
+    lf_trans : float
+        transformed low flow ratio
+    """
+    if hf_ratio >= 1:
+        hf_trans = hf_ratio
+    elif hf_ratio < 1:
+        hf_trans = 1/hf_ratio
+
+    if lf_ratio >= 1:
+        lf_trans = lf_ratio
+    elif lf_ratio < 1:
+        lf_trans = 1/lf_ratio
+
+    return hf_trans, lf_trans
+
+def calc_bias_dir(hf_trans, lf_trans):
+    """
+    Calculate slope of bias balance.
+
+    Args
+    ----------
+    hf_trans : float
+        transformed high flow ratio
+
+    lf_trans : float
+        transformed low flow ratio
+
+    Returns
+    ----------
+    b_dir : float
+        direction of bias
+    """
+    b_dir = (hf_trans - lf_trans) * (-1)
+
+    return b_dir
+
+def calc_bias_balance(hf_trans, lf_trans):
+    """
+    Calculate slope of bias balance.
+
+    Args
+    ----------
+    hf_trans : float
+        transformed high flow ratio
+
+    lf_trans : float
+        transformed low flow ratio
+
+    Returns
+    ----------
+    b_bal : float
+        balance of bias
+    """
+    b_bal = (hf_trans - 1) + (lf_trans - 1)
+
+    return b_bal
+
+# def calc_bias_balance(hf_trans, lf_trans):
+#     """
+#     Calculate slope of bias balance (alternative version).
+#
+#     Args
+#     ----------
+#     hf_trans : float
+#         transformed high flow ratio
+#
+#     lf_trans : float
+#         transformed low flow ratio
+#
+#     Returns
+#     ----------
+#     b_bal : float
+#         balance of bias
+#     """
+#     b_bal = ((hf_trans + lf_trans)/2) - 1
+#
+#     return b_bal
+
 def calc_temp_cor(obs, sim, r='pearson'):
     """
     Calculate temporal correlation between observed and simulated
@@ -391,10 +528,20 @@ def calc_de(obs, sim, sort=True):
     sig : float
         diagnostic efficiency measure
     """
-    bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim, sort=sort)
-    bias_slope = calc_bias_slope(obs, sim, sort=sort)
+    # mean relative bias
+    brel_mean, _ = calc_brel_mean(obs, sim, sort=sort)
+    # high flow ratios and low flow ratios
+    hf, lf = calc_hf_lf_ratio(obs, sim, sort=True)
+    # transform high flow ratios and low flow ratios
+    hf_trans, lf_trans = trans_hf_lf_ratio(hf, lf)
+    # direction of bias
+    b_dir = calc_bias_dir(hf_trans, lf_trans)
+    # bias balance
+    b_bal = calc_bias_balance(hf_trans, lf_trans)
+    # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
-    sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2  + (temp_cor - 1)**2)
+    # diagnostic efficiency
+    sig = 1 - np.sqrt((brel_mean)**2 + (b_bal)**2 + (b_dir)**2 + (temp_cor - 1)**2)
 
     return sig
 
@@ -415,9 +562,20 @@ def calc_de_sort(obs, sim):
     sig : float
         diagnostic efficiency measure
     """
-    bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim, sort=False)
-    bias_slope = calc_bias_slope(obs, sim, sort=False)
-    sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2)
+    # mean relative bias
+    brel_mean, _ = calc_brel_mean(obs, sim)
+    # high flow ratios and low flow ratios
+    hf, lf = calc_hf_lf_ratio(obs, sim, sort=True)
+    # transform high flow ratios and low flow ratios
+    hf_trans, lf_trans = trans_hf_lf_ratio(hf, lf)
+    # direction of bias
+    b_dir = calc_bias_dir(hf_trans, lf_trans)
+    # bias balance
+    b_bal = calc_bias_balance(hf_trans, lf_trans)
+    # bias slope
+    bias_slope = calc_bias_slope(b_dir, b_bal)
+    # diagnostic efficiency
+    sig = 1 - np.sqrt((brel_mean)**2 + (bias_slope)**2)
 
     return sig
 
@@ -463,10 +621,12 @@ def calc_kge(obs, sim, r='pearson', var='std'):
     non-parametric variant of the Kling-Gupta efficiency, Hydrological Sciences
     Journal, 63, 1941-1953, 10.1080/02626667.2018.1552002, 2018.
     """
+    # calculate alpha term
     obs_mean = np.mean(obs)
     sim_mean = np.mean(sim)
     kge_alpha = sim_mean/obs_mean
 
+    # calculate KGE with gamma term
     if var == 'cv':
         obs_std = np.std(obs)
         sim_std = np.std(sim)
@@ -477,6 +637,7 @@ def calc_kge(obs, sim, r='pearson', var='std'):
 
         sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma - 1)**2  + (temp_cor - 1)**2)
 
+    # calculate KGE with beta term
     elif var == 'std':
         obs_std = np.std(obs)
         sim_std = np.std(sim)
@@ -526,14 +687,21 @@ def vis2d_de(obs, sim, sort=True):
     sort : boolean, default True
         if True time series are sorted by ascending order
     """
-    bias_bal, sum_brel = calc_fdc_bias_balance(obs, sim, sort=sort)
-    bias_slope = calc_bias_slope(obs, sim, sort=sort)
+    # mean relative bias
+    brel_mean, _ = calc_brel_mean(obs, sim, sort=sort)
+    # high flow ratios and low flow ratios
+    hf, lf = calc_hf_lf_ratio(obs, sim, sort=sort)
+    # transform high flow ratios and low flow ratios
+    hf_trans, lf_trans = trans_hf_lf_ratio(hf, lf)
+    # direction of bias
+    b_dir = calc_bias_dir(hf_trans, lf_trans)
+    # bias balance
+    b_bal = calc_bias_balance(hf_trans, lf_trans)
+    # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
-    sig = 1 - np.sqrt((bias_bal)**2 + (bias_slope)**2  + (temp_cor - 1)**2)
+    # diagnostic efficiency
+    sig = 1 - np.sqrt((brel_mean)**2 + (b_bal)**2 + (b_dir)**2 + (temp_cor - 1)**2)
     sig = np.round(sig, decimals=2)
-
-    y = np.array([0, bias_bal])
-    x = np.array([0, bias_slope])
 
     # create new colormap
     top = cm.get_cmap('Oranges_r', 128)
@@ -547,7 +715,7 @@ def vis2d_de(obs, sim, sort=True):
     norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
     rgba_color = ogcmp(norm(temp_cor))
 
-    ax_lim = abs(np.round(bias_slope, decimals=0)) + .1
+    ax_lim = abs(np.round(b_dir, decimals=0)) + .1
     if ax_lim < 1:
         ax_lim = 1.1
 
@@ -577,20 +745,20 @@ def vis2d_de(obs, sim, sort=True):
     xx = np.arange(-ax_lim+.1, ax_lim, delta)
     yy = np.arange(-ax_lim+.1, ax_lim, delta)
     XX, YY = np.meshgrid(xx, yy)
-    ZZ = 1 - np.sqrt((XX)**2 + (YY)**2)
+    ZZ = 1 - np.sqrt((XX)**2 + (YY)**2 + (YY)**2)
     cp = ax.contour(XX, YY, ZZ, colors='black', alpha=.5)
     ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
 
-    if (abs(bias_bal) > 0.05) or (abs(bias_slope) > 0.05):
-        im = ax.quiver(0, 0, bias_slope, bias_bal, color=rgba_color, scale=1, units='xy')
-    elif (abs(bias_bal) <= 0.05) and (abs(bias_slope) <= 0.05):
-        im = ax.plot(bias_slope, bias_bal, color=rgba_color, marker='.', markersize=20)
+    if (abs(brel_mean) > 0.05) or (abs(b_dir) > 0.05):
+        im = ax.quiver(0, 0, b_dir, brel_mean, color=rgba_color, scale=1, units='xy')
+    elif (abs(brel_mean) <= 0.05) and (abs(b_dir) <= 0.05):
+        im = ax.plot(b_dir, brel_mean, color=rgba_color, marker='.', markersize=20)
     ax.set_xlim([-ax_lim , ax_lim])
     ax.set_ylim([-ax_lim, ax_lim])
     ax.axhline(y=0, ls="-", c=".1", alpha=.5)
     ax.axvline(x=0, ls="-", c=".1", alpha=.5)
-    ax.set(ylabel=r'$B_{bal}$ [-]',
-           xlabel=r'$B_{slope}$  [-]')
+    ax.set(ylabel=r'$\overline{B_{rel}}$ [-]',
+           xlabel=r'$B_{dir}$  [-]')
     fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
 
 def vis2d_kge(obs, sim, r='pearson', var='std'):
@@ -605,10 +773,12 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
     sim : array_like
         simulated time series
     """
+    # calculate alpha term
     obs_mean = np.mean(obs)
     sim_mean = np.mean(sim)
     kge_alpha = sim_mean/obs_mean
 
+    # calculate gamma term
     if var == 'cv':
         obs_std = np.std(obs)
         sim_std = np.std(sim)
@@ -619,9 +789,6 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
 
         sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma- 1)**2  + (temp_cor - 1)**2)
         sig = np.round(sig, decimals=2)
-
-        y = np.array([0, kge_alpha - 1])
-        x = np.array([0, kge_gamma - 1])
 
         # convert temporal correlation to color
         norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
@@ -660,6 +827,7 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
                xlabel=r'$\gamma$ - 1 [-]')
         fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
 
+    # calculate beta term
     elif var == 'std':
         obs_std = np.std(obs)
         sim_std = np.std(sim)
@@ -668,9 +836,6 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
 
         sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta- 1)**2  + (temp_cor - 1)**2)
         sig = np.round(sig, decimals=2)
-
-        y = np.array([0, kge_alpha - 1])
-        x = np.array([0, kge_beta - 1])
 
         # convert temporal correlation to color
         norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
