@@ -375,6 +375,76 @@ def calc_hf_lf_ratio(obs, sim, sort=True):
 
     return hf_ratio, lf_ratio
 
+def calc_hf_lf_b_area(obs, sim, sort=True):
+    """
+    Calculate absolute bias area for high flow and low flow.
+
+    Args
+    ----------
+    obs : array_like
+        observed time series
+
+    sim : array_like
+        simulated time series
+
+    sort : boolean, default True
+        if True time series are sorted by ascending order
+
+    Returns
+    ----------
+    hf_b_area : float
+        bias area for high flow
+
+    lf_b_area : float
+        bias area for low flow
+    """
+    if sort:
+        obs = np.sort(obs)[::-1]
+        sim = np.sort(sim)[::-1]
+    sim_obs_diff = np.subtract(sim, obs)
+    brel = np.divide(sim_obs_diff, obs)
+    brel_abs = abs(brel)
+    # area below observed high flows
+    hf_area = integrate.quad(lambda x: integrand(brel_abs, x), 0, .25)
+    # area below observed low flows
+    lf_area = integrate.quad(lambda x: integrand(brel_abs, x), .75, 1)
+
+    hf_b_area = hf_area[0]
+    lf_b_area = lf_area[0]
+
+    return hf_b_area, lf_b_area
+
+def calc_b_area(obs, sim, sort=True):
+    """
+    Calculate absolute bias area for high flow and low flow.
+
+    Args
+    ----------
+    obs : array_like
+        observed time series
+
+    sim : array_like
+        simulated time series
+
+    sort : boolean, default True
+        if True time series are sorted by ascending order
+
+    Returns
+    ----------
+    b_area[0] : float
+        bias area
+    """
+    if sort:
+        obs = np.sort(obs)[::-1]
+        sim = np.sort(sim)[::-1]
+    sim_obs_diff = np.subtract(sim, obs)
+    brel = np.divide(sim_obs_diff, obs)
+    brel_abs = abs(brel)
+    # area of bias
+    b_area = integrate.quad(lambda x: integrand(brel_abs, x), 0, 1)
+
+    return b_area[0]
+
 def trans_hf_lf_ratio(hf_ratio, lf_ratio):
     """
     Transform high flow ratio and low flow ratio to make distances for
@@ -431,7 +501,7 @@ def calc_bias_dir(hf_ratio, lf_ratio):
 
 def calc_bias_balance(hf_ratio, lf_ratio):
     """
-    Calculate slope of bias balance.
+    Calculate bias balance.
 
     Args
     ----------
@@ -450,26 +520,26 @@ def calc_bias_balance(hf_ratio, lf_ratio):
 
     return b_bal
 
-# def calc_bias_balance(hf_trans, lf_trans):
-#     """
-#     Calculate slope of bias balance (alternative version).
-#
-#     Args
-#     ----------
-#     hf_trans : float
-#         transformed high flow ratio
-#
-#     lf_trans : float
-#         transformed low flow ratio
-#
-#     Returns
-#     ----------
-#     b_bal : float
-#         balance of bias
-#     """
-#     b_bal = ((hf_trans + lf_trans)/2) - 1
-#
-#     return b_bal
+def calc_bias_balance1(hf_b_area, lf_b_area):
+    """
+    Calculate bias balance (alternative version).
+
+    Args
+    ----------
+    hf_b_area : float
+        bias area for high flow
+
+    lf_b_area : float
+        bias area for low flow
+
+    Returns
+    ----------
+    b_bal : float
+        balance of bias
+    """
+    b_bal = hf_b_area + lf_b_area
+
+    return b_bal
 
 def calc_temp_cor(obs, sim, r='pearson'):
     """
@@ -540,11 +610,8 @@ def calc_de(obs, sim, sort=True):
     b_bal = calc_bias_balance(hf, lf)
     # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
-    # bias slope
-    b_slope = calc_bias_slope(b_dir, b_bal)
     # diagnostic efficiency
-    # sig = 1 - np.sqrt((brel_mean)**2 + (b_bal)**2 + (b_dir)**2 + (temp_cor - 1)**2)
-    sig = 1 - np.sqrt((brel_mean)**2 + (b_slope)**2 + (temp_cor - 1)**2)
+    sig = 1 - np.sqrt((brel_mean)**2 + (b_bal)**2 + (b_dir)**2 + (temp_cor - 1)**2)
 
     return sig
 
@@ -573,10 +640,8 @@ def calc_de_sort(obs, sim):
     b_dir = calc_bias_dir(hf, lf)
     # bias balance
     b_bal = calc_bias_balance(hf, lf)
-    # bias slope
-    bias_slope = calc_bias_slope(b_dir, b_bal)
     # diagnostic efficiency
-    sig = 1 - np.sqrt((brel_mean)**2 + (bias_slope)**2)
+    sig = 1 - np.sqrt((brel_mean)**2 + (b_bal)**2 + (b_dir)**2)
 
     return sig
 
@@ -786,7 +851,7 @@ def vis2d_de(obs, sim, sort=True):
                   labelbottom=False, grid_alpha=.01)  # turn labels and grid off
     ax.text(5.9, -ax_lim - 0.3, 'High flow underestimation - \n Low flow overestimation', rotation=90)
     ax.text(1.82, -ax_lim - 0.22, 'P overestimation')
-    ax.text(3.54, -ax_lim - 0.52, 'High flow overestimation - \n Low flow underestimation', rotation=90)
+    ax.text(3.54, -ax_lim - 0.6, 'High flow overestimation - \n Low flow underestimation', rotation=90)
     ax.text(4.41, -ax_lim - 0.3, 'P underestimation')
     # add colorbar for temporal correlation
     cax = fig.add_axes([.88, .15, .02, .7], frameon=False)
@@ -898,10 +963,10 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=False, grid_alpha=.01)  # turn labels and grid off
-        ax.text(5.9, -ax_lim - 0.3, r'$\alpha$ [-]', rotation=90)
-        ax.text(4.41, -ax_lim - 0.3, r'$\gamma$ [-]')
+        ax.text(3.2, -ax_lim - .22, r'$\alpha$ [-]', rotation=90)
+        ax.text(4.65, -ax_lim - .18 , r'$\gamma$ [-]')
         # add colorbar for temporal correlation
-        cax = fig.add_axes([.88, .15, .02, .7], frameon=False)
+        cax = fig.add_axes([.8, .15, .02, .7], frameon=False)
         cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
                             label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -991,10 +1056,10 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=False, grid_alpha=.01)  # turn labels and grid off
-        ax.text(3.2, -ax_lim - .12, r'$\alpha$ [-]', rotation=90)
-        ax.text(4.65, -ax_lim - .15 , r'$\beta$ [-]')
+        ax.text(3.2, -ax_lim - .22, r'$\alpha$ [-]', rotation=90)
+        ax.text(4.65, -ax_lim - .18 , r'$\beta$ [-]')
         # add colorbar for temporal correlation
-        cax = fig.add_axes([.88, .15, .02, .7], frameon=False)
+        cax = fig.add_axes([.8, .15, .02, .7], frameon=False)
         cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
                             label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
