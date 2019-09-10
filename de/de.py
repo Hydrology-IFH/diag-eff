@@ -29,7 +29,8 @@ from sklearn import linear_model
 from sklearn.utils import shuffle
 from sklearn.metrics import r2_score
 import seaborn as sns
-sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})  # controlling figure aesthetics
+# controlling figure aesthetics
+sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
 
 __title__ = 'de'
 __version__ = '0.1'
@@ -65,7 +66,8 @@ def import_ts(path, sep=','):
     df_ts : dataframe
         imported time series
     """
-    df_ts = pd.read_csv(path, sep=sep, na_values=-9999, parse_dates=True, index_col=0, dayfirst=True)
+    df_ts = pd.read_csv(path, sep=sep, na_values=-9999, parse_dates=True,
+                        index_col=0, dayfirst=True)
     # drop nan values
     df_ts = df_ts.dropna()
 
@@ -292,45 +294,45 @@ def integrand(y, x):
     i = int(x * len(y))  # convert to index
     return y[i]
 
-def calc_bias_slope(obs, sim, sort=True):
-    """
-    Calculate slope of bias balance.
-
-    Args
-    ----------
-    obs : array_like
-        observed time series
-
-    sim : array_like
-        simulated time series
-
-    sort : boolean, default True
-        if True time series are sorted by ascending order
-
-    Returns
-    ----------
-    b_slope : float
-        slope of linear regression
-    """
-    if sort:
-        obs = np.sort(obs)[::-1]
-        sim = np.sort(sim)[::-1]
-    # area below observed high flows
-    hf_obs_area = integrate.quad(lambda x: integrand(obs, x), 0, .25)
-    # area below simulated high flows
-    hf_sim_area = integrate.quad(lambda x: integrand(sim, x), 0, .25)
-    # area below observed low flows
-    lf_obs_area = integrate.quad(lambda x: integrand(obs, x), .75, 1)
-    # area below simulated low flows
-    lf_sim_area = integrate.quad(lambda x: integrand(sim, x), .75, 1)
-    # high flow ratio
-    hf_ratio = hf_sim_area[0]/hf_obs_area[0]
-    # low flow ratio
-    lf_ratio = lf_sim_area[0]/lf_obs_area[0]
-    # slope between high flow ratio and low flow ratio
-    b_slope = (hf_ratio - lf_ratio) * (-1)
-
-    return b_slope
+# def calc_bias_slope(obs, sim, sort=True):
+#     """
+#     Calculate slope of bias balance.
+#
+#     Args
+#     ----------
+#     obs : array_like
+#         observed time series
+#
+#     sim : array_like
+#         simulated time series
+#
+#     sort : boolean, default True
+#         if True time series are sorted by ascending order
+#
+#     Returns
+#     ----------
+#     b_slope : float
+#         slope of linear regression
+#     """
+#     if sort:
+#         obs = np.sort(obs)[::-1]
+#         sim = np.sort(sim)[::-1]
+#     # area below observed high flows
+#     hf_obs_area = integrate.quad(lambda x: integrand(obs, x), 0, .25)
+#     # area below simulated high flows
+#     hf_sim_area = integrate.quad(lambda x: integrand(sim, x), 0, .25)
+#     # area below observed low flows
+#     lf_obs_area = integrate.quad(lambda x: integrand(obs, x), .75, 1)
+#     # area below simulated low flows
+#     lf_sim_area = integrate.quad(lambda x: integrand(sim, x), .75, 1)
+#     # high flow ratio
+#     hf_ratio = hf_sim_area[0]/hf_obs_area[0]
+#     # low flow ratio
+#     lf_ratio = lf_sim_area[0]/lf_obs_area[0]
+#     # slope between high flow ratio and low flow ratio
+#     b_slope = (hf_ratio - lf_ratio) * (-1)
+#
+#     return b_slope
 
 def calc_hf_lf_ratio(obs, sim, sort=True):
     """
@@ -406,45 +408,45 @@ def trans_hf_lf_ratio(hf_ratio, lf_ratio):
 
     return hf_trans, lf_trans
 
-def calc_bias_dir(hf_trans, lf_trans):
+def calc_bias_dir(hf_ratio, lf_ratio):
     """
     Calculate slope of bias balance.
 
     Args
     ----------
-    hf_trans : float
-        transformed high flow ratio
+    hf_ratio : float
+        high flow ratio
 
-    lf_trans : float
-        transformed low flow ratio
+    lf_ratio : float
+        low flow ratio
 
     Returns
     ----------
     b_dir : float
         direction of bias
     """
-    b_dir = (hf_trans - lf_trans) * (-1)
+    b_dir = (hf_ratio - lf_ratio) * (-1)
 
     return b_dir
 
-def calc_bias_balance(hf_trans, lf_trans):
+def calc_bias_balance(hf_ratio, lf_ratio):
     """
     Calculate slope of bias balance.
 
     Args
     ----------
-    hf_trans : float
-        transformed high flow ratio
+    hf_ratio : float
+        high flow ratio
 
-    lf_trans : float
-        transformed low flow ratio
+    lf_ratio : float
+        low flow ratio
 
     Returns
     ----------
     b_bal : float
         balance of bias
     """
-    b_bal = (hf_trans - 1) + (lf_trans - 1)
+    b_bal = (hf_ratio - 1) + (lf_ratio - 1)
 
     return b_bal
 
@@ -532,16 +534,17 @@ def calc_de(obs, sim, sort=True):
     brel_mean, _ = calc_brel_mean(obs, sim, sort=sort)
     # high flow ratios and low flow ratios
     hf, lf = calc_hf_lf_ratio(obs, sim, sort=True)
-    # transform high flow ratios and low flow ratios
-    hf_trans, lf_trans = trans_hf_lf_ratio(hf, lf)
     # direction of bias
-    b_dir = calc_bias_dir(hf_trans, lf_trans)
+    b_dir = calc_bias_dir(hf, lf)
     # bias balance
-    b_bal = calc_bias_balance(hf_trans, lf_trans)
+    b_bal = calc_bias_balance(hf, lf)
     # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
+    # bias slope
+    b_slope = calc_bias_slope(b_dir, b_bal)
     # diagnostic efficiency
-    sig = 1 - np.sqrt((brel_mean)**2 + (b_bal)**2 + (b_dir)**2 + (temp_cor - 1)**2)
+    # sig = 1 - np.sqrt((brel_mean)**2 + (b_bal)**2 + (b_dir)**2 + (temp_cor - 1)**2)
+    sig = 1 - np.sqrt((brel_mean)**2 + (b_slope)**2 + (temp_cor - 1)**2)
 
     return sig
 
@@ -566,12 +569,10 @@ def calc_de_sort(obs, sim):
     brel_mean, _ = calc_brel_mean(obs, sim)
     # high flow ratios and low flow ratios
     hf, lf = calc_hf_lf_ratio(obs, sim, sort=True)
-    # transform high flow ratios and low flow ratios
-    hf_trans, lf_trans = trans_hf_lf_ratio(hf, lf)
     # direction of bias
-    b_dir = calc_bias_dir(hf_trans, lf_trans)
+    b_dir = calc_bias_dir(hf, lf)
     # bias balance
-    b_bal = calc_bias_balance(hf_trans, lf_trans)
+    b_bal = calc_bias_balance(hf, lf)
     # bias slope
     bias_slope = calc_bias_slope(b_dir, b_bal)
     # diagnostic efficiency
@@ -691,17 +692,19 @@ def vis2d_de(obs, sim, sort=True):
     brel_mean, _ = calc_brel_mean(obs, sim, sort=sort)
     # high flow ratios and low flow ratios
     hf, lf = calc_hf_lf_ratio(obs, sim, sort=sort)
-    # transform high flow ratios and low flow ratios
-    hf_trans, lf_trans = trans_hf_lf_ratio(hf, lf)
     # direction of bias
-    b_dir = calc_bias_dir(hf_trans, lf_trans)
+    b_dir = calc_bias_dir(hf, lf)
     # bias balance
-    b_bal = calc_bias_balance(hf_trans, lf_trans)
+    b_bal = calc_bias_balance(hf, lf)
     # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
     # diagnostic efficiency
-    sig = 1 - np.sqrt((brel_mean)**2 + (b_bal)**2 + (b_dir)**2 + (temp_cor - 1)**2)
-    sig = np.round(sig, decimals=2)
+    sig = 1 - np.sqrt((brel_mean)**2 + (b_dir)**2 + (b_bal)**2 + (temp_cor - 1)**2)
+    sig = np.round(sig, decimals=2)  # round to 2 decimals
+
+    # convert to radians
+    # (y, x) Trigonometric inverse tangent
+    diag = np.arctan2(brel_mean, b_dir)
 
     # create new colormap
     top = cm.get_cmap('Oranges_r', 128)
@@ -713,53 +716,84 @@ def vis2d_de(obs, sim, sort=True):
 
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
-    rgba_color = ogcmp(norm(temp_cor))
+    rgba_color = cm.RdYlGn(norm(temp_cor))
 
-    ax_lim = abs(np.round(b_dir, decimals=0)) + .1
-    if ax_lim < 1:
-        ax_lim = 1.1
+    delta = 0.01  # for spacing
 
-    fig, ax = plt.subplots()
-    # Make dummie mappable
-    c = np.arange(-1, 1.1, 0.1)
-    dummie_cax = ax.scatter(c, c, c=c, cmap=ogcmp)
+    # determine axis limits
+    if sig > 0:
+        yy = np.arange(0, 1, delta)[::-1]
+        ax_lim = 0
+    elif sig <= 0 and sig > -1:
+        yy = np.arange(-1, 1 - delta, delta)[::-1]
+        ax_lim = 1
+    elif sig <= -1:
+        yy = np.arange(-2, 2 - delta, delta)[::-1]
+        ax_lim = 2
+
+    len_yy = len(yy)
+
+    # arrays to plot contour lines of DE
+    xx = np.radians(np.linspace(0, 360, len_yy))
+    theta, r = np.meshgrid(xx, yy)
+
+    # arrays to plot contours of P overestimation
+    xx1 = np.radians(np.linspace(45, 135, len_yy))
+    theta1, r1 = np.meshgrid(xx1, yy)
+
+    # arrays to plot contours of P underestimation
+    xx2 = np.radians(np.linspace(225, 315, len_yy))
+    theta2, r2 = np.meshgrid(xx2, yy)
+
+    # arrays to plot contours of model errors
+    xx3 = np.radians(np.linspace(135, 225, len_yy))
+    theta3, r3 = np.meshgrid(xx3, yy)
+
+    # arrays to plot contours of model errors
+    len_yy2 = int(len_yy/2)
+    if len_yy != len_yy2 + len_yy2:
+        xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+    else:
+        xx0 = np.radians(np.linspace(0, 45, len_yy2))
+
+    xx360 = np.radians(np.linspace(315, 360, len_yy2))
+    xx4 = np.concatenate((xx360, xx0), axis=None)
+    theta4, r4 = np.meshgrid(xx4, yy)
+
+    # diagnostic polar plot
+    fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
+    # dummie plot for colorbar of temporal correlation
+    cs = np.arange(-1, 1.1, 0.1)
+    dummie_cax = ax.scatter(cs, cs, c=cs, cmap='RdYlGn')
     # Clear axis
     ax.cla()
-
-    # make the shaded regions for input errors
-    ix = [0, -ax_lim, ax_lim, 0, -ax_lim, ax_lim, 0]
-    iy = [0, ax_lim, ax_lim, 0, -ax_lim, -ax_lim, 0]
-    verts = [(0, 0), *zip(ix, iy), (0, 0)]
-    poly = Polygon(verts, facecolor='plum', edgecolor=None, alpha=.3)
-    ax.add_patch(poly)
-
-    # make the shaded regions for model errors
-    ix = [0, -ax_lim, -ax_lim, 0, ax_lim, ax_lim, 0]
-    iy = [0, ax_lim, -ax_lim, 0, -ax_lim, ax_lim, 0]
-    verts = [(0, 0), *zip(ix, iy), (0, 0)]
-    poly1 = Polygon(verts, facecolor='silver', edgecolor=None, alpha=.3)
-    ax.add_patch(poly1)
-
-    # make contours for efficiency measure
-    delta = 0.05
-    xx = np.arange(-ax_lim+.1, ax_lim, delta)
-    yy = np.arange(-ax_lim+.1, ax_lim, delta)
-    XX, YY = np.meshgrid(xx, yy)
-    ZZ = 1 - np.sqrt((XX)**2 + (YY)**2 + (YY)**2)
-    cp = ax.contour(XX, YY, ZZ, colors='black', alpha=.5)
-    ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
-
-    if (abs(brel_mean) > 0.05) or (abs(b_dir) > 0.05):
-        im = ax.quiver(0, 0, b_dir, brel_mean, color=rgba_color, scale=1, units='xy')
-    elif (abs(brel_mean) <= 0.05) and (abs(b_dir) <= 0.05):
-        im = ax.plot(b_dir, brel_mean, color=rgba_color, marker='.', markersize=20)
-    ax.set_xlim([-ax_lim , ax_lim])
-    ax.set_ylim([-ax_lim, ax_lim])
-    ax.axhline(y=0, ls="-", c=".1", alpha=.5)
-    ax.axvline(x=0, ls="-", c=".1", alpha=.5)
-    ax.set(ylabel=r'$\overline{B_{rel}}$ [-]',
-           xlabel=r'$B_{dir}$  [-]')
-    fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
+    # contours P overestimation
+    cpio = ax.contourf(theta1, r1, r1, cmap='pink', alpha=.3)
+    # contours P underestimation
+    cpiu = ax.contourf(theta2, r2, r2, cmap='pink', alpha=.3)
+    # contours model errors
+    cpmou = ax.contourf(theta3, r3, r3, cmap='gray', alpha=.3)
+    cpmuo = ax.contourf(theta4, r4, r4, cmap='gray', alpha=.3)
+    # contours of DE
+    cp = ax.contour(theta, r, r, colors='black', alpha=.5)
+    cl = ax.clabel(cp, inline=1, fontsize=8, fmt='%1.1f')
+    # diagnose the error
+    c = ax.scatter(diag, sig, color=rgba_color)
+    ax.set_rticks([])  # turn defalut ticks off
+    ax.set_rmin(1)
+    ax.set_rmax(-ax_lim)
+    ax.tick_params(labelleft=False, labelright=False, labeltop=False,
+                  labelbottom=False, grid_alpha=.01)  # turn labels and grid off
+    ax.text(5.9, -ax_lim - 0.3, 'High flow underestimation - \n Low flow overestimation', rotation=90)
+    ax.text(1.82, -ax_lim - 0.22, 'P overestimation')
+    ax.text(3.54, -ax_lim - 0.52, 'High flow overestimation - \n Low flow underestimation', rotation=90)
+    ax.text(4.41, -ax_lim - 0.3, 'P underestimation')
+    # add colorbar for temporal correlation
+    cax = fig.add_axes([.88, .15, .02, .7], frameon=False)
+    cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
+                        label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
+    cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
+    cbar.ax.tick_params(direction='in', labelsize=10)
 
 def vis2d_kge(obs, sim, r='pearson', var='std'):
     """
@@ -790,42 +824,88 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma- 1)**2  + (temp_cor - 1)**2)
         sig = np.round(sig, decimals=2)
 
+        # convert to radians
+        # (y, x) Trigonometric inverse tangent
+        diag = np.arctan2(kge_alpha, kge_gamma)
+
         # convert temporal correlation to color
         norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
         rgba_color = cm.RdYlGn(norm(temp_cor))
 
-        x_lim = 1.1
-        y_lim = 1.1
+        delta = 0.01  # for spacing
 
-        fig, ax = plt.subplots()
-        # Make dummie mappable
-        c = np.arange(-1, 1.1, 0.1)
-        dummie_cax = ax.scatter(c, c, c=c, cmap=cm.RdYlGn)
+        # determine axis limits
+        if sig > 0:
+            yy = np.arange(0, 1, delta)[::-1]
+            ax_lim = 0
+        elif sig <= 0 and sig > -1:
+            yy = np.arange(-1, 1 - delta, delta)[::-1]
+            ax_lim = 1
+        elif sig <= -1:
+            yy = np.arange(-2, 2 - delta, delta)[::-1]
+            ax_lim = 2
+
+        len_yy = len(yy)
+
+        # arrays to plot contour lines of DE
+        xx = np.radians(np.linspace(0, 360, len_yy))
+        theta, r = np.meshgrid(xx, yy)
+
+        # arrays to plot contours of P overestimation
+        xx1 = np.radians(np.linspace(45, 135, len_yy))
+        theta1, r1 = np.meshgrid(xx1, yy)
+
+        # arrays to plot contours of P underestimation
+        xx2 = np.radians(np.linspace(225, 315, len_yy))
+        theta2, r2 = np.meshgrid(xx2, yy)
+
+        # arrays to plot contours of model errors
+        xx3 = np.radians(np.linspace(135, 225, len_yy))
+        theta3, r3 = np.meshgrid(xx3, yy)
+
+        # arrays to plot contours of model errors
+        len_yy2 = int(len_yy/2)
+        if len_yy != len_yy2 + len_yy2:
+            xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+        else:
+            xx0 = np.radians(np.linspace(0, 45, len_yy2))
+
+        xx360 = np.radians(np.linspace(315, 360, len_yy2))
+        xx4 = np.concatenate((xx360, xx0), axis=None)
+        theta4, r4 = np.meshgrid(xx4, yy)
+
+        # diagnostic polar plot
+        fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
+        # dummie plot for colorbar of temporal correlation
+        cs = np.arange(-1, 1.1, 0.1)
+        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='RdYlGn')
         # Clear axis
         ax.cla()
-
-        # make contours for efficiency measure
-        delta = 0.05
-        xx = np.arange(-x_lim+.1, x_lim, delta)
-        yy = np.arange(-y_lim+.1, y_lim, delta)
-        XX, YY = np.meshgrid(xx, yy)
-        ZZ = 1 - np.sqrt((XX)**2 + (YY)**2)
-        cp = ax.contour(XX, YY, ZZ, colors='black', alpha=.5)
-        ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
-
-        if (abs(kge_alpha - 1) > 0.05) or (abs(kge_gamma- 1) > 0.05):
-            im = ax.quiver(0, 0, kge_gamma - 1, kge_alpha - 1, color=rgba_color, scale=1, units='xy')
-        elif (abs(kge_alpha - 1) <= 0.05) and (abs(kge_gamma - 1) <= 0.05):
-            im = ax.plot(kge_gamma - 1, kge_alpha - 1, color=rgba_color, marker='.', markersize=20)
-        ax.set_xlim([-x_lim , x_lim ])
-        ax.set_ylim([-y_lim , y_lim ])
-        ax.axhline(y=0, ls="-", c=".1", alpha=.5)
-        ax.axvline(x=0, ls="-", c=".1", alpha=.5)
-        # ax.plot([-x_lim , x_lim], [-y_lim , y_lim], ls="--", c=".3")
-        # ax.plot([-x_lim , x_lim ], [y_lim , -y_lim], ls="--", c=".3")
-        ax.set(ylabel=r'$\alpha$ - 1 [-]',
-               xlabel=r'$\gamma$ - 1 [-]')
-        fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
+        # contours P overestimation
+        cpio = ax.contourf(theta1, r1, r1, cmap='pink', alpha=.3)
+        # contours P underestimation
+        cpiu = ax.contourf(theta2, r2, r2, cmap='pink', alpha=.3)
+        # contours model errors
+        cpmou = ax.contourf(theta3, r3, r3, cmap='gray', alpha=.3)
+        cpmuo = ax.contourf(theta4, r4, r4, cmap='gray', alpha=.3)
+        # contours of DE
+        cp = ax.contour(theta, r, r, colors='black', alpha=.5)
+        cl = ax.clabel(cp, inline=1, fontsize=8, fmt='%1.1f')
+        # diagnose the error
+        c = ax.scatter(diag, sig, color=rgba_color)
+        ax.set_rticks([])  # turn defalut ticks off
+        ax.set_rmin(1)
+        ax.set_rmax(-ax_lim)
+        ax.tick_params(labelleft=False, labelright=False, labeltop=False,
+                      labelbottom=False, grid_alpha=.01)  # turn labels and grid off
+        ax.text(5.9, -ax_lim - 0.3, r'$\alpha$ [-]', rotation=90)
+        ax.text(4.41, -ax_lim - 0.3, r'$\gamma$ [-]')
+        # add colorbar for temporal correlation
+        cax = fig.add_axes([.88, .15, .02, .7], frameon=False)
+        cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
+                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
+        cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
+        cbar.ax.tick_params(direction='in', labelsize=10)
 
     # calculate beta term
     elif var == 'std':
@@ -837,44 +917,90 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta- 1)**2  + (temp_cor - 1)**2)
         sig = np.round(sig, decimals=2)
 
+        # convert to radians
+        # (y, x) Trigonometric inverse tangent
+        diag = np.arctan2(kge_alpha, kge_beta)
+
         # convert temporal correlation to color
         norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
         rgba_color = cm.RdYlGn(norm(temp_cor))
 
-        x_lim = 1.1
-        y_lim = 1.1
+        delta = 0.01  # for spacing
 
-        fig, ax = plt.subplots()
-        # Make dummie mappable
-        c = np.arange(-1, 1.1, 0.1)
-        dummie_cax = ax.scatter(c, c, c=c, cmap=cm.RdYlGn)
+        # determine axis limits
+        if sig > 0:
+            yy = np.arange(0, 1, delta)[::-1]
+            ax_lim = 0
+        elif sig <= 0 and sig > -1:
+            yy = np.arange(-1, 1 - delta, delta)[::-1]
+            ax_lim = 1
+        elif sig <= -1:
+            yy = np.arange(-2, 2 - delta, delta)[::-1]
+            ax_lim = 2
+
+        len_yy = len(yy)
+
+        # arrays to plot contour lines of DE
+        xx = np.radians(np.linspace(0, 360, len_yy))
+        theta, r = np.meshgrid(xx, yy)
+
+        # arrays to plot contours of P overestimation
+        xx1 = np.radians(np.linspace(45, 135, len_yy))
+        theta1, r1 = np.meshgrid(xx1, yy)
+
+        # arrays to plot contours of P underestimation
+        xx2 = np.radians(np.linspace(225, 315, len_yy))
+        theta2, r2 = np.meshgrid(xx2, yy)
+
+        # arrays to plot contours of model errors
+        xx3 = np.radians(np.linspace(135, 225, len_yy))
+        theta3, r3 = np.meshgrid(xx3, yy)
+
+        # arrays to plot contours of model errors
+        len_yy2 = int(len_yy/2)
+        if len_yy != len_yy2 + len_yy2:
+            xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+        else:
+            xx0 = np.radians(np.linspace(0, 45, len_yy2))
+
+        xx360 = np.radians(np.linspace(315, 360, len_yy2))
+        xx4 = np.concatenate((xx360, xx0), axis=None)
+        theta4, r4 = np.meshgrid(xx4, yy)
+
+        # diagnostic polar plot
+        fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
+        # dummie plot for colorbar of temporal correlation
+        cs = np.arange(-1, 1.1, 0.1)
+        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='RdYlGn')
         # Clear axis
         ax.cla()
+        # contours P overestimation
+        cpio = ax.contourf(theta1, r1, r1, cmap='pink', alpha=.3)
+        # contours P underestimation
+        cpiu = ax.contourf(theta2, r2, r2, cmap='pink', alpha=.3)
+        # contours model errors
+        cpmou = ax.contourf(theta3, r3, r3, cmap='gray', alpha=.3)
+        cpmuo = ax.contourf(theta4, r4, r4, cmap='gray', alpha=.3)
+        # contours of DE
+        cp = ax.contour(theta, r, r, colors='black', alpha=.5)
+        cl = ax.clabel(cp, inline=1, fontsize=8, fmt='%1.1f')
+        # diagnose the error
+        c = ax.scatter(diag, sig, color=rgba_color)
+        ax.set_rticks([])  # turn defalut ticks off
+        ax.set_rmin(1)
+        ax.set_rmax(-ax_lim)
+        ax.tick_params(labelleft=False, labelright=False, labeltop=False,
+                      labelbottom=False, grid_alpha=.01)  # turn labels and grid off
+        ax.text(3.2, -ax_lim - .12, r'$\alpha$ [-]', rotation=90)
+        ax.text(4.65, -ax_lim - .15 , r'$\beta$ [-]')
+        # add colorbar for temporal correlation
+        cax = fig.add_axes([.88, .15, .02, .7], frameon=False)
+        cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
+                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
+        cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
+        cbar.ax.tick_params(direction='in', labelsize=10)
 
-        # make contours for efficiency measure
-        delta = 0.05
-        xx = np.arange(-x_lim+.1, x_lim, delta)
-        yy = np.arange(-y_lim+.1, y_lim, delta)
-        XX, YY = np.meshgrid(xx, yy)
-        ZZ = 1 - np.sqrt((XX)**2 + (YY)**2)
-        cp = ax.contour(XX, YY, ZZ, colors='black', alpha=.5)
-        ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
-
-        if (abs(kge_alpha - 1) > 0.05) or (abs(kge_beta - 1) > 0.05):
-            im = ax.quiver(0, 0, kge_beta - 1, kge_alpha - 1, color=rgba_color, scale=1, units='xy')
-        elif (abs(kge_alpha - 1) <= 0.05) and (abs(kge_beta - 1) <= 0.05):
-            im = ax.plot(kge_beta - 1, kge_alpha - 1, color=rgba_color, marker='.', markersize=20)
-        ax.set_xlim([-x_lim , x_lim ])
-        ax.set_ylim([-y_lim , y_lim ])
-        ax.axhline(y=0, ls="-", c=".1", alpha=.5)
-        ax.axvline(x=0, ls="-", c=".1", alpha=.5)
-        # ax.plot([-x_lim , x_lim], [-y_lim , y_lim], ls="--", c=".3")
-        # ax.plot([-x_lim , x_lim ], [y_lim , -y_lim], ls="--", c=".3")
-        ax.set(ylabel=r'$\alpha$ - 1 [-]',
-               xlabel=r'$\beta$ - 1 [-]')
-        fig.colorbar(dummie_cax, orientation='vertical', label='r [-]')
-
-def pos_shift_ts(ts, offset=1.25, multi=True):
+def pos_shift_ts(ts, offset=1.5, multi=True):
     """
     Precipitation overestimation.
 
@@ -901,7 +1027,7 @@ def pos_shift_ts(ts, offset=1.25, multi=True):
 
     return shift_pos
 
-def neg_shift_ts(ts, offset=0.75, multi=True):
+def neg_shift_ts(ts, offset=0.5, multi=True):
     """
     Precipitation underestimation.
 
@@ -1309,12 +1435,12 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
            xlabel='Time [Days]')
 
 
-# if __name__ == "__main__":
-#    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/9960682_Q_1970_2012.csv'
+if __name__ == "__main__":
+   path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/9960682_Q_1970_2012.csv'
 ##    path = '/Users/robo/Desktop/PhD/de/examples/data/9960682_Q_1970_2012.csv'
 
-#    # import observed time series
-#    df_ts = import_ts(path, sep=';')
+   # import observed time series
+   df_ts = import_ts(path, sep=';')
 #    plot_ts(df_ts)
 
 #    # peak detection
@@ -1406,22 +1532,22 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
 #    vis2d_de(obs_arr, sim_arr)
 #    vis2d_kge(obs_arr, sim_arr)
 #
-#    ### precipitation surplus ###
-#    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-#    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    obs_sim.loc[:, 'Qsim'] = pos_shift_ts(df_ts['Qobs'].values)  # positive offset
-#    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#
-#    obs_arr = obs_sim['Qobs'].values
-#    sim_arr = obs_sim['Qsim'].values
-#
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
+   ### precipitation surplus ###
+   obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
+   obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
+   obs_sim.loc[:, 'Qsim'] = pos_shift_ts(df_ts['Qobs'].values)  # positive offset
+   plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
+   fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
+
+   obs_arr = obs_sim['Qobs'].values
+   sim_arr = obs_sim['Qsim'].values
+
+   sig_de = calc_de(obs_arr, sim_arr)
+   sig_kge = calc_kge(obs_arr, sim_arr)
+   sig_nse = calc_nse(obs_arr, sim_arr)
+
+   vis2d_de(obs_arr, sim_arr)
+   vis2d_kge(obs_arr, sim_arr)
 
 #    ### precipitation shortage ###
 #    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
