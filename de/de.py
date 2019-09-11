@@ -202,76 +202,47 @@ def calc_brel_mean(obs, sim, sort=True):
 
     Returns
     ----------
-    mean_brel : float
+    brel_mean : float
         average relative bias
-
-    sum_diff : float
-        relative bias balance
     """
     if sort:
         obs = np.sort(obs)[::-1]
         sim = np.sort(sim)[::-1]
     sim_obs_diff = np.subtract(sim, obs)
     brel = np.divide(sim_obs_diff, obs)
-    mean_brel = np.mean(brel)
-    sum_diff = np.sum(brel)
+    brel_mean = np.mean(brel)
 
-    return mean_brel, sum_diff
+    return brel_mean
 
-def calc_fdc_bias_slope(obs, sim, sort=True, plot=True):
+def calc_brel_rest(obs, sim, sort=True):
     """
-    Calculate slope of bias balance.
+    Subtract arithmetic mean of relative bias from relative bias.
 
     Args
     ----------
-    obs : array_like
+    obs : series
         observed time series
 
-    sim : array_like
+    sim : series
         simulated time series
 
     sort : boolean, default True
         if True time series are sorted by ascending order
 
-    plot : boolean, default True
-        if True plot for linear regression is displayed
-
     Returns
     ----------
-    b : float
-        slope of linear regression
-
-    score : float
-        score of linear regression model
+    brel_rest : array_like
+        remaining relative bias
     """
     if sort:
         obs = np.sort(obs)[::-1]
         sim = np.sort(sim)[::-1]
     sim_obs_diff = np.subtract(sim, obs)
     brel = np.divide(sim_obs_diff, obs)
-    mean_brel = np.mean(brel)
-    y = np.divide(sim_obs_diff, obs)
-    x = np.arange(len(y))
-    ranks = x[::-1]
-    prob = [(ranks[i]/(len(y)+1)) for i in range(len(y))]
-    prob_arr = np.asarray(prob[::-1])
-    xx = prob_arr.reshape((-1, 1))
+    brel_mean = np.mean(brel)
+    brel_rest = brel - brel_mean
 
-    lm = linear_model.LinearRegression()
-    reg = lm.fit(xx, y)
-    y_reg = reg.predict(xx)
-    b = reg.coef_[0]
-    score = r2_score(y, y_reg)
-
-    if plot:
-        fig, ax = plt.subplots()
-        ax.plot(prob_arr, y, 'b.', markersize=8)
-        ax.plot(prob_arr, y_reg, 'r-')
-        ax.axhline(y=mean_brel, ls='--', color='blue', alpha=.8)
-        ax.set(ylabel=r'$B_{rel}$ [-]',
-               xlabel='Exceedence probabilty [-]')
-
-    return b, score
+    return brel_rest
 
 def integrand(y, x):
     """
@@ -294,252 +265,78 @@ def integrand(y, x):
     i = int(x * len(y))  # convert to index
     return y[i]
 
-# def calc_bias_slope(obs, sim, sort=True):
-#     """
-#     Calculate slope of bias balance.
-#
-#     Args
-#     ----------
-#     obs : array_like
-#         observed time series
-#
-#     sim : array_like
-#         simulated time series
-#
-#     sort : boolean, default True
-#         if True time series are sorted by ascending order
-#
-#     Returns
-#     ----------
-#     b_slope : float
-#         slope of linear regression
-#     """
-#     if sort:
-#         obs = np.sort(obs)[::-1]
-#         sim = np.sort(sim)[::-1]
-#     # area below observed high flows
-#     hf_obs_area = integrate.quad(lambda x: integrand(obs, x), 0, .25)
-#     # area below simulated high flows
-#     hf_sim_area = integrate.quad(lambda x: integrand(sim, x), 0, .25)
-#     # area below observed low flows
-#     lf_obs_area = integrate.quad(lambda x: integrand(obs, x), .75, 1)
-#     # area below simulated low flows
-#     lf_sim_area = integrate.quad(lambda x: integrand(sim, x), .75, 1)
-#     # high flow ratio
-#     hf_ratio = hf_sim_area[0]/hf_obs_area[0]
-#     # low flow ratio
-#     lf_ratio = lf_sim_area[0]/lf_obs_area[0]
-#     # slope between high flow ratio and low flow ratio
-#     b_slope = (hf_ratio - lf_ratio) * (-1)
-#
-#     return b_slope
-
-def calc_hf_lf_ratio(obs, sim, sort=True):
-    """
-    Calculate high flow ratio and low flow ratio.
-
-    Args
-    ----------
-    obs : array_like
-        observed time series
-
-    sim : array_like
-        simulated time series
-
-    sort : boolean, default True
-        if True time series are sorted by ascending order
-
-    Returns
-    ----------
-    hf_ratio : float
-        high flow ratio
-
-    lf_ratio : float
-        low flow ratio
-    """
-    if sort:
-        obs = np.sort(obs)[::-1]
-        sim = np.sort(sim)[::-1]
-    # area below observed high flows
-    hf_obs_area = integrate.quad(lambda x: integrand(obs, x), 0, .25)
-    # area below simulated high flows
-    hf_sim_area = integrate.quad(lambda x: integrand(sim, x), 0, .25)
-    # area below observed low flows
-    lf_obs_area = integrate.quad(lambda x: integrand(obs, x), .75, 1)
-    # area below simulated low flows
-    lf_sim_area = integrate.quad(lambda x: integrand(sim, x), .75, 1)
-    # high flow ratio
-    hf_ratio = hf_sim_area[0]/hf_obs_area[0]
-    # low flow ratio
-    lf_ratio = lf_sim_area[0]/lf_obs_area[0]
-
-    return hf_ratio, lf_ratio
-
-def calc_hf_lf_b_area(obs, sim, sort=True):
+def calc_b_area(brel_rest):
     """
     Calculate absolute bias area for high flow and low flow.
 
     Args
     ----------
-    obs : array_like
-        observed time series
-
-    sim : array_like
-        simulated time series
-
-    sort : boolean, default True
-        if True time series are sorted by ascending order
-
-    Returns
-    ----------
-    hf_b_area : float
-        bias area for high flow
-
-    lf_b_area : float
-        bias area for low flow
-    """
-    if sort:
-        obs = np.sort(obs)[::-1]
-        sim = np.sort(sim)[::-1]
-    sim_obs_diff = np.subtract(sim, obs)
-    brel = np.divide(sim_obs_diff, obs)
-    brel_abs = abs(brel)
-    # area below observed high flows
-    hf_area = integrate.quad(lambda x: integrand(brel_abs, x), 0, .25)
-    # area below observed low flows
-    lf_area = integrate.quad(lambda x: integrand(brel_abs, x), .75, 1)
-
-    hf_b_area = hf_area[0]
-    lf_b_area = lf_area[0]
-
-    return hf_b_area, lf_b_area
-
-def calc_b_area(obs, sim, sort=True):
-    """
-    Calculate absolute bias area for high flow and low flow.
-
-    Args
-    ----------
-    obs : array_like
-        observed time series
-
-    sim : array_like
-        simulated time series
-
-    sort : boolean, default True
-        if True time series are sorted by ascending order
+    brel_rest : array_like
+        remaining relative bias
 
     Returns
     ----------
     b_area[0] : float
         bias area
     """
-    if sort:
-        obs = np.sort(obs)[::-1]
-        sim = np.sort(sim)[::-1]
-    sim_obs_diff = np.subtract(sim, obs)
-    brel = np.divide(sim_obs_diff, obs)
-    brel_abs = abs(brel)
+    brel_rest_abs = abs(brel_rest)
     # area of bias
-    b_area = integrate.quad(lambda x: integrand(brel_abs, x), 0, 1)
+    b_area = integrate.quad(lambda x: integrand(brel_rest_abs, x), 0, 1)
 
     return b_area[0]
 
-def trans_hf_lf_ratio(hf_ratio, lf_ratio):
+def calc_bias_dir(brel_rest):
     """
-    Transform high flow ratio and low flow ratio to make distances for
-    underestimation or overestimation, respectively, comparable.
+    Calculate absolute bias area for high flow and low flow.
 
     Args
     ----------
-    hf_ratio : float
-        high flow ratio
-
-    lf_ratio : float
-        low flow ratio
-
-    Returns
-    ----------
-    hf_trans : float
-        transformed high flow ratio
-
-    lf_trans : float
-        transformed low flow ratio
-    """
-    if hf_ratio >= 1:
-        hf_trans = hf_ratio
-    elif hf_ratio < 1:
-        hf_trans = 1/hf_ratio
-
-    if lf_ratio >= 1:
-        lf_trans = lf_ratio
-    elif lf_ratio < 1:
-        lf_trans = 1/lf_ratio
-
-    return hf_trans, lf_trans
-
-def calc_bias_dir(hf_ratio, lf_ratio):
-    """
-    Calculate slope of bias balance.
-
-    Args
-    ----------
-    hf_ratio : float
-        high flow ratio
-
-    lf_ratio : float
-        low flow ratio
+    brel_rest : array_like
+        remaining relative bias
 
     Returns
     ----------
     b_dir : float
         direction of bias
     """
-    b_dir = (hf_ratio - lf_ratio) * (-1)
+    # integral of relative bias < 50 %
+    hf_area = integrate.quad(lambda x: integrand(brel_rest, x), 0, .5)
+
+    # direction of bias
+    b_dir = hf_area[0]
 
     return b_dir
 
-def calc_bias_balance(hf_ratio, lf_ratio):
+def calc_bias_slope(b_area, b_dir, nd=0.05):
     """
-    Calculate bias balance.
+    Calculate slope of bias balance.
 
     Args
     ----------
-    hf_ratio : float
-        high flow ratio
+    b_area : float
+        absolute area of remaining bias
 
-    lf_ratio : float
-        low flow ratio
+    b_dir : float
+        direction of bias
 
-    Returns
-    ----------
-    b_bal : float
-        balance of bias
-    """
-    b_bal = (hf_ratio - 1) + (lf_ratio - 1)
-
-    return b_bal
-
-def calc_bias_balance1(hf_b_area, lf_b_area):
-    """
-    Calculate bias balance (alternative version).
-
-    Args
-    ----------
-    hf_b_area : float
-        bias area for high flow
-
-    lf_b_area : float
-        bias area for low flow
+    nd : float
+        threshold for which no unambiguous diagnosis is available
 
     Returns
     ----------
-    b_bal : float
-        balance of bias
+    b_slope : float
+        slope of bias
     """
-    b_bal = hf_b_area + lf_b_area
+    if b_dir > nd:
+        b_slope = b_area
 
-    return b_bal
+    elif b_dir < -nd:
+        b_slope = b_area * (-1)
+
+    elif (b_dir >= -nd) and (b_dir <= nd):
+        b_slope = 0
+
+    return b_slope
 
 def calc_temp_cor(obs, sim, r='pearson'):
     """
@@ -601,17 +398,15 @@ def calc_de(obs, sim, sort=True):
         diagnostic efficiency measure
     """
     # mean relative bias
-    brel_mean, _ = calc_brel_mean(obs, sim, sort=sort)
-    # high flow ratios and low flow ratios
-    hf, lf = calc_hf_lf_ratio(obs, sim, sort=True)
-    # direction of bias
-    b_dir = calc_bias_dir(hf, lf)
-    # bias balance
-    b_bal = calc_bias_balance(hf, lf)
+    brel_mean = calc_brel_mean(obs, sim, sort=sort)
+    # remaining relative bias
+    brel_rest = calc_brel_rest(obs, sim, sort=sort)
+    # area of relative remaing bias
+    b_area = calc_b_area(brel_rest)
     # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
     # diagnostic efficiency
-    sig = 1 - np.sqrt((brel_mean)**2 + (b_bal)**2 + (b_dir)**2 + (temp_cor - 1)**2)
+    sig = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
 
     return sig
 
@@ -633,15 +428,13 @@ def calc_de_sort(obs, sim):
         diagnostic efficiency measure
     """
     # mean relative bias
-    brel_mean, _ = calc_brel_mean(obs, sim)
-    # high flow ratios and low flow ratios
-    hf, lf = calc_hf_lf_ratio(obs, sim, sort=True)
-    # direction of bias
-    b_dir = calc_bias_dir(hf, lf)
-    # bias balance
-    b_bal = calc_bias_balance(hf, lf)
+    brel_mean = calc_brel_mean(obs, sim)
+    # remaining relative bias
+    brel_rest = calc_brel_rest(obs, sim)
+    # area of relative remaing bias
+    b_area = calc_b_area(brel_rest)
     # diagnostic efficiency
-    sig = 1 - np.sqrt((brel_mean)**2 + (b_bal)**2 + (b_dir)**2)
+    sig = 1 - np.sqrt((brel_mean)**2 + (b_area)**2)
 
     return sig
 
@@ -754,22 +547,24 @@ def vis2d_de(obs, sim, sort=True):
         if True time series are sorted by ascending order
     """
     # mean relative bias
-    brel_mean, _ = calc_brel_mean(obs, sim, sort=sort)
-    # high flow ratios and low flow ratios
-    hf, lf = calc_hf_lf_ratio(obs, sim, sort=sort)
-    # direction of bias
-    b_dir = calc_bias_dir(hf, lf)
-    # bias balance
-    b_bal = calc_bias_balance(hf, lf)
+    brel_mean = calc_brel_mean(obs, sim, sort=sort)
+    # remaining relative bias
+    brel_rest = calc_brel_rest(obs, sim, sort=sort)
+    # area of relative remaing bias
+    b_area = calc_b_area(brel_rest)
     # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
     # diagnostic efficiency
-    sig = 1 - np.sqrt((brel_mean)**2 + (b_dir)**2 + (b_bal)**2 + (temp_cor - 1)**2)
+    sig = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
     sig = np.round(sig, decimals=2)  # round to 2 decimals
 
+    # direction of bias
+    b_dir = calc_bias_dir(brel_rest)
+    # slope of bias
+    b_slope = calc_bias_slope(b_area, b_dir)
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    diag = np.arctan2(brel_mean, b_dir)
+    diag = np.arctan2(brel_mean, b_slope)
 
     # create new colormap
     top = cm.get_cmap('Oranges_r', 128)
@@ -843,8 +638,19 @@ def vis2d_de(obs, sim, sort=True):
     cp = ax.contour(theta, r, r, colors='black', alpha=.5)
     cl = ax.clabel(cp, inline=1, fontsize=8, fmt='%1.1f')
     # diagnose the error
-    c = ax.scatter(diag, sig, color=rgba_color)
-    ax.set_rticks([])  # turn defalut ticks off
+    if b_slope >= 0.05:
+        c = ax.scatter(diag, sig, color=rgba_color)
+    elif abs(brel_mean) > 0.05 and b_slope < 0.05:
+        c = ax.scatter(diag, sig, color=rgba_color)
+    elif abs(brel_mean) <= 0.05 and b_slope < 0.05:
+        x = np.arange(sig, 1.0, 0.01)
+        x1 = np.arange(1.0, sig, 0.01)
+        x2 = np.concatenate((x, x1), axis=None)
+        y = np.repeat(0, len(x))
+        y1 = np.repeat(np.pi, len(x1))
+        y2 = np.concatenate((y, y1), axis=None)
+        c = ax.plot(y2, x2, 'b-')
+    ax.set_rticks([])  # turn default ticks off
     ax.set_rmin(1)
     ax.set_rmax(-ax_lim)
     ax.tick_params(labelleft=False, labelright=False, labeltop=False,
