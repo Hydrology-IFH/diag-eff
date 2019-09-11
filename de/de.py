@@ -307,7 +307,7 @@ def calc_bias_dir(brel_rest):
 
     return b_dir
 
-def calc_bias_slope(b_area, b_dir, nd=0.05):
+def calc_bias_slope(b_area, b_dir):
     """
     Calculate slope of bias balance.
 
@@ -319,21 +319,18 @@ def calc_bias_slope(b_area, b_dir, nd=0.05):
     b_dir : float
         direction of bias
 
-    nd : float
-        threshold for which no unambiguous diagnosis is available
-
     Returns
     ----------
     b_slope : float
         slope of bias
     """
-    if b_dir > nd:
-        b_slope = b_area
-
-    elif b_dir < -nd:
+    if b_dir > 0:
         b_slope = b_area * (-1)
 
-    elif (b_dir >= -nd) and (b_dir <= nd):
+    elif b_dir < 0:
+        b_slope = b_area
+
+    elif b_dir == 0:
         b_slope = 0
 
     return b_slope
@@ -531,7 +528,7 @@ def calc_nse(obs, sim):
 
     return sig
 
-def vis2d_de(obs, sim, sort=True):
+def vis2d_de(obs, sim, sort=True, nd=0.05):
     """
     2-D visualization of Diagnostic-Efficiency (DE)
 
@@ -545,9 +542,16 @@ def vis2d_de(obs, sim, sort=True):
 
     sort : boolean, default True
         if True time series are sorted by ascending order
+
+    nd : float, default 0.05
+        threshold for diagnosis
     """
     # mean relative bias
     brel_mean = calc_brel_mean(obs, sim, sort=sort)
+
+    str_brel_mean = 'Brel_mean: {}'.format(np.round(brel_mean, decimals=2))
+    print(str_brel_mean)
+
     # remaining relative bias
     brel_rest = calc_brel_rest(obs, sim, sort=sort)
     # area of relative remaing bias
@@ -560,11 +564,22 @@ def vis2d_de(obs, sim, sort=True):
 
     # direction of bias
     b_dir = calc_bias_dir(brel_rest)
+
+    str_b_dir = 'B_dir: {}'.format(np.round(b_dir, decimals=2))
+    print(str_b_dir)
+
     # slope of bias
     b_slope = calc_bias_slope(b_area, b_dir)
+
+    str_b_slope = 'B_slope: {}'.format(np.round(b_slope, decimals=2))
+    print(str_b_slope)
+
     # convert to radians
     # (y, x) Trigonometric inverse tangent
     diag = np.arctan2(brel_mean, b_slope)
+
+    str_diag = 'diag: {}'.format(np.round(diag, decimals=2))
+    print(str_diag)
 
     # create new colormap
     top = cm.get_cmap('Oranges_r', 128)
@@ -637,19 +652,22 @@ def vis2d_de(obs, sim, sort=True):
     # contours of DE
     cp = ax.contour(theta, r, r, colors='black', alpha=.5)
     cl = ax.clabel(cp, inline=1, fontsize=8, fmt='%1.1f')
+    # threshold efficiency for FBM
+    sig_diag = 1 - np.sqrt((nd)**2 + (nd)**2 + (nd)**2)
     # diagnose the error
-    if b_slope >= 0.05:
+    if abs(brel_mean) <= nd and abs(b_slope) > nd and sig <= sig_diag:
         c = ax.scatter(diag, sig, color=rgba_color)
-    elif abs(brel_mean) > 0.05 and b_slope < 0.05:
+    elif abs(brel_mean) > nd and abs(b_slope) <= nd and sig <= sig_diag:
         c = ax.scatter(diag, sig, color=rgba_color)
-    elif abs(brel_mean) <= 0.05 and b_slope < 0.05:
-        x = np.arange(sig, 1.0, 0.01)
-        x1 = np.arange(1.0, sig, 0.01)
-        x2 = np.concatenate((x, x1), axis=None)
-        y = np.repeat(0, len(x))
-        y1 = np.repeat(np.pi, len(x1))
-        y2 = np.concatenate((y, y1), axis=None)
-        c = ax.plot(y2, x2, 'b-')
+    elif abs(brel_mean) > nd and abs(b_slope) > nd and sig <= sig_diag:
+        c = ax.scatter(diag, sig, color=rgba_color)
+    # FBM
+    elif abs(brel_mean) <= nd and abs(b_slope) <= nd and sig <= sig_diag:
+        c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
+        c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
+    # FGM
+    elif abs(brel_mean) <= nd and abs(b_slope) <= nd and sig > sig_diag:
+        c = ax.scatter(diag, sig, color=rgba_color)
     ax.set_rticks([])  # turn default ticks off
     ax.set_rmin(1)
     ax.set_rmax(-ax_lim)
