@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 """
-    diagnostic_model_efficiency.de
-    ~~~~~~~~~~~
-    Diagnosing model performance using an efficiency measure based on flow
-    duration curve and temoral correlation. The efficiency measure can be
-    visualized in 2D-Plot which facilitates decomposing potential error origins
-    (model errors vs. input data erros)
-    :2019 by Robin Schwemmle.
-    :license: GNU GPLv3, see LICENSE for more details.
+diagnostic_model_efficiency.de
+~~~~~~~~~~~
+Diagnosing model performance using an efficiency measure based on flow
+duration curve and temoral correlation. The efficiency measure can be
+visualized in 2D-Plot which facilitates decomposing potential error origins
+(model errors vs. input data erros)
+:2019 by Robin Schwemmle.
+:license: GNU GPLv3, see LICENSE for more details.
 """
 
 import datetime as dt
@@ -53,18 +53,18 @@ def import_ts(path, sep=','):
     """
     Import .csv-file with streamflow time series (m3/s).
 
-    Args
+    Parameters
     ----------
     path : str
-        path to .csv-file which contains time series
+        Path to .csv-file which contains time series
 
-    sep : str, default ‘,’
-        delimeter to use
+    sep : str, optional
+        Delimeter to use. The default is ‘,’.
 
     Returns
     ----------
     df_ts : dataframe
-        imported time series
+        Imported time series
     """
     df_ts = pd.read_csv(path, sep=sep, na_values=-9999, parse_dates=True,
                         index_col=0, dayfirst=True)
@@ -77,10 +77,10 @@ def plot_ts(ts):
     """
     Plot time series.
 
-    Args
+    Parameters
     ----------
     ts : dataframe
-        dataframe with time series
+        Dataframe with time series
     """
     fig, ax = plt.subplots()
     ax.plot(ts.index, ts.iloc[:, 0].values, color='blue')
@@ -91,7 +91,7 @@ def plot_obs_sim(obs, sim):
     """
     Plot observed and simulated time series.
 
-    Args
+    Parameters
     ----------
     obs : series
         observed time series
@@ -108,29 +108,29 @@ def fdc(ts):
     """
     Generate a flow duration curve for a single hydrologic time series.
 
-    Args
+    Parameters
     ----------
     ts : dataframe
-        containing a hydrologic time series
+        Containing a hydrologic time series
     """
     data = ts.dropna()
     data = np.sort(data.values)  # sort values by ascending order
     ranks = sp.stats.rankdata(data, method='ordinal')  # rank data
     ranks = ranks[::-1]
     # calculate exceedence probability
-    prob = [100*(ranks[i]/(len(data)+1)) for i in range(len(data))]
+    prob = [(ranks[i]/(len(data)+1)) for i in range(len(data))]
 
     fig, ax = plt.subplots()
     ax.plot(prob, data, color='blue')
     ax.set(ylabel=_q_lab,
-           xlabel='Exceedence probabilty [%]', yscale='log')
+           xlabel='Exceedence probabilty [-]', yscale='log')
 
 def fdc_obs_sim(obs, sim):
     """
     Plotting the flow duration curves of two hydrologic time series (e.g.
     observed streamflow and simulated streamflow).
 
-    Args
+    Parameters
     ----------
     obs : series
         observed time series
@@ -146,17 +146,17 @@ def fdc_obs_sim(obs, sim):
     # calculate exceedence probability
     ranks_obs = sp.stats.rankdata(obs['obs'], method='ordinal')
     ranks_obs = ranks_obs[::-1]
-    prob_obs = [100*(ranks_obs[i]/(len(obs['obs'])+1)) for i in range(len(obs['obs']))]
+    prob_obs = [(ranks_obs[i]/(len(obs['obs'])+1)) for i in range(len(obs['obs']))]
 
     ranks_sim = sp.stats.rankdata(sim['sim'], method='ordinal')
     ranks_sim = ranks_sim[::-1]
-    prob_sim = [100*(ranks_sim[i]/(len(sim['sim'])+1)) for i in range(len(sim['sim']))]
+    prob_sim = [(ranks_sim[i]/(len(sim['sim'])+1)) for i in range(len(sim['sim']))]
 
     fig, ax = plt.subplots()
     ax.plot(prob_obs, obs['obs'], color='blue', label='Observed')
     ax.plot(prob_sim, sim['sim'], color='red', label='Simulated')
     ax.set(ylabel=_q_lab,
-           xlabel='Exceedence probabilty [%]', yscale='log')
+           xlabel='Exceedence probabilty [-]', yscale='log')
     ax.legend(loc=1)
 
 def fdc_obs_sort(Q):
@@ -165,10 +165,10 @@ def fdc_obs_sort(Q):
     Descending order of ebserved time series is applied to simulated time
     series.
 
-    Args
+    Parameters
     ----------
     Q : dataframe
-        containing time series of Qobs and Qsim.
+        Containing time series of Qobs and Qsim.
     """
     df_Q = pd.DataFrame(data=Q)
     df_Q_sort = sort_obs(df_Q)
@@ -176,29 +176,30 @@ def fdc_obs_sort(Q):
     # calculate exceedence probability
     ranks_obs = sp.stats.rankdata(df_Q_sort['Qobs'], method='ordinal')
     ranks_obs = ranks_obs[::-1]
-    prob_obs = [100*(ranks_obs[i]/(len(df_Q_sort['Qobs'])+1)) for i in range(len(df_Q_sort['Qobs']))]
+    prob_obs = [(ranks_obs[i]/(len(df_Q_sort['Qobs'])+1)) for i in range(len(df_Q_sort['Qobs']))]
 
     fig, ax = plt.subplots()
     ax.plot(prob_obs, df_Q_sort['Qsim'], color='red', label='Simulated')
     ax.plot(prob_obs, df_Q_sort['Qobs'], color='blue', label='Observed')
     ax.set(ylabel=_q_lab,
-           xlabel='Exceedence probabilty [%]', yscale='log')
+           xlabel='Exceedence probabilty [-]', yscale='log')
     ax.legend(loc=1)
 
 def calc_brel_mean(obs, sim, sort=True):
     """
     Calculate arithmetic mean of relative bias.
 
-    Args
+    Parameters
     ----------
-    obs : series
-        observed time series
+    obs : (N,)array_like
+        observed time series as 1-D array
 
-    sim : series
+    sim : (N,)array_like
         simulated time series
 
-    sort : boolean, default True
-        if True time series are sorted by ascending order
+    sort : boolean, optional
+        If True, time series are sorted by ascending order. If False, time series
+        are not sorted. The default is to sort.
 
     Returns
     ----------
@@ -218,16 +219,17 @@ def calc_brel_rest(obs, sim, sort=True):
     """
     Subtract arithmetic mean of relative bias from relative bias.
 
-    Args
+    Parameters
     ----------
-    obs : series
-        observed time series
+    obs : (N,)array_like
+        observed time series as 1-D array
 
-    sim : series
+    sim : (N,)array_like
         simulated time series
 
-    sort : boolean, default True
-        if True time series are sorted by ascending order
+    sort : boolean, optional
+        If True, time series are sorted by ascending order. If False, time series
+        are not sorted. The default is to sort.
 
     Returns
     ----------
@@ -250,7 +252,7 @@ def integrand(y, x):
 
     f(x)
 
-    Args
+    Parameters
     ----------
     y : array_like
         time series
@@ -269,10 +271,10 @@ def calc_b_area(brel_rest):
     """
     Calculate absolute bias area for high flow and low flow.
 
-    Args
+    Parameters
     ----------
-    brel_rest : array_like
-        remaining relative bias
+    brel_rest : (N,)array_like
+        remaining relative bias as 1-D array
 
     Returns
     ----------
@@ -289,10 +291,10 @@ def calc_bias_dir(brel_rest):
     """
     Calculate absolute bias area for high flow and low flow.
 
-    Args
+    Parameters
     ----------
-    brel_rest : array_like
-        remaining relative bias
+    brel_rest : (N,)array_like
+        remaining relative bias as 1-D array
 
     Returns
     ----------
@@ -311,7 +313,7 @@ def calc_bias_slope(b_area, b_dir):
     """
     Calculate slope of bias balance.
 
-    Args
+    Parameters
     ----------
     b_area : float
         absolute area of remaining bias
@@ -340,23 +342,23 @@ def calc_temp_cor(obs, sim, r='pearson'):
     Calculate temporal correlation between observed and simulated
     time series.
 
-    Args
+    Parameters
     ----------
-    obs : array_like
-        observed time series
+    obs : (N,)array_like
+        Observed time series as 1-D array
 
-    sim : array_like
-        simulated time series
+    sim : (N,)array_like
+        Simulated time series
 
-    r : str, default 'pearson'
-        either spearman correlation coefficient ('spearman') or pearson
-        correlation coefficient ('pearson') can be used to describe temporal
-        correlation
+    r : str, optional
+        Either Ppearman correlation coefficient ('spearman') or Pearson
+        correlation coefficient ('pearson') can be used to describe the temporal
+        correlation. The default is to calculate the Pearson correlation.
 
     Returns
     ----------
     temp_cor : float
-        rank correlation between observed and simulated time series
+        Rank correlation between observed and simulated time series
     """
     if r == 'spearman':
         r = sp.stats.spearmanr(obs, sim)
@@ -378,21 +380,22 @@ def calc_de(obs, sim, sort=True):
     """
     Calculate Diagnostic-Efficiency (DE).
 
-    Args
+    Parameters
     ----------
-    obs : array_like
-        observed time series
+    obs : (N,)array_like
+        Observed time series as 1-D array
 
-    sim : array_like
-        simulated time series
+    sim : (N,)array_like
+        Simulated time series
 
-    sort : boolean, default True
-        if True time series are sorted by ascending order
+    sort : boolean, optional
+        If True, time series are sorted by ascending order. If False, time series
+        are not sorted. The default is to sort.
 
     Returns
     ----------
     sig : float
-        diagnostic efficiency measure
+        Diagnostic efficiency measure
     """
     # mean relative bias
     brel_mean = calc_brel_mean(obs, sim, sort=sort)
@@ -411,13 +414,15 @@ def calc_de_sort(obs, sim):
     """
     Calculate Diagnostic-Efficiency (DE).
 
-    Args
-    ----------
-    obs : array_like
-        observed time series
+    Simulated values are sorted by order of observed values.
 
-    sim : array_like
-        simulated time series
+    Parameters
+    ----------
+    obs : (N,)array_like
+        Observed time series as 1-D array
+
+    sim : (N,)array_like
+        Simulated time series
 
     Returns
     ----------
@@ -439,23 +444,24 @@ def calc_kge(obs, sim, r='pearson', var='std'):
     """
     Calculate Kling-Gupta-Efficiency (KGE).
 
-    Args
+    Parameters
     ----------
-    obs : array_like
-        observed time series
+    obs : (N,)array_like
+        Observed time series as 1-D array
 
-    sim : array_like
-        simulated time series
+    sim : (N,)array_like
+        Simulated time series
 
-    r : str, default 'pearson'
-        either spearman correlation coefficient ('spearman', Pool et al. 2018)
-        or pearson correlation coefficient ('pearson'; Gupta et al. 2009,
-        Kling et al. 2012) can be used to describe temporal correlation
+    r : str, optional
+        Either Ppearman correlation coefficient ('spearman'; Pool et al. 2018)
+        or Pearson correlation coefficient ('pearson'; Gupta et al. 2009) can
+        be used to describe the temporal correlation. The default is to
+        calculate the Pearson correlation.
 
-    var : str, default 'std'
-        either coefficient of variation ('cv'; Kling et al. 2012) or standard
+    var : str, optional
+        Either coefficient of variation ('cv'; Kling et al. 2012) or standard
         deviation ('std'; Gupta et al. 2009, Pool et al. 2018) to describe the
-        gamma term
+        gamma term. The default is to calculate the standard deviation.
 
     Returns
     ----------
@@ -508,18 +514,24 @@ def calc_nse(obs, sim):
     """
     Calculate Nash-Sutcliffe-Efficiency (NSE).
 
-    Args
+    Parameters
     ----------
-    obs : array_like
-        observed time series
+    obs : (N,)array_like
+        Observed time series as 1-D array
 
-    sim : array_like
-        simulated time series
+    sim : (N,)array_like
+        Simulated time series as 1-D array
 
     Returns
     ----------
     sig : float
         Nash-Sutcliffe-Efficiency measure
+
+    References
+    ----------
+    Nash, J. E., and Sutcliffe, J. V.: River flow forecasting through conceptual
+    models part I - A discussion of principles, Journal of Hydrology, 10,
+    282-290, 10.1016/0022-1694(70)90255-6, 1970.
     """
     sim_obs_diff = np.sum((sim - obs)**2)
     obs_mean = np.mean(obs)
@@ -528,28 +540,34 @@ def calc_nse(obs, sim):
 
     return sig
 
-def vis2d_de(obs, sim, sort=True, nd=0.05):
+def vis2d_de(obs, sim, sort=True, nd=0., extended=False):
     """
-    2-D visualization of Diagnostic-Efficiency (DE)
+    Polar plot of Diagnostic-Efficiency (DE)
 
-    Args
+    Parameters
     ----------
-    obs : array_like
-        observed time series
+    obs : (N,)array_like
+        Observed time series as 1-D array
 
-    sim : array_like
-        simulated time series
+    sim : (N,)array_like
+        Simulated time series as 1-D array
 
-    sort : boolean, default True
-        if True time series are sorted by ascending order
+    sort : boolean, optional
+        If True, time series are sorted by ascending order. If False, time series
+        are not sorted. The default is to sort.
 
-    nd : float, default 0.05
-        threshold for diagnosis
+    nd : float, optional
+        Threshold for which diagnosis can be made. The default is 0.05.
+
+    extended : boolean, optional
+        If True, extended diagnostic plot is displayed. In addtion, the duration
+        curve of B_rest is plotted besides the polar plot. The default is,
+        that only the diagnostic polar plot is displayed.
     """
     # mean relative bias
     brel_mean = calc_brel_mean(obs, sim, sort=sort)
 
-    str_brel_mean = 'Brel_mean: {}'.format(np.round(brel_mean, decimals=2))
+    str_brel_mean = 'Brel_mean: {}'.format(np.round(brel_mean, decimals=3))
     print(str_brel_mean)
 
     # remaining relative bias
@@ -565,33 +583,25 @@ def vis2d_de(obs, sim, sort=True, nd=0.05):
     # direction of bias
     b_dir = calc_bias_dir(brel_rest)
 
-    str_b_dir = 'B_dir: {}'.format(np.round(b_dir, decimals=2))
+    str_b_dir = 'B_dir: {}'.format(np.round(b_dir, decimals=3))
     print(str_b_dir)
 
     # slope of bias
     b_slope = calc_bias_slope(b_area, b_dir)
 
-    str_b_slope = 'B_slope: {}'.format(np.round(b_slope, decimals=2))
+    str_b_slope = 'B_slope: {}'.format(np.round(b_slope, decimals=3))
     print(str_b_slope)
 
     # convert to radians
     # (y, x) Trigonometric inverse tangent
     diag = np.arctan2(brel_mean, b_slope)
 
-    str_diag = 'diag: {}'.format(np.round(diag, decimals=2))
+    str_diag = 'diag: {}'.format(np.round(diag, decimals=3))
     print(str_diag)
-
-    # create new colormap
-    top = cm.get_cmap('Oranges_r', 128)
-    bottom = cm.get_cmap('Greens', 128)
-
-    newcolors = np.vstack((top(np.linspace(0, 1, 128)),
-                           bottom(np.linspace(0, 1, 128))))
-    ogcmp = ListedColormap(newcolors, name='OrangeGreen')
 
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
-    rgba_color = cm.RdYlGn(norm(temp_cor))
+    rgba_color = cm.YlGnBu(norm(temp_cor))
 
     delta = 0.01  # for spacing
 
@@ -636,65 +646,138 @@ def vis2d_de(obs, sim, sort=True, nd=0.05):
     theta4, r4 = np.meshgrid(xx4, yy)
 
     # diagnostic polar plot
-    fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
-    # dummie plot for colorbar of temporal correlation
-    cs = np.arange(-1, 1.1, 0.1)
-    dummie_cax = ax.scatter(cs, cs, c=cs, cmap='RdYlGn')
-    # Clear axis
-    ax.cla()
-    # contours P overestimation
-    cpio = ax.contourf(theta1, r1, r1, cmap='pink', alpha=.3)
-    # contours P underestimation
-    cpiu = ax.contourf(theta2, r2, r2, cmap='pink', alpha=.3)
-    # contours model errors
-    cpmou = ax.contourf(theta3, r3, r3, cmap='gray', alpha=.3)
-    cpmuo = ax.contourf(theta4, r4, r4, cmap='gray', alpha=.3)
-    # contours of DE
-    cp = ax.contour(theta, r, r, colors='black', alpha=.5)
-    cl = ax.clabel(cp, inline=1, fontsize=8, fmt='%1.1f')
-    # threshold efficiency for FBM
-    sig_diag = 1 - np.sqrt((nd)**2 + (nd)**2 + (nd)**2)
-    # diagnose the error
-    if abs(brel_mean) <= nd and abs(b_slope) > nd and sig <= sig_diag:
-        c = ax.scatter(diag, sig, color=rgba_color)
-    elif abs(brel_mean) > nd and abs(b_slope) <= nd and sig <= sig_diag:
-        c = ax.scatter(diag, sig, color=rgba_color)
-    elif abs(brel_mean) > nd and abs(b_slope) > nd and sig <= sig_diag:
-        c = ax.scatter(diag, sig, color=rgba_color)
-    # FBM
-    elif abs(brel_mean) <= nd and abs(b_slope) <= nd and sig <= sig_diag:
-        c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
-        c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
-    # FGM
-    elif abs(brel_mean) <= nd and abs(b_slope) <= nd and sig > sig_diag:
-        c = ax.scatter(diag, sig, color=rgba_color)
-    ax.set_rticks([])  # turn default ticks off
-    ax.set_rmin(1)
-    ax.set_rmax(-ax_lim)
-    ax.tick_params(labelleft=False, labelright=False, labeltop=False,
-                  labelbottom=False, grid_alpha=.01)  # turn labels and grid off
-    ax.text(5.9, -ax_lim - 0.3, 'High flow underestimation - \n Low flow overestimation', rotation=90)
-    ax.text(1.82, -ax_lim - 0.22, 'P overestimation')
-    ax.text(3.54, -ax_lim - 0.6, 'High flow overestimation - \n Low flow underestimation', rotation=90)
-    ax.text(4.41, -ax_lim - 0.3, 'P underestimation')
-    # add colorbar for temporal correlation
-    cax = fig.add_axes([.88, .15, .02, .7], frameon=False)
-    cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
-                        label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
-    cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
-    cbar.ax.tick_params(direction='in', labelsize=10)
+    if not extended:
+        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'))
+        # dummie plot for colorbar of temporal correlation
+        cs = np.arange(-1, 1.1, 0.1)
+        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+        # Clear axis
+        ax.cla()
+        # contours P overestimation
+        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
+        # contours P underestimation
+        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
+        # contours model errors
+        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
+        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+        # contours of DE
+        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
+        cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+        # threshold efficiency for FBM
+        sig_lim = 1 - np.sqrt((nd)**2 + (nd)**2 + (nd)**2)
+        # relation of b_dir which explains the error
+        if abs(b_area) > 0:
+            exp_err = (abs(b_dir) * 2)/abs(b_area)
+        elif abs(b_area) == 0:
+            exp_err = 0
+        # diagnose the error
+        if abs(brel_mean) <= nd and exp_err > nd and sig <= sig_lim:
+            c = ax.scatter(diag, sig, color=rgba_color)
+        elif abs(brel_mean) > nd and exp_err <= nd and sig <= sig_lim:
+            c = ax.scatter(diag, sig, color=rgba_color)
+        elif abs(brel_mean) > nd and exp_err> nd and sig <= sig_lim:
+            c = ax.scatter(diag, sig, color=rgba_color)
+        # FBM
+        elif abs(brel_mean) <= nd and exp_err <= nd and sig <= sig_lim:
+            c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
+            c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
+        # FGM
+        elif abs(brel_mean) <= nd and exp_err <= nd and sig > sig_lim:
+            c = ax.scatter(diag, sig, color=rgba_color)
+        ax.set_rticks([])  # turn default ticks off
+        ax.set_rmin(1)
+        ax.set_rmax(-ax_lim)
+        ax.tick_params(labelleft=False, labelright=False, labeltop=False,
+                      labelbottom=True, grid_alpha=.01)  # turn labels and grid off
+        ax.set_xticklabels(['', '', 'P overestimation', '', '', '', 'P underestimation', ''])
+        ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        # add colorbar for temporal correlation
+        cax = fig.add_axes([.97, .15, .04, .7], frameon=False)
+        cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
+                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
+        cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
+        cbar.ax.tick_params(direction='in', labelsize=10)
+
+    elif extended:
+            fig = plt.figure(figsize=(12, 6))
+            gs = fig.add_gridspec(1, 2)
+            ax = fig.add_subplot(gs[0, 0], projection='polar')
+            ax1 = fig.add_axes([.65, .3, .35, .35], frameon=True)
+            # dummie plot for colorbar of temporal correlation
+            cs = np.arange(-1, 1.1, 0.1)
+            dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+            # Clear axis
+            ax.cla()
+            # contours P overestimation
+            cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
+            # contours P underestimation
+            cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
+            # contours model errors
+            cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
+            cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+            # contours of DE
+            cp = ax.contour(theta, r, r, colors='black', alpha=.7)
+            cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+            # threshold efficiency for FBM
+            sig_lim = 1 - np.sqrt((nd)**2 + (nd)**2 + (nd)**2)
+            # relation of b_dir which explains the error
+            if abs(b_area) > 0:
+                exp_err = (abs(b_dir) * 2)/abs(b_area)
+            elif abs(b_area) == 0:
+                exp_err = 0
+            # diagnose the error
+            if abs(brel_mean) <= nd and exp_err > nd and sig <= sig_lim:
+                c = ax.scatter(diag, sig, color=rgba_color)
+            elif abs(brel_mean) > nd and exp_err <= nd and sig <= sig_lim:
+                c = ax.scatter(diag, sig, color=rgba_color)
+            elif abs(brel_mean) > nd and exp_err> nd and sig <= sig_lim:
+                c = ax.scatter(diag, sig, color=rgba_color)
+            # FBM
+            elif abs(brel_mean) <= nd and exp_err <= nd and sig <= sig_lim:
+                c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
+                c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
+            # FGM
+            elif abs(brel_mean) <= nd and exp_err <= nd and sig > sig_lim:
+                c = ax.scatter(diag, sig, color=rgba_color)
+            ax.set_rticks([])  # turn default ticks off
+            ax.set_rmin(1)
+            ax.set_rmax(-ax_lim)
+            ax.tick_params(labelleft=False, labelright=False, labeltop=False,
+                          labelbottom=True, grid_alpha=.01)  # turn labels and grid off
+            ax.set_xticklabels(['', '', 'P overestimation', '', '', '', 'P underestimation', ''])
+            ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+            # add colorbar for temporal correlation
+            cax = fig.add_axes([.52, .15, .02, .7], frameon=False)
+            cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
+                                label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
+            cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
+            cbar.ax.tick_params(direction='in', labelsize=10)
+
+            # plot B_rest
+            # calculate exceedence probability
+            prob = np.linspace(0, 1, len(brel_rest))
+            ax1.axhline(y=0, color='slategrey')
+            ax1.axvline(x=0.5, color='slategrey')
+            ax1.plot(prob, brel_rest, color='black')
+            ax1.fill_between(prob, brel_rest, where=0 < brel_rest, facecolor='purple')
+            ax1.fill_between(prob, brel_rest, where=0 > brel_rest, facecolor='red')
+            ax1.set(ylabel=r'$B_{rest}$ [-]',
+                    xlabel='Exceedence probabilty [-]')
+
 
 def vis2d_kge(obs, sim, r='pearson', var='std'):
     """
-    2-D visualization of Kling-Gupta-Efficiency (KGE)
+    Polar plot of Kling-Gupta-Efficiency (KGE)
 
-    Args
+    Parameters
     ----------
-    obs : array_like
-        observed time series
+    obs : (N,)array_like
+        Observed time series as 1-D array
 
-    sim : array_like
-        simulated time series
+    sim : (N,)array_like
+        Simulated time series as 1-D array
     """
     # calculate alpha term
     obs_mean = np.mean(obs)
@@ -719,7 +802,7 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
 
         # convert temporal correlation to color
         norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
-        rgba_color = cm.RdYlGn(norm(temp_cor))
+        rgba_color = cm.YlGnBu(norm(temp_cor))
 
         delta = 0.01  # for spacing
 
@@ -764,33 +847,33 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         theta4, r4 = np.meshgrid(xx4, yy)
 
         # diagnostic polar plot
-        fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
+        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'))
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(-1, 1.1, 0.1)
-        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='RdYlGn')
+        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
         # Clear axis
         ax.cla()
         # contours P overestimation
-        cpio = ax.contourf(theta1, r1, r1, cmap='pink', alpha=.3)
+        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
         # contours P underestimation
-        cpiu = ax.contourf(theta2, r2, r2, cmap='pink', alpha=.3)
+        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
         # contours model errors
-        cpmou = ax.contourf(theta3, r3, r3, cmap='gray', alpha=.3)
-        cpmuo = ax.contourf(theta4, r4, r4, cmap='gray', alpha=.3)
+        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
+        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
         # contours of DE
-        cp = ax.contour(theta, r, r, colors='black', alpha=.5)
-        cl = ax.clabel(cp, inline=1, fontsize=8, fmt='%1.1f')
+        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
+        cl = ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
         # diagnose the error
         c = ax.scatter(diag, sig, color=rgba_color)
         ax.set_rticks([])  # turn defalut ticks off
         ax.set_rmin(1)
         ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
-                      labelbottom=False, grid_alpha=.01)  # turn labels and grid off
-        ax.text(3.2, -ax_lim - .22, r'$\alpha$ [-]', rotation=90)
-        ax.text(4.65, -ax_lim - .18 , r'$\gamma$ [-]')
+                      labelbottom=True, grid_alpha=.01)  # turn labels and grid off
+        ax.text(-.05, 0.5, r'$\alpha$ [-]', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.set_xticklabels(['', '', '', '', '', '', r'$\gamma$ [-]', ''])
         # add colorbar for temporal correlation
-        cax = fig.add_axes([.8, .15, .02, .7], frameon=False)
+        cax = fig.add_axes([.95, .15, .04, .7], frameon=False)
         cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
                             label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -812,7 +895,7 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
 
         # convert temporal correlation to color
         norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
-        rgba_color = cm.RdYlGn(norm(temp_cor))
+        rgba_color = cm.YlGnBu(norm(temp_cor))
 
         delta = 0.01  # for spacing
 
@@ -857,33 +940,33 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         theta4, r4 = np.meshgrid(xx4, yy)
 
         # diagnostic polar plot
-        fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
+        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'))
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(-1, 1.1, 0.1)
-        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='RdYlGn')
+        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
         # Clear axis
         ax.cla()
         # contours P overestimation
-        cpio = ax.contourf(theta1, r1, r1, cmap='pink', alpha=.3)
+        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
         # contours P underestimation
-        cpiu = ax.contourf(theta2, r2, r2, cmap='pink', alpha=.3)
+        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
         # contours model errors
-        cpmou = ax.contourf(theta3, r3, r3, cmap='gray', alpha=.3)
-        cpmuo = ax.contourf(theta4, r4, r4, cmap='gray', alpha=.3)
+        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
+        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
         # contours of DE
-        cp = ax.contour(theta, r, r, colors='black', alpha=.5)
-        cl = ax.clabel(cp, inline=1, fontsize=8, fmt='%1.1f')
+        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
+        cl = ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
         # diagnose the error
         c = ax.scatter(diag, sig, color=rgba_color)
         ax.set_rticks([])  # turn defalut ticks off
         ax.set_rmin(1)
         ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
-                      labelbottom=False, grid_alpha=.01)  # turn labels and grid off
-        ax.text(3.2, -ax_lim - .22, r'$\alpha$ [-]', rotation=90)
-        ax.text(4.65, -ax_lim - .18 , r'$\beta$ [-]')
+                      labelbottom=True, grid_alpha=.01)  # turn labels and grid off
+        ax.text(-.05, 0.5, r'$\alpha$ [-]', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$ [-]', ''])
         # add colorbar for temporal correlation
-        cax = fig.add_axes([.8, .15, .02, .7], frameon=False)
+        cax = fig.add_axes([.95, .15, .04, .7], frameon=False)
         cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
                             label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -895,19 +978,23 @@ def pos_shift_ts(ts, offset=1.5, multi=True):
 
     Mimicking input errors by multiplying/adding with constant offset.
 
-    Args
+    Parameters
     ----------
-    ts : array_like
-        observed time series
+    ts : (N,)array_like
+        Observed time series
 
-    offset : float, int, default 1.25
-        offset multiplied/added to time series. If multi true, offset
-        has to be greater than 1.
+    offset : float, optional
+        Offset multiplied/added to time series. If multi true, offset
+        has to be greater than 1. The default is 25 % of P overestimation.
+
+    multi : boolean, optional
+        If True, offset is multiplied. If False, offset is added. The default
+        is multiplication.
 
     Returns
     ----------
     shift_pos : array_like
-        time series with positve offset
+        Time series with positve offset
     """
     if multi:
         shift_pos = ts * offset
@@ -922,17 +1009,18 @@ def neg_shift_ts(ts, offset=0.5, multi=True):
 
     Mimicking input errors by multiplying/subtracting with constant offset.
 
-    Args
+    Parameters
     ----------
-    ts : array_like
-        time series
+    ts : (N,)array_like
+        Observed time series
 
-    offset : float, int, default 0.75
-        offset multiplied/subtracted to time series. If multi true, offset
-        has to be less than 1.
+    offset : float, optional
+        Offset multiplied/subtracted to time series. If multi true, offset
+        has to be greater than 1. The default is 25 % of P underestimation.
 
-    multi : boolean, default True
-        whether offset is multiplied or not. If false, then
+    multi : boolean, optional
+        If True, offset is multiplied. If False, offset is subtracted. The default
+        is multiplication.
 
     Returns
     ----------
@@ -954,18 +1042,18 @@ def smooth_ts(ts, win=5):
     Time series is smoothed by rolling average. Maxima decrease and minima
     decrease.
 
-    Args
+    Parameters
     ----------
     ts : dataframe
-        time series
+        Time series
 
-    win : int, default 5
-        size of window used to apply rolling mean
+    win : int, optional
+        Size of window used to apply rolling mean. The default is 5 days.
 
     Returns
     ----------
     smoothed_ts : series
-        smoothed time series
+        Smoothed time series
     """
     smoothed_ts = ts.rolling(window=win).mean()
     smoothed_ts.fillna(method='bfill', inplace=True)
@@ -980,15 +1068,18 @@ def highunder_lowover(ts, prop=0.5):
     increasing factors. Medium to low flows are increased by linear
     increasing factors.
 
-    Args
+    Parameters
     ----------
     ts : dataframe
-        observed time series
+        Observed time series
+
+    prop : float, optional
+        Factor by which time series is tilted.
 
     Returns
     ----------
     ts_smoothed : dataframe
-        smoothed time series
+        Smoothed time series
     """
     obs_sim = pd.DataFrame(index=ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.iloc[:, 0] = ts.iloc[:, 0]
@@ -1009,10 +1100,10 @@ def sort_obs(ts):
     """
     Sort time series by observed values.
 
-    Args
+    Parameters
     ----------
     ts : dataframe
-        dataframe with two time series (e.g. observed and simulated)
+        Dataframe with two time series (e.g. observed and simulated)
 
     Returns
     ----------
@@ -1029,13 +1120,13 @@ def _datacheck_peakdetect(x_axis, y_axis):
     """
     Check input data for peak detection.
 
-    Args
+    Parameters
     ----------
     x_axis : str
         path to file with meta informations on the catchments
 
-    y_axis : str, default ‘,’
-        delimeter to use
+    y_axis : str, optional
+        delimeter to use. The default is ','.
 
     Returns
     ----------
@@ -1065,7 +1156,7 @@ def peakdetect(y_axis, x_axis = None, lookahead=200, delta=0):
     Discovers peaks by searching for values which are surrounded by lower
     or larger values for maxima and minima respectively
 
-    Args
+    Parameters
     ----------
     y_axis : array_like
         contains the signal over which to find peaks
@@ -1076,12 +1167,12 @@ def peakdetect(y_axis, x_axis = None, lookahead=200, delta=0):
         index of the y_axis is used.
         (default: None)
 
-    lookahead : int, default 200
+    lookahead : int, optional
         distance to look ahead from a peak candidate to determine if
         it is the actual peak
         '(samples / period) / f' where '4 >= f >= 1.25' might be a good value
 
-    delta : int, default 0
+    delta : int, optional
         this specifies a minimum difference between a peak and
         the following points, before a peak may be considered a peak. Useful
         to hinder the function from picking up false peaks towards to end of
@@ -1190,21 +1281,21 @@ def disaggregate_obs(ts, max_peaks_ind, min_peaks_ind):
     Increase max values and decrease min values.
 
 
-    Args
+    Parameters
     ----------
     ts : dataframe
-        dataframe with time series
+        Dataframe with time series
 
     max_peaks_ind : list
-        index where max. peaks occur
+        Index where max. peaks occur
 
     min_peaks_ind : list
-        index where min. peaks occur
+        Index where min. peaks occur
 
     Returns
     ----------
     ts : dataframe
-        disaggregated time series
+        Disaggregated time series
     """
     idx_max = max_peaks_ind - dt.timedelta(days=1)
     idxu_max = max_peaks_ind.union(idx_max)
@@ -1239,10 +1330,13 @@ def highover_lowunder(ts, prop=0.5):
     decreasing factors. Medium to low flows are decreased by linear
     decreasing factors.
 
-    Args
+    Parameters
     ----------
     ts : dataframe
-        dataframe with time series
+        Dataframe with time series
+
+    prop : float, optional
+        Factor by which time series is tilted.
 
     Returns
     ----------
@@ -1268,12 +1362,12 @@ def time_shift(ts, tshift=3, random=False):
     """
     Timing errors
 
-    Args
+    Parameters
     ----------
     ts : dataframe
         dataframe with time series
 
-    tshift : int, default 5
+    tshift : int, optional
         days by which time series is shifted. Both positive and negative
         time shift are possible.
 
@@ -1305,7 +1399,7 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
     """
     Plot time series.
 
-    Args
+    Parameters
     ----------
     ts : dataframe
         dataframe with time series
