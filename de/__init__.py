@@ -5,4 +5,5 @@ DE - Diagnosing model Efficiency
 """
 
 from __future__ import print_function, division, absolute_import
-from .de import *
+from . import de
+from . import util

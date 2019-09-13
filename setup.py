@@ -19,7 +19,6 @@ management of time series is handled using pandas data frame objects.
 INSTALL_REQUIRES = [
     'numpy',
     'scipy',
-    'scikit-learn',
     'matplotlib',
     'seaborn',
     'pandas',

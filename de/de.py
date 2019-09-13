@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-diagnostic_model_efficiency.de
+de.de
 ~~~~~~~~~~~
 Diagnosing model performance using an efficiency measure based on flow
 duration curve and temoral correlation. The efficiency measure can be
@@ -25,9 +25,6 @@ from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 import scipy as sp
 import scipy.integrate as integrate
-from sklearn import linear_model
-from sklearn.utils import shuffle
-from sklearn.metrics import r2_score
 import seaborn as sns
 # controlling figure aesthetics
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
@@ -48,30 +45,6 @@ __license__ = 'GNU GPLv3'
 _mmd = r'[mm $d^{-1}$]'
 _m3s = r'[$m^{3}$ $s^{-1}$]'
 _q_lab = r'[$m^{3}$ $s^{-1}$]'
-
-def import_ts(path, sep=','):
-    """
-    Import .csv-file with streamflow time series (m3/s).
-
-    Parameters
-    ----------
-    path : str
-        Path to .csv-file which contains time series
-
-    sep : str, optional
-        Delimeter to use. The default is ‘,’.
-
-    Returns
-    ----------
-    df_ts : dataframe
-        Imported time series
-    """
-    df_ts = pd.read_csv(path, sep=sep, na_values=-9999, parse_dates=True,
-                        index_col=0, dayfirst=True)
-    # drop nan values
-    df_ts = df_ts.dropna()
-
-    return df_ts
 
 def plot_ts(ts):
     """
@@ -410,36 +383,6 @@ def calc_de(obs, sim, sort=True):
 
     return sig
 
-def calc_de_sort(obs, sim):
-    """
-    Calculate Diagnostic-Efficiency (DE).
-
-    Simulated values are sorted by order of observed values.
-
-    Parameters
-    ----------
-    obs : (N,)array_like
-        Observed time series as 1-D array
-
-    sim : (N,)array_like
-        Simulated time series
-
-    Returns
-    ----------
-    sig : float
-        diagnostic efficiency measure
-    """
-    # mean relative bias
-    brel_mean = calc_brel_mean(obs, sim)
-    # remaining relative bias
-    brel_rest = calc_brel_rest(obs, sim)
-    # area of relative remaing bias
-    b_area = calc_b_area(brel_rest)
-    # diagnostic efficiency
-    sig = 1 - np.sqrt((brel_mean)**2 + (b_area)**2)
-
-    return sig
-
 def calc_kge(obs, sim, r='pearson', var='std'):
     """
     Calculate Kling-Gupta-Efficiency (KGE).
@@ -540,7 +483,7 @@ def calc_nse(obs, sim):
 
     return sig
 
-def vis2d_de(obs, sim, sort=True, nd=0., extended=False):
+def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
     """
     Polar plot of Diagnostic-Efficiency (DE)
 
@@ -556,7 +499,7 @@ def vis2d_de(obs, sim, sort=True, nd=0., extended=False):
         If True, time series are sorted by ascending order. If False, time series
         are not sorted. The default is to sort.
 
-    nd : float, optional
+    lim : float, optional
         Threshold for which diagnosis can be made. The default is 0.05.
 
     extended : boolean, optional
@@ -647,7 +590,7 @@ def vis2d_de(obs, sim, sort=True, nd=0., extended=False):
 
     # diagnostic polar plot
     if not extended:
-        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'))
+        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'), constrained_layout=True)
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(-1, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
@@ -664,25 +607,25 @@ def vis2d_de(obs, sim, sort=True, nd=0., extended=False):
         cp = ax.contour(theta, r, r, colors='black', alpha=.7)
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
         # threshold efficiency for FBM
-        sig_lim = 1 - np.sqrt((nd)**2 + (nd)**2 + (nd)**2)
+        sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
         # relation of b_dir which explains the error
         if abs(b_area) > 0:
             exp_err = (abs(b_dir) * 2)/abs(b_area)
         elif abs(b_area) == 0:
             exp_err = 0
         # diagnose the error
-        if abs(brel_mean) <= nd and exp_err > nd and sig <= sig_lim:
+        if abs(brel_mean) <= lim and exp_err > lim and sig <= sig_lim:
             c = ax.scatter(diag, sig, color=rgba_color)
-        elif abs(brel_mean) > nd and exp_err <= nd and sig <= sig_lim:
+        elif abs(brel_mean) > lim and exp_err <= lim and sig <= sig_lim:
             c = ax.scatter(diag, sig, color=rgba_color)
-        elif abs(brel_mean) > nd and exp_err> nd and sig <= sig_lim:
+        elif abs(brel_mean) > lim and exp_err> lim and sig <= sig_lim:
             c = ax.scatter(diag, sig, color=rgba_color)
         # FBM
-        elif abs(brel_mean) <= nd and exp_err <= nd and sig <= sig_lim:
+        elif abs(brel_mean) <= lim and exp_err <= lim and sig <= sig_lim:
             c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
             c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
         # FGM
-        elif abs(brel_mean) <= nd and exp_err <= nd and sig > sig_lim:
+        elif abs(brel_mean) <= lim and exp_err <= lim and sig > sig_lim:
             c = ax.scatter(diag, sig, color=rgba_color)
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
@@ -693,17 +636,16 @@ def vis2d_de(obs, sim, sort=True, nd=0., extended=False):
         ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
         ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
         # add colorbar for temporal correlation
-        cax = fig.add_axes([.97, .15, .04, .7], frameon=False)
-        cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
-                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
         cbar.ax.tick_params(direction='in', labelsize=10)
 
     elif extended:
-            fig = plt.figure(figsize=(12, 6))
+            fig = plt.figure(figsize=(12, 6), constrained_layout=True)
             gs = fig.add_gridspec(1, 2)
             ax = fig.add_subplot(gs[0, 0], projection='polar')
-            ax1 = fig.add_axes([.65, .3, .35, .35], frameon=True)
+            ax1 = fig.add_axes([.64, .3, .33, .33], frameon=True)
             # dummie plot for colorbar of temporal correlation
             cs = np.arange(-1, 1.1, 0.1)
             dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
@@ -720,25 +662,25 @@ def vis2d_de(obs, sim, sort=True, nd=0., extended=False):
             cp = ax.contour(theta, r, r, colors='black', alpha=.7)
             cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
             # threshold efficiency for FBM
-            sig_lim = 1 - np.sqrt((nd)**2 + (nd)**2 + (nd)**2)
+            sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
             # relation of b_dir which explains the error
             if abs(b_area) > 0:
                 exp_err = (abs(b_dir) * 2)/abs(b_area)
             elif abs(b_area) == 0:
                 exp_err = 0
             # diagnose the error
-            if abs(brel_mean) <= nd and exp_err > nd and sig <= sig_lim:
+            if abs(brel_mean) <= lim and exp_err > lim and sig <= sig_lim:
                 c = ax.scatter(diag, sig, color=rgba_color)
-            elif abs(brel_mean) > nd and exp_err <= nd and sig <= sig_lim:
+            elif abs(brel_mean) > lim and exp_err <= lim and sig <= sig_lim:
                 c = ax.scatter(diag, sig, color=rgba_color)
-            elif abs(brel_mean) > nd and exp_err> nd and sig <= sig_lim:
+            elif abs(brel_mean) > lim and exp_err> lim and sig <= sig_lim:
                 c = ax.scatter(diag, sig, color=rgba_color)
             # FBM
-            elif abs(brel_mean) <= nd and exp_err <= nd and sig <= sig_lim:
+            elif abs(brel_mean) <= lim and exp_err <= lim and sig <= sig_lim:
                 c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
                 c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
             # FGM
-            elif abs(brel_mean) <= nd and exp_err <= nd and sig > sig_lim:
+            elif abs(brel_mean) <= lim and exp_err <= lim and sig > sig_lim:
                 c = ax.scatter(diag, sig, color=rgba_color)
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
@@ -749,9 +691,8 @@ def vis2d_de(obs, sim, sort=True, nd=0., extended=False):
             ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
             ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
             # add colorbar for temporal correlation
-            cax = fig.add_axes([.52, .15, .02, .7], frameon=False)
-            cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
-                                label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
+            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+                                label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
             cbar.ax.tick_params(direction='in', labelsize=10)
 
@@ -765,7 +706,6 @@ def vis2d_de(obs, sim, sort=True, nd=0., extended=False):
             ax1.fill_between(prob, brel_rest, where=0 > brel_rest, facecolor='red')
             ax1.set(ylabel=r'$B_{rest}$ [-]',
                     xlabel='Exceedence probabilty [-]')
-
 
 def vis2d_kge(obs, sim, r='pearson', var='std'):
     """
@@ -847,7 +787,7 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         theta4, r4 = np.meshgrid(xx4, yy)
 
         # diagnostic polar plot
-        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'))
+        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'), constrained_layout=True)
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(-1, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
@@ -873,9 +813,8 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         ax.text(-.05, 0.5, r'$\alpha$ [-]', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
         ax.set_xticklabels(['', '', '', '', '', '', r'$\gamma$ [-]', ''])
         # add colorbar for temporal correlation
-        cax = fig.add_axes([.95, .15, .04, .7], frameon=False)
-        cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
-                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
         cbar.ax.tick_params(direction='in', labelsize=10)
 
@@ -940,7 +879,7 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         theta4, r4 = np.meshgrid(xx4, yy)
 
         # diagnostic polar plot
-        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'))
+        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'), constrained_layout=True)
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(-1, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
@@ -966,14 +905,15 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         ax.text(-.05, 0.5, r'$\alpha$ [-]', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
         ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$ [-]', ''])
         # add colorbar for temporal correlation
-        cax = fig.add_axes([.95, .15, .04, .7], frameon=False)
-        cbar = fig.colorbar(dummie_cax, cax=cax, orientation='vertical',
-                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1])
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
         cbar.ax.tick_params(direction='in', labelsize=10)
 
 def pos_shift_ts(ts, offset=1.5, multi=True):
     """
+    Generate input data errors.
+
     Precipitation overestimation.
 
     Mimicking input errors by multiplying/adding with constant offset.
@@ -1005,6 +945,8 @@ def pos_shift_ts(ts, offset=1.5, multi=True):
 
 def neg_shift_ts(ts, offset=0.5, multi=True):
     """
+    Generate input data errors.
+
     Precipitation underestimation.
 
     Mimicking input errors by multiplying/subtracting with constant offset.
@@ -1035,33 +977,10 @@ def neg_shift_ts(ts, offset=0.5, multi=True):
 
     return shift_neg
 
-def smooth_ts(ts, win=5):
-    """
-    Underestimate high flows - Overestimate low flows.
-
-    Time series is smoothed by rolling average. Maxima decrease and minima
-    decrease.
-
-    Parameters
-    ----------
-    ts : dataframe
-        Time series
-
-    win : int, optional
-        Size of window used to apply rolling mean. The default is 5 days.
-
-    Returns
-    ----------
-    smoothed_ts : series
-        Smoothed time series
-    """
-    smoothed_ts = ts.rolling(window=win).mean()
-    smoothed_ts.fillna(method='bfill', inplace=True)
-
-    return smoothed_ts
-
 def highunder_lowover(ts, prop=0.5):
     """
+    Generate model errors.
+
     Underestimate high flows - Overestimate low flows
 
     Mimicking model errors. High to medium flows are decreased by linear
@@ -1096,232 +1015,10 @@ def highunder_lowover(ts, prop=0.5):
 
     return ts_smoothed
 
-def sort_obs(ts):
-    """
-    Sort time series by observed values.
-
-    Parameters
-    ----------
-    ts : dataframe
-        Dataframe with two time series (e.g. observed and simulated)
-
-    Returns
-    ----------
-    obs_sort : dataframe
-        dataframe with two time series sorted by the observed values
-        in ascending order
-    """
-    df_ts = pd.DataFrame(data=ts)
-    obs_sort = df_ts.sort_values(by=['Qobs'], ascending=False)
-
-    return obs_sort
-
-def _datacheck_peakdetect(x_axis, y_axis):
-    """
-    Check input data for peak detection.
-
-    Parameters
-    ----------
-    x_axis : str
-        path to file with meta informations on the catchments
-
-    y_axis : str, optional
-        delimeter to use. The default is ','.
-
-    Returns
-    ----------
-    x_axis : dataframe
-        imported time series
-    """
-
-    if x_axis is None:
-        x_axis = range(len(y_axis))
-
-    if len(y_axis) != len(x_axis):
-        raise ValueError("Input vectors y_axis and x_axis must have same length")
-
-    #needs to be a numpy array
-    y_axis = np.array(y_axis)
-    x_axis = np.array(x_axis)
-
-    return x_axis, y_axis
-
-def peakdetect(y_axis, x_axis = None, lookahead=200, delta=0):
-    """
-    Converted from/based on a MATLAB scripts at:
-    http://billauer.co.il/peakdet.html
-    https://gist.github.com/sixtenbe/1178136
-
-    Function for detecting local maxima and minima in a signal.
-    Discovers peaks by searching for values which are surrounded by lower
-    or larger values for maxima and minima respectively
-
-    Parameters
-    ----------
-    y_axis : array_like
-        contains the signal over which to find peaks
-
-    x_axis : array_like, optional
-        values correspond to the y_axis list and is used
-        in the return to specify the position of the peaks. If omitted an
-        index of the y_axis is used.
-        (default: None)
-
-    lookahead : int, optional
-        distance to look ahead from a peak candidate to determine if
-        it is the actual peak
-        '(samples / period) / f' where '4 >= f >= 1.25' might be a good value
-
-    delta : int, optional
-        this specifies a minimum difference between a peak and
-        the following points, before a peak may be considered a peak. Useful
-        to hinder the function from picking up false peaks towards to end of
-        the signal. It is recommended that delta should be set to
-        delta >= RMSnoise * 5.
-        When omitted delta function causes a 20% decrease in speed.
-        When used correctly it can double the speed of the function.
-
-    Returns
-    ----------
-    max_peaks : list
-        containing the positive peaks. Each cell of the list contains a tuple
-        of: (position, peak_value)
-        to get the average peak value do: np.mean(max_peaks, 0)[1] on the
-        results to unpack one of the lists into x, y coordinates do:
-        x, y = zip(*max_peaks)
-
-    min_peaks : list
-        containing the negative peaks. Each cell of the list contains a tuple
-        of: (position, peak_value)
-        to get the average peak value do: np.mean(max_peaks, 0)[1] on the
-        results to unpack one of the lists into x, y coordinates do:
-        x, y = zip(*max_peaks)
-    """
-    max_peaks = []
-    min_peaks = []
-    dump = []  # Used to pop the first hit which is false
-
-    # check input data
-    x_axis, y_axis = _datacheck_peakdetect(x_axis, y_axis)
-    # store data length for later use
-    length = len(y_axis)
-
-    # perform some checks
-    if lookahead < 1:
-        raise ValueError("Lookahead must be '1' or above in value")
-    if not (np.isscalar(delta) and delta >= 0):
-        raise ValueError("delta must be a positive number")
-
-    # maxima and minima candidates are temporarily stored in
-    # mx and mn respectively
-    mn, mx = np.Inf, -np.Inf
-
-    # Only detect peak if there is 'lookahead' amount of points after it
-    for index, (x, y) in enumerate(zip(x_axis[:-lookahead], y_axis[:-lookahead])):
-        if y > mx:
-            mx = y
-            mxpos = x
-        if y < mn:
-            mn = y
-            mnpos = x
-
-        #### look for max ####
-        if y < mx-delta and mx != np.Inf:
-            # Maxima peak candidate found
-            # look ahead in signal to ensure that this is a peak and not jitter
-            if y_axis[index:index+lookahead].max() < mx:
-                max_peaks.append([mxpos, mx])
-                dump.append(True)
-                #set algorithm to only find minima now
-                mx = np.Inf
-                mn = np.Inf
-                if index+lookahead >= length:
-                    # end is within lookahead no more peaks can be found
-                    break
-                continue
-            #else:  #slows shit down this does
-            #    mx = ahead
-            #    mxpos = x_axis[np.where(y_axis[index:index+lookahead]==mx)]
-
-        #### look for min ####
-        if y > mn+delta and mn != -np.Inf:
-            # Minima peak candidate found
-            # look ahead in signal to ensure that this is a peak and not jitter
-            if y_axis[index:index+lookahead].min() > mn:
-                min_peaks.append([mnpos, mn])
-                dump.append(False)
-                # set algorithm to only find maxima now
-                mn = -np.Inf
-                mx = -np.Inf
-                if index+lookahead >= length:
-                    #end is within lookahead no more peaks can be found
-                    break
-            #else:  #slows shit down this does
-            #    mn = ahead
-            #    mnpos = x_axis[np.where(y_axis[index:index+lookahead]==mn)]
-
-
-    #Remove the false hit on the first value of the y_axis
-    try:
-        if dump[0]:
-            max_peaks.pop(0)
-        else:
-            min_peaks.pop(0)
-        del dump
-    except IndexError:
-        # no peaks were found, should the function return empty lists?
-        pass
-
-    return max_peaks, min_peaks
-
-def disaggregate_obs(ts, max_peaks_ind, min_peaks_ind):
-    """
-    Overestimate high flows - Underestimate low flows.
-
-    Increase max values and decrease min values.
-
-
-    Parameters
-    ----------
-    ts : dataframe
-        Dataframe with time series
-
-    max_peaks_ind : list
-        Index where max. peaks occur
-
-    min_peaks_ind : list
-        Index where min. peaks occur
-
-    Returns
-    ----------
-    ts : dataframe
-        Disaggregated time series
-    """
-    idx_max = max_peaks_ind - dt.timedelta(days=1)
-    idxu_max = max_peaks_ind.union(idx_max)
-    idx1_max = max_peaks_ind - dt.timedelta(days=2)
-#    idxu1_max = idxu_max.union(idx1_max)
-
-    idx_min = min_peaks_ind + dt.timedelta(days=1)
-    idxu_min = min_peaks_ind.union(idx_min)
-    idx1_min = min_peaks_ind + dt.timedelta(days=2)
-#    idxu1_min = idxu_min.union(idx1_min)
-
-    ts.loc[idx1_max, 'Qobs'] = ts.loc[idx1_max, 'Qobs'] * 1.1
-    ts.loc[idx_max, 'Qobs'] = ts.loc[idx_max, 'Qobs'] * 1.2
-    ts.loc[max_peaks_ind, 'Qobs'] = ts.loc[max_peaks_ind, 'Qobs'] * 1.3
-
-    ts.loc[idx1_min, 'Qobs'] = ts.loc[idx1_min, 'Qobs'] * 0.5
-    ts.loc[idx_min, 'Qobs'] = ts.loc[idx_min, 'Qobs'] * 0.5
-    ts.loc[min_peaks_ind, 'Qobs'] = ts.loc[min_peaks_ind, 'Qobs'] * 0.5
-
-#    ts.loc[idxu1_max, 'Qobs'] = ts.loc[idxu1_max, 'Qobs'] * 1.01
-#    ts.loc[idxu1_min, 'Qobs'] = ts.loc[idxu1_min, 'Qobs'] * 0.99
-
-    return ts
-
 def highover_lowunder(ts, prop=0.5):
     """
+    Generate model errors.
+
     Overestimate high flows - Underestimate low flows.
 
     Increase max values and decrease min values.
@@ -1358,9 +1055,9 @@ def highover_lowunder(ts, prop=0.5):
 
     return ts_disagg
 
-def time_shift(ts, tshift=3, random=False):
+def time_shift(ts, tshift=3, random=True):
     """
-    Timing errors
+    Generate timing errors.
 
     Parameters
     ----------
@@ -1369,10 +1066,10 @@ def time_shift(ts, tshift=3, random=False):
 
     tshift : int, optional
         days by which time series is shifted. Both positive and negative
-        time shift are possible.
+        time shift are possible. The default is 3 days.
 
-    random : boolean, default False
-        whether time series is shuffled or not.
+    random : boolean, optional
+        If True, time series is shuffled. The feault is shuffling.
 
     Returns
     ----------
@@ -1390,213 +1087,7 @@ def time_shift(ts, tshift=3, random=False):
     if random:
         ts_shift = ts
         y = ts_shift.iloc[:, 0].values
-        ys = shuffle(y, random_state=0)
+        ys = np.random.shuffle(y)
         ts_shift.iloc[:, 0] = ys
 
     return ts_shift
-
-def plot_peaks(ts, max_peak_ts, min_peak_ts):
-    """
-    Plot time series.
-
-    Parameters
-    ----------
-    ts : dataframe
-        dataframe with time series
-
-    max_peak_ts : dataframe
-        dataframe with max. peaks of time series
-
-    min_peak_ts : dataframe
-        dataframe with min. peaks of time series
-    """
-    fig, ax = plt.subplots()
-    ax.plot(ts.index, ts.iloc[:, 0].values, color='blue')
-    ax.plot(max_peak_ts.index, max_peak_ts.iloc[:, 0].values, 'r.')
-    ax.plot(min_peak_ts.index, min_peak_ts.iloc[:, 0].values, 'g.')
-    ax.set(ylabel=r'[$m^{3}$ $s^{-1}$]',
-           xlabel='Time [Days]')
-
-
-if __name__ == "__main__":
-   path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/9960682_Q_1970_2012.csv'
-##    path = '/Users/robo/Desktop/PhD/de/examples/data/9960682_Q_1970_2012.csv'
-
-   # import observed time series
-   df_ts = import_ts(path, sep=';')
-#    plot_ts(df_ts)
-
-#    # peak detection
-#    obs_arr = df_ts['Qobs'].values
-#    ll_ind = df_ts.index.tolist()
-#    max_peaks, min_peaks = peakdetect(obs_arr, x_axis=ll_ind, lookahead=7)
-#    max_peaks_ind, max_peaks_val = zip(*max_peaks)
-#    min_peaks_ind, min_peaks_val = zip(*min_peaks)
-#    df_max_peaks = pd.DataFrame(index=max_peaks_ind, data=max_peaks_val, columns=['max_peaks'])
-#    df_min_peaks = pd.DataFrame(index=min_peaks_ind, data=min_peaks_val, columns=['min_peaks'])
-#    plot_peaks(df_ts, df_max_peaks, df_min_peaks)
-#
-#    ### increase high flows - decrease low flows ###
-#    tsd = disaggregate_obs(df_ts.copy(), df_max_peaks.index, df_min_peaks.index)
-#    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-#    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qobs']  # disaggregated time series
-#    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#
-#    obs_arr = obs_sim['Qobs'].values
-#    sim_arr = obs_sim['Qsim'].values
-
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
-
-#    ### increase high flows - decrease low flows ###
-#    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-#    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    tsd = highover_lowunder(df_ts.copy(), prop=.99)
-#    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0]  # disaggregated time series
-#    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#
-#    obs_arr = obs_sim['Qobs'].values
-#    sim_arr = obs_sim['Qsim'].values
-#
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
-
-    # obs_sim_sort = sort_obs(obs_sim)
-    # obs_arr_sort = obs_sim_sort['Qobs'].values
-    # sim_arr_sort = obs_sim_sort['Qsim'].values
-    # sig_der_sort = calc_de_sort(obs_arr_sort, sim_arr_sort)
-    # sig_de_sort = calc_de(obs_arr_sort, sim_arr_sort, sort=False)
-    # fdc_obs_sort(obs_sim_sort)
-    # vis2d_de(obs_arr_sort, sim_arr_sort, sort=False)
-
-#    ### decrease high flows - increase low flows ###
-#    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-#    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    obs_sim.loc[:, 'Qsim'] = smooth_ts(df_ts['Qobs'], win=5)  # smoothed time series
-#    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#
-#    obs_arr = obs_sim['Qobs'].values
-#    sim_arr = obs_sim['Qsim'].values
-#
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
-#
-#    ### decrease high flows - increase low flows ###
-#    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-#    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    tss = highunder_lowover(df_ts.copy())  # smoothed time series
-#    obs_sim.loc[:, 'Qsim'] = tss.iloc[:, 0]  # smoothed time series
-#    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#
-#    obs_arr = obs_sim['Qobs'].values
-#    sim_arr = obs_sim['Qsim'].values
-#
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
-#
-   ### precipitation surplus ###
-   obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-   obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-   obs_sim.loc[:, 'Qsim'] = pos_shift_ts(df_ts['Qobs'].values)  # positive offset
-   plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-   fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-
-   obs_arr = obs_sim['Qobs'].values
-   sim_arr = obs_sim['Qsim'].values
-
-   sig_de = calc_de(obs_arr, sim_arr)
-   sig_kge = calc_kge(obs_arr, sim_arr)
-   sig_nse = calc_nse(obs_arr, sim_arr)
-
-   vis2d_de(obs_arr, sim_arr)
-   vis2d_kge(obs_arr, sim_arr)
-
-#    ### precipitation shortage ###
-#    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-#    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    obs_sim.loc[:, 'Qsim'] = neg_shift_ts(df_ts['Qobs'].values)  # negative offset
-#    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#
-#    obs_arr = obs_sim['Qobs'].values
-#    sim_arr = obs_sim['Qsim'].values
-#
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
-
-
-#    ### averaged time series ###
-#    obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
-#    obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-#    obs_mean = np.mean(obs_sim['Qobs'].values)
-#    obs_sim.loc[:, 'Qsim'] = np.repeat(obs_mean, len(obs_sim['Qobs'].values))
-#    plot_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#    fdc_obs_sim(obs_sim['Qobs'], obs_sim['Qsim'])
-#
-#    obs_arr = obs_sim['Qobs'].values
-#    sim_arr = obs_sim['Qsim'].values
-#
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
-
-
-#    ### Tier-1 ###
-#    path_wrr1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/GRDC_4103631_wrr1.csv'
-#    df_wrr1 = import_ts(path_wrr1, sep=';')
-#    fdc_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
-#    plot_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
-#
-#    obs_arr = df_wrr1['Qobs'].values
-#    sim_arr = df_wrr1['Qsim'].values
-#
-#    sig_de = calc_de(obs_arr, sim_arr)
-#    sig_kge = calc_kge(obs_arr, sim_arr)
-#    sig_nse = calc_nse(obs_arr, sim_arr)
-#
-#    vis2d_de(obs_arr, sim_arr)
-#    vis2d_kge(obs_arr, sim_arr)
-
-   # ### Tier-2 ###
-   # path_wrr2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/GRDC_4103631_wrr2.csv'
-   # df_wrr2 = import_ts(path_wrr2, sep=';')
-   # fdc_obs_sim(df_wrr2['Qobs'], df_wrr2['Qsim'])
-   # plot_obs_sim(df_wrr2['Qobs'], df_wrr2['Qsim'])
-   #
-   # obs_arr = df_wrr2['Qobs'].values
-   # sim_arr = df_wrr2['Qsim'].values
-   #
-   # sig_de = calc_de(obs_arr, sim_arr)
-   # sig_kge = calc_kge(obs_arr, sim_arr)
-   # sig_nse = calc_nse(obs_arr, sim_arr)
-   #
-   # vis2d_de(obs_arr, sim_arr)
-   # vis2d_kge(obs_arr, sim_arr)
