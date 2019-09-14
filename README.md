@@ -29,32 +29,32 @@ This software can be distributed freely under the GPL v3 license. Please read th
 ## Installation
 PyPI:
 
-```
-  pip install de
+```bash
+pip install de
 ```  
   
 
 GIT:
 
-```
-  git clone https://github.com/schwemro/de.git
-  cd de
-  pip install -e .
+```bash
+git clone https://github.com/schwemro/de.git
+cd de
+pip install -e .
 ```
 
 ## Usage
 
-```
-  from de import de
-  from de import util
+```python
+from de import de
+from de import util
 
-  path = '.../obs_sim.csv'
-  df_ts = util.import_ts(path, sep=';')
+path = '.../obs_sim.csv'
+df_ts = util.import_ts(path, sep=';')
 
-  obs_arr = df_ts['Qobs'].values
-  sim_arr = df_ts['Qsim'].values
+obs_arr = df_ts['Qobs'].values
+sim_arr = df_ts['Qsim'].values
 
-  sig_de = de.calc_de(obs_arr, sim_arr)
+sig_de = de.calc_de(obs_arr, sim_arr)
 
-  de.vis2d_de(obs_arr, sim_arr)
+de.vis2d_de(obs_arr, sim_arr)
 ```
