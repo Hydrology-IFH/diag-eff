@@ -8,7 +8,7 @@ Info: de needs Python >= 3.6!
 
 ## How to cite
 
-In case you use SciKit-GStat in other software or scientific publications,
+In case you use de in other software or scientific publications,
 please reference this module. It is published and has a DOI. It can be cited
 as:
     ...
