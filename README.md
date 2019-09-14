@@ -29,22 +29,22 @@ This software can be distributed freely under the GPL v3 license. Please read th
 ## Installation
 PyPI:
 
-.. code-block:: bash
-
+```
   pip install de
+```  
+  
 
 GIT:
 
-.. code-block:: bash
-
+```
   git clone https://github.com/schwemro/de.git
   cd de
   pip install -e .
+```
 
 ## Usage
 
-.. code-block:: python
-
+```
   from de import de
   from de import util
 
@@ -57,3 +57,4 @@ GIT:
   sig_de = de.calc_de(obs_arr, sim_arr)
 
   de.vis2d_de(obs_arr, sim_arr)
+```
