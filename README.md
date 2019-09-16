@@ -8,7 +8,7 @@ Info: de needs Python >= 3.6!
 
 ## How to cite
 
-In case you use SciKit-GStat in other software or scientific publications,
+In case you use de in other software or scientific publications,
 please reference this module. It is published and has a DOI. It can be cited
 as:
     ...
@@ -29,31 +29,32 @@ This software can be distributed freely under the GPL v3 license. Please read th
 ## Installation
 PyPI:
 
-.. code-block:: bash
-
-  pip install de
+```bash
+pip install de
+```  
+  
 
 GIT:
 
-.. code-block:: bash
-
-  git clone https://github.com/schwemro/de.git
-  cd de
-  pip install -e .
+```bash
+git clone https://github.com/schwemro/de.git
+cd de
+pip install -e .
+```
 
 ## Usage
 
-.. code-block:: python
+```python
+from de import de
+from de import util
 
-  from de import de
-  from de import util
+path = '.../obs_sim.csv'
+df_ts = util.import_ts(path, sep=';')
 
-  path = '.../obs_sim.csv'
-  df_ts = util.import_ts(path, sep=';')
+obs_arr = df_ts['Qobs'].values
+sim_arr = df_ts['Qsim'].values
 
-  obs_arr = df_ts['Qobs'].values
-  sim_arr = df_ts['Qsim'].values
+sig_de = de.calc_de(obs_arr, sim_arr)
 
-  sig_de = de.calc_de(obs_arr, sim_arr)
-
-  de.vis2d_de(obs_arr, sim_arr)
+de.vis2d_de(obs_arr, sim_arr)
+```
