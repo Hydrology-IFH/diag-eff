@@ -18,10 +18,7 @@ import numpy as np
 np.seterr(divide='ignore', invalid='ignore')
 import matplotlib
 from matplotlib import cm
-from matplotlib.colors import ListedColormap
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon
-import matplotlib.patches as mpatches
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
@@ -29,7 +26,7 @@ import scipy as sp
 import scipy.integrate as integrate
 import seaborn as sns
 # controlling figure aesthetics
-sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
+sns.set_style('ticks', {'xtick.major.size': 8, 'ytick.major.size': 8})
 
 __title__ = 'de'
 __version__ = '0.1'
@@ -46,7 +43,7 @@ __license__ = 'GNU GPLv3'
 
 _mmd = r'[mm $d^{-1}$]'
 _m3s = r'[$m^{3}$ $s^{-1}$]'
-_q_lab = r'[$m^{3}$ $s^{-1}$]'
+_q_lab = _mmd
 
 def plot_ts(ts):
     """
@@ -134,32 +131,6 @@ def fdc_obs_sim(obs, sim):
            xlabel='Exceedence probabilty [-]', yscale='log')
     ax.legend(loc=1)
 
-def fdc_obs_sort(Q):
-    """
-    Plotting the flow duration curves of observed and simulated runoff.
-    Descending order of ebserved time series is applied to simulated time
-    series.
-
-    Parameters
-    ----------
-    Q : dataframe
-        Containing time series of Qobs and Qsim.
-    """
-    df_Q = pd.DataFrame(data=Q)
-    df_Q_sort = sort_obs(df_Q)
-
-    # calculate exceedence probability
-    ranks_obs = sp.stats.rankdata(df_Q_sort['Qobs'], method='ordinal')
-    ranks_obs = ranks_obs[::-1]
-    prob_obs = [(ranks_obs[i]/(len(df_Q_sort['Qobs'])+1)) for i in range(len(df_Q_sort['Qobs']))]
-
-    fig, ax = plt.subplots()
-    ax.plot(prob_obs, df_Q_sort['Qsim'], color='red', label='Simulated')
-    ax.plot(prob_obs, df_Q_sort['Qobs'], color='blue', label='Observed')
-    ax.set(ylabel=_q_lab,
-           xlabel='Exceedence probabilty [-]', yscale='log')
-    ax.legend(loc=1)
-
 def calc_brel_mean(obs, sim, sort=True):
     """
     Calculate arithmetic mean of relative bias.
@@ -186,6 +157,8 @@ def calc_brel_mean(obs, sim, sort=True):
         sim = np.sort(sim)[::-1]
     sim_obs_diff = np.subtract(sim, obs)
     brel = np.divide(sim_obs_diff, obs)
+    brel[sim_obs_diff==0] = 0
+    brel = brel[np.isfinite(brel)]
     brel_mean = np.mean(brel)
 
     return brel_mean
@@ -216,6 +189,8 @@ def calc_brel_rest(obs, sim, sort=True):
         sim = np.sort(sim)[::-1]
     sim_obs_diff = np.subtract(sim, obs)
     brel = np.divide(sim_obs_diff, obs)
+    brel[sim_obs_diff==0] = 0
+    brel = brel[np.isfinite(brel)]
     brel_mean = np.mean(brel)
     brel_rest = brel - brel_mean
 
@@ -258,7 +233,7 @@ def calc_b_area(brel_rest):
     """
     brel_rest_abs = abs(brel_rest)
     # area of bias
-    b_area = integrate.quad(lambda x: integrand(brel_rest_abs, x), 0, 1)
+    b_area = integrate.quad(lambda x: integrand(brel_rest_abs, x), 0.001, .999, limit=10000)
 
     return b_area[0]
 
@@ -277,7 +252,7 @@ def calc_bias_dir(brel_rest):
         direction of bias
     """
     # integral of relative bias < 50 %
-    hf_area = integrate.quad(lambda x: integrand(brel_rest, x), 0, .5)
+    hf_area = integrate.quad(lambda x: integrand(brel_rest, x), 0.001, .5, limit=10000)
 
     # direction of bias
     b_dir = hf_area[0]
@@ -555,11 +530,14 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
         yy = np.arange(0, 1, delta)[::-1]
         ax_lim = 0
     elif sig <= 0 and sig > -1:
-        yy = np.arange(-1, 1 - delta, delta)[::-1]
+        yy = np.arange(-1, 1, delta)[::-1]
         ax_lim = 1
     elif sig <= -1:
-        yy = np.arange(-2, 2 - delta, delta)[::-1]
+        yy = np.arange(-2, 1, delta)[::-1]
         ax_lim = 2
+    elif sig <= -2:
+        yy = np.arange(-3, 1, delta)[::-1]
+        ax_lim = 3
 
     len_yy = len(yy)
 
@@ -760,12 +738,15 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
     if sig_min > 0:
         yy = np.arange(0, 1, delta)[::-1]
         ax_lim = 0
-    elif sig_min <= 0 and sig > -1:
-        yy = np.arange(-1, 1 - delta, delta)[::-1]
+    elif sig_min <= 0 and sig_min > -1:
+        yy = np.arange(-1, 1, delta)[::-1]
         ax_lim = 1
     elif sig_min <= -1:
-        yy = np.arange(-2, 2 - delta, delta)[::-1]
+        yy = np.arange(-2, 1, delta)[::-1]
         ax_lim = 2
+    elif sig_min <= -2:
+        yy = np.arange(-3, 1, delta)[::-1]
+        ax_lim = 3
 
     len_yy = len(yy)
 
@@ -846,7 +827,7 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
         ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.set_xticklabels(['', '', 'P overestimation', '', '', '', 'P underestimation', ''])
+        ax.set_xticklabels(['', '', 'P overestimation', '', '', r'0$^\circ$/360$^\circ$', 'P underestimation', ''])
         ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
         ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
         # add colorbar for temporal correlation
@@ -907,7 +888,7 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-            ax.set_xticklabels(['', '', 'P overestimation', '', '', '', 'P underestimation', ''])
+            ax.set_xticklabels(['', '', 'P overestimation', '', '', r'0$^\circ$/360$^\circ$', 'P underestimation', ''])
             ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
             ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
             # add colorbar for temporal correlation
@@ -916,20 +897,55 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
             cbar.ax.tick_params(direction='in', labelsize=10)
 
-            # plot 1-D density
-            ax1 = sns.kdeplot(diag, shade=True, color="r")
-            ax1.axvline(x=np.deg2rad(45), color='slategrey')
-            ax1.axvline(x=np.deg2rad(135), color='slategrey')
-            ax1.axvline(x=np.deg2rad(225), color='slategrey')
-            ax1.axvline(x=np.deg2rad(315), color='slategrey')
-            ax1.set(ylabel=r'DE [-]',
+            # convert to degrees
+            diag_deg = (diag  * (180 / np.pi)) + 135
+            diag_deg[diag_deg < 0] = 360 - diag_deg[diag_deg < 0]
+
+            # 1-D density plot
+            g = sns.kdeplot(diag_deg, color='k', ax=ax1)
+            kde_data = g.get_lines()[0].get_data()
+            kde_xx = kde_data[0]
+            kde_yy = kde_data[1]
+            x1 = np.where(kde_xx <= 90)[-1][-1]
+            x2 = np.where(kde_xx <= 180)[-1][-1]
+            x3 = np.where(kde_xx <= 270)[-1][-1]
+            ax1.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.3)
+            ax1.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.3)
+            ax1.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.3)
+            ax1.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.3)
+            ax1.set_xticks([0, 90, 180, 270, 360])
+            ax1.set_xlim(0, 360)
+            ax1.set_ylim(0, )
+            ax1.set(ylabel=r'[-]',
                     xlabel='[$^\circ$]')
 
-            # plot 2-D
-            fig, ax2 = plt.subplots()
-            ax2 = sns.kdeplot(diag, sig_de)
-            ax2.set(ylabel=r'[-]',
-                    xlabel='[$^\circ$]')
+            # 2-D density plot
+            # g = (sns.jointplot(diag_deg, sig_de, color='k', marginal_kws={'color':'k'}).plot_joint(sns.kdeplot, zorder=0, n_levels=10))
+            g = (sns.jointplot(diag_deg, sig_de, kind='kde', zorder=0, alpha=.5, n_levels=20, cmap='Greens_d', joint_kws={'shade':False}, marginal_kws={'color':'k', 'shade':False}).plot_joint(sns.scatterplot, color='k', alpha=.5))
+            g.set_axis_labels(r'[$^\circ$]', r'DE [-]')
+            g.ax_joint.set_xticks([0, 90, 180, 270, 360])
+            g.ax_joint.set_xlim(0, 360)
+            g.ax_joint.set_ylim(-ax_lim, 1)
+            g.ax_marg_x.set_xticks([0, 90, 180, 270, 360])
+            kde_data = g.ax_marg_x.get_lines()[0].get_data()
+            kde_xx = kde_data[0]
+            kde_yy = kde_data[1]
+            x1 = np.where(kde_xx <= 90)[-1][-1]
+            x2 = np.where(kde_xx <= 180)[-1][-1]
+            x3 = np.where(kde_xx <= 270)[-1][-1]
+            g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.3)
+            g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.3)
+            g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.3)
+            g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.3)
+            kde_data = g.ax_marg_y.get_lines()[0].get_data()
+            kde_xx = kde_data[0]
+            kde_yy = kde_data[1]
+            norm = matplotlib.colors.Normalize(vmin=-ax_lim, vmax=1.0)
+            colors = cm.Reds_r(norm(kde_yy))
+            npts = len(kde_xx)
+            for i in range(npts - 1):
+                g.ax_marg_y.fill_betweenx([kde_yy[i], kde_yy[i+1]], [kde_xx[i], kde_xx[i+1]], color=colors[i])
+            g.fig.tight_layout()
 
 def vis2d_kge(obs, sim, r='pearson', var='std'):
     """

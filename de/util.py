@@ -72,6 +72,32 @@ def sort_obs(ts):
 
     return obs_sort
 
+def fdc_obs_sort(Q):
+    """
+    Plotting the flow duration curves of observed and simulated runoff.
+    Descending order of ebserved time series is applied to simulated time
+    series.
+
+    Parameters
+    ----------
+    Q : dataframe
+        Containing time series of Qobs and Qsim.
+    """
+    df_Q = pd.DataFrame(data=Q)
+    df_Q_sort = sort_obs(df_Q)
+
+    # calculate exceedence probability
+    ranks_obs = sp.stats.rankdata(df_Q_sort['Qobs'], method='ordinal')
+    ranks_obs = ranks_obs[::-1]
+    prob_obs = [(ranks_obs[i]/(len(df_Q_sort['Qobs'])+1)) for i in range(len(df_Q_sort['Qobs']))]
+
+    fig, ax = plt.subplots()
+    ax.plot(prob_obs, df_Q_sort['Qsim'], color='red', label='Simulated')
+    ax.plot(prob_obs, df_Q_sort['Qobs'], color='blue', label='Observed')
+    ax.set(ylabel=_q_lab,
+           xlabel='Exceedence probabilty [-]', yscale='log')
+    ax.legend(loc=1)
+
 def calc_de_sort(obs, sim):
     """
     Calculate Diagnostic-Efficiency (DE).
