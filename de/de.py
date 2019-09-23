@@ -17,6 +17,8 @@ import numpy as np
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
 np.seterr(divide='ignore', invalid='ignore')
 import matplotlib
+import matplotlib.dates as mdates
+import matplotlib.transforms as mtransforms
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -43,7 +45,8 @@ __license__ = 'GNU GPLv3'
 
 _mmd = r'[mm $d^{-1}$]'
 _m3s = r'[$m^{3}$ $s^{-1}$]'
-_q_lab = _mmd
+_q_lab = _m3s
+_sim_lab = 'Manipulated'
 
 def plot_ts(ts):
     """
@@ -57,7 +60,15 @@ def plot_ts(ts):
     fig, ax = plt.subplots()
     ax.plot(ts.index, ts.iloc[:, 0].values, color='blue')
     ax.set(ylabel=_q_lab,
-           xlabel='Time [Days]')
+           xlabel='Time [Years]')
+    ax.set_ylim(0, )
+    ax.set_xlim(ts.index[0], ts.index[-1])
+    years_5 = mdates.YearLocator(5)
+    years = mdates.YearLocator()
+    yearsFmt = mdates.DateFormatter('%Y')
+    ax.xaxis.set_major_locator(years_5)
+    ax.xaxis.set_major_formatter(yearsFmt)
+    ax.xaxis.set_minor_locator(years)
 
 def plot_obs_sim(obs, sim):
     """
@@ -72,9 +83,39 @@ def plot_obs_sim(obs, sim):
         simulated time series
     """
     fig, ax = plt.subplots()
-    ax.plot(sim.index, sim, color='red')  # simulated time series
-    ax.plot(obs.index, obs, color='blue')  # observed time series
+    ax.plot(obs.index, obs, lw=2, color='blue')  # observed time series
+    ax.plot(sim.index, sim, lw=1, ls='-.', color='red', alpha=.8)  # simulated time series
     ax.set(ylabel=_q_lab, xlabel='Time')
+    ax.set_ylim(0, )
+    ax.set_xlim(obs.index[0], obs.index[-1])
+
+def plot_obs_sim_ax(obs, sim, ax, fig_num):
+    """
+    Plot observed and simulated time series.
+
+    Parameters
+    ----------
+    obs : series
+        observed time series
+    sim : series
+        simulated time series
+    ax : axes
+        Axes object to draw the plot onto
+    fig_num : string
+        string object for figure caption
+    """
+    ax.plot(obs.index, obs, lw=2, color='blue')  # observed time series
+    ax.plot(sim.index, sim, lw=1, ls='-.', color='red', alpha=.8)  # simulated time series
+    ax.set_ylim(0, )
+    ax.set_xlim(obs.index[0], obs.index[-1])
+    ax.text(.88, .93, fig_num, transform=ax.transAxes)
+    # format the ticks
+    years_20 = mdates.YearLocator(20)
+    years_5 = mdates.YearLocator(5)
+    yearsFmt = mdates.DateFormatter('%Y')
+    ax.xaxis.set_major_locator(years_20)
+    ax.xaxis.set_major_formatter(yearsFmt)
+    ax.xaxis.set_minor_locator(years_5)
 
 def fdc(ts):
     """
@@ -125,11 +166,52 @@ def fdc_obs_sim(obs, sim):
     prob_sim = [(ranks_sim[i]/(len(sim['sim'])+1)) for i in range(len(sim['sim']))]
 
     fig, ax = plt.subplots()
-    ax.plot(prob_obs, obs['obs'], color='blue', label='Observed')
-    ax.plot(prob_sim, sim['sim'], color='red', label='Simulated')
+    ax.plot(prob_obs, obs['obs'], color='blue', lw=2, label='Observed')
+    ax.plot(prob_sim, sim['sim'], color='red', lw=1, ls='-.', label=_sim_lab,
+            alpha=.8)
     ax.set(ylabel=_q_lab,
            xlabel='Exceedence probabilty [-]', yscale='log')
     ax.legend(loc=1)
+    ax.set_ylim(0, )
+    ax.set_xlim(0, 1)
+
+def fdc_obs_sim_ax(obs, sim, ax, fig_num):
+    """
+    Plotting the flow duration curves of two hydrologic time series (e.g.
+    observed streamflow and simulated streamflow).
+
+    Parameters
+    ----------
+    obs : series
+        observed time series
+    sim : series
+        simulated time series
+    ax : axes
+        Axes object to draw the plot onto
+    fig_num : string
+        string object for figure caption
+    """
+    obs_sim = pd.DataFrame(index=obs.index, columns=['obs', 'sim'])
+    obs_sim.loc[:, 'obs'] = obs.values
+    obs_sim.loc[:, 'sim'] = sim.values
+    obs = obs_sim.sort_values(by=['obs'], ascending=True)
+    sim = obs_sim.sort_values(by=['sim'], ascending=True)
+
+    # calculate exceedence probability
+    ranks_obs = sp.stats.rankdata(obs['obs'], method='ordinal')
+    ranks_obs = ranks_obs[::-1]
+    prob_obs = [(ranks_obs[i]/(len(obs['obs'])+1)) for i in range(len(obs['obs']))]
+
+    ranks_sim = sp.stats.rankdata(sim['sim'], method='ordinal')
+    ranks_sim = ranks_sim[::-1]
+    prob_sim = [(ranks_sim[i]/(len(sim['sim'])+1)) for i in range(len(sim['sim']))]
+
+    ax.plot(prob_obs, obs['obs'], lw=2, color='blue')
+    ax.plot(prob_sim, sim['sim'], lw=1, ls='-.', color='red')
+    ax.text(.88, .93, fig_num, transform=ax.transAxes)
+    ax.set(yscale='log')
+    ax.set_ylim(0, )
+    ax.set_xlim(0, 1)
 
 def calc_brel_mean(obs, sim, sort=True):
     """
@@ -176,8 +258,8 @@ def calc_brel_rest(obs, sim, sort=True):
         simulated time series
 
     sort : boolean, optional
-        If True, time series are sorted by ascending order. If False, time series
-        are not sorted. The default is to sort.
+        If True, time series are sorted by ascending order. If False, time
+        series are not sorted. The default is to sort.
 
     Returns
     ----------
@@ -233,7 +315,8 @@ def calc_b_area(brel_rest):
     """
     brel_rest_abs = abs(brel_rest)
     # area of bias
-    b_area = integrate.quad(lambda x: integrand(brel_rest_abs, x), 0.001, .999, limit=10000)
+    b_area = integrate.quad(lambda x: integrand(brel_rest_abs, x), 0.001, .999,
+                            limit=10000)
 
     return b_area[0]
 
@@ -252,7 +335,8 @@ def calc_bias_dir(brel_rest):
         direction of bias
     """
     # integral of relative bias < 50 %
-    hf_area = integrate.quad(lambda x: integrand(brel_rest, x), 0.001, .5, limit=10000)
+    hf_area = integrate.quad(lambda x: integrand(brel_rest, x), 0.001, .5,
+                             limit=10000)
 
     # direction of bias
     b_dir = hf_area[0]
@@ -339,8 +423,8 @@ def calc_de(obs, sim, sort=True):
         Simulated time series
 
     sort : boolean, optional
-        If True, time series are sorted by ascending order. If False, time series
-        are not sorted. The default is to sort.
+        If True, time series are sorted by ascending order. If False, time
+        series are not sorted. The default is to sort.
 
     Returns
     ----------
@@ -529,14 +613,14 @@ def calc_kge(obs, sim, r='pearson', var='std'):
 
     # calculate KGE with gamma term
     if var == 'cv':
-        kge_gamma = kge_gamma(obs, sim)
+        kge_gamma = calc_kge_gamma(obs, sim)
         temp_cor = calc_temp_cor(obs, sim, r=r)
 
         sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma - 1)**2  + (temp_cor - 1)**2)
 
     # calculate KGE with beta term
     elif var == 'std':
-        kge_beta = kge_beta(obs, sim)
+        kge_beta = calc_kge_beta(obs, sim)
         temp_cor = calc_temp_cor(obs, sim, r=r)
 
         sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta - 1)**2  + (temp_cor - 1)**2)
@@ -683,7 +767,9 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
 
     # diagnostic polar plot
     if not extended:
-        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(6, 6),
+                               subplot_kw=dict(projection='polar'),
+                               constrained_layout=True)
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(-1, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
@@ -711,12 +797,16 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
             c = ax.scatter(diag, sig, color=rgba_color)
         elif abs(brel_mean) > lim and exp_err <= lim and sig <= sig_lim:
             c = ax.scatter(diag, sig, color=rgba_color)
-        elif abs(brel_mean) > lim and exp_err> lim and sig <= sig_lim:
+        elif abs(brel_mean) > lim and exp_err > lim and sig <= sig_lim:
             c = ax.scatter(diag, sig, color=rgba_color)
         # FBM
         elif abs(brel_mean) <= lim and exp_err <= lim and sig <= sig_lim:
-            c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
-            c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
+            c = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5, zorder=1,
+                         width=.05, length_includes_head=True,
+                         transform=mtransforms.Affine2D().translate(0, 0) + ax.transData)
+            c1 = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5,
+                          zorder=1, width=.05, length_includes_head=True,
+                          transform=mtransforms.Affine2D().translate(np.pi, 0) + ax.transData)
         # FGM
         elif abs(brel_mean) <= lim and exp_err <= lim and sig > sig_lim:
             c = ax.scatter(diag, sig, color=rgba_color)
@@ -726,11 +816,16 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
         ax.set_xticklabels(['', '', 'P overestimation', '', '', '', 'P underestimation', ''])
-        ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-        ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
-                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+                            ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+        cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
         cbar.ax.tick_params(direction='in', labelsize=10)
 
@@ -753,7 +848,8 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
             cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
             # contours of DE
             cp = ax.contour(theta, r, r, colors='black', alpha=.7)
-            cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+            cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
+                           inline_spacing=6)
             # threshold efficiency for FBM
             sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
             # relation of b_dir which explains the error
@@ -766,12 +862,16 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
                 c = ax.scatter(diag, sig, color=rgba_color)
             elif abs(brel_mean) > lim and exp_err <= lim and sig <= sig_lim:
                 c = ax.scatter(diag, sig, color=rgba_color)
-            elif abs(brel_mean) > lim and exp_err> lim and sig <= sig_lim:
+            elif abs(brel_mean) > lim and exp_err > lim and sig <= sig_lim:
                 c = ax.scatter(diag, sig, color=rgba_color)
             # FBM
             elif abs(brel_mean) <= lim and exp_err <= lim and sig <= sig_lim:
-                c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
-                c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
+                c = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5, zorder=1,
+                             width=.05, length_includes_head=True,
+                             transform=mtransforms.Affine2D().translate(0, 0) + ax.transData)
+                c1 = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5,
+                              zorder=1, width=.05, length_includes_head=True,
+                              transform=mtransforms.Affine2D().translate(np.pi, 0) + ax.transData)
             # FGM
             elif abs(brel_mean) <= lim and exp_err <= lim and sig > sig_lim:
                 c = ax.scatter(diag, sig, color=rgba_color)
@@ -781,11 +881,16 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
             ax.set_xticklabels(['', '', 'P overestimation', '', '', '', 'P underestimation', ''])
-            ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-            ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
+                    va='center', ha='center', rotation=90,
+                    rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
+                    va='center', ha='center', rotation=90,
+                    rotation_mode='anchor', transform=ax.transAxes)
             # add colorbar for temporal correlation
             cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
-                                label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+                                ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+            cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
             cbar.ax.tick_params(direction='in', labelsize=10)
 
@@ -892,7 +997,9 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
 
     # diagnostic polar plot
     if not extended:
-        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(6, 6),
+                               subplot_kw=dict(projection='polar'),
+                               constrained_layout=True)
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(-1, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
@@ -907,7 +1014,8 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
         cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
         # contours of DE
         cp = ax.contour(theta, r, r, colors='black', alpha=.7)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+        cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
+                       inline_spacing=6)
         # threshold efficiency for FBM
         sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
         # loop over each data point
@@ -919,33 +1027,42 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             # relation of b_dir which explains the error
             if abs(ba) > 0:
                 exp_err = (abs(bd) * 2)/abs(ba)
-            elif abs(b_area) == 0:
+            elif abs(ba) == 0:
                 exp_err = 0
             # diagnose the error
             if abs(bm) <= lim and exp_err > lim and sig <= sig_lim:
-                c = ax.scatter(ang, sig, color=rgba_color)
+                c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim:
-                c = ax.scatter(ang, sig, color=rgba_color)
-            elif abs(bm) > lim and exp_err> lim and sig <= sig_lim:
-                c = ax.scatter(ang, sig, color=rgba_color)
+                c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
+            elif abs(bm) > lim and exp_err > lim and sig <= sig_lim:
+                c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             # FBM
             elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
-                c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
-                c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
+                c = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5, zorder=1,
+                             width=.05, length_includes_head=True,
+                             transform=mtransforms.Affine2D().translate(0, 0) + ax.transData)
+                c1 = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5,
+                              zorder=1, width=.05, length_includes_head=True,
+                              transform=mtransforms.Affine2D().translate(np.pi, 0) + ax.transData)
             # FGM
             elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim:
-                c = ax.scatter(ang, sig, color=rgba_color)
+                c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
         ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
         ax.set_xticklabels(['', '', 'P overestimation', '', '', r'0$^\circ$/360$^\circ$', 'P underestimation', ''])
-        ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-        ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
-                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+                            ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+        cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
         cbar.ax.tick_params(direction='in', labelsize=10)
 
@@ -980,33 +1097,42 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                 # relation of b_dir which explains the error
                 if abs(ba) > 0:
                     exp_err = (abs(bd) * 2)/abs(ba)
-                elif abs(b_area) == 0:
+                elif abs(ba) == 0:
                     exp_err = 0
                 # diagnose the error
                 if abs(bm) <= lim and exp_err > lim and sig <= sig_lim:
-                    c = ax.scatter(ang, sig, color=rgba_color)
+                    c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
                 elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim:
-                    c = ax.scatter(ang, sig, color=rgba_color)
-                elif abs(bm) > lim and exp_err> lim and sig <= sig_lim:
-                    c = ax.scatter(ang, sig, color=rgba_color)
+                    c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
+                elif abs(bm) > lim and exp_err > lim and sig <= sig_lim:
+                    c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
                 # FBM
                 elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
-                    c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
-                    c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
+                    c = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5, zorder=1,
+                                 width=.05, length_includes_head=True,
+                                 transform=mtransforms.Affine2D().translate(0, 0) + ax.transData)
+                    c1 = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5,
+                                  zorder=1, width=.05, length_includes_head=True,
+                                  transform=mtransforms.Affine2D().translate(np.pi, 0) + ax.transData)
                 # FGM
                 elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim:
-                    c = ax.scatter(ang, sig, color=rgba_color)
+                    c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
             ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
             ax.set_xticklabels(['', '', 'P overestimation', '', '', r'0$^\circ$/360$^\circ$', 'P underestimation', ''])
-            ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-            ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
+                    va='center', ha='center', rotation=90,
+                    rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
+                    va='center', ha='center', rotation=90,
+                    rotation_mode='anchor', transform=ax.transAxes)
             # add colorbar for temporal correlation
             cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
-                                label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+                                ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+            cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
             cbar.ax.tick_params(direction='in', labelsize=10)
 
@@ -1022,10 +1148,14 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             x1 = np.where(kde_xx <= 90)[-1][-1]
             x2 = np.where(kde_xx <= 180)[-1][-1]
             x3 = np.where(kde_xx <= 270)[-1][-1]
-            ax1.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.3)
-            ax1.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.3)
-            ax1.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.3)
-            ax1.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.3)
+            ax1.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple',
+                             alpha=0.3)
+            ax1.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey',
+                             alpha=0.3)
+            ax1.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1],
+                             facecolor='purple', alpha=0.3)
+            ax1.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey',
+                             alpha=0.3)
             ax1.set_xticks([0, 90, 180, 270, 360])
             ax1.set_xlim(0, 360)
             ax1.set_ylim(0, )
@@ -1034,7 +1164,9 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
 
             # 2-D density plot
             # g = (sns.jointplot(diag_deg, sig_de, color='k', marginal_kws={'color':'k'}).plot_joint(sns.kdeplot, zorder=0, n_levels=10))
-            g = (sns.jointplot(diag_deg, sig_de, kind='kde', zorder=0, alpha=.5, n_levels=20, cmap='Greens_d', joint_kws={'shade':False}, marginal_kws={'color':'k', 'shade':False}).plot_joint(sns.scatterplot, color='k', alpha=.5))
+            g = (sns.jointplot(diag_deg, sig_de, kind='kde', zorder=1,
+                               n_levels=20, cmap='Greens', shade_lowest=False,
+                               marginal_kws={'color':'k', 'shade':False}).plot_joint(sns.scatterplot, color='k', alpha=.5, zorder=2))
             g.set_axis_labels(r'[$^\circ$]', r'DE [-]')
             g.ax_joint.set_xticks([0, 90, 180, 270, 360])
             g.ax_joint.set_xlim(0, 360)
@@ -1046,10 +1178,14 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             x1 = np.where(kde_xx <= 90)[-1][-1]
             x2 = np.where(kde_xx <= 180)[-1][-1]
             x3 = np.where(kde_xx <= 270)[-1][-1]
-            g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.3)
-            g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.3)
-            g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.3)
-            g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.3)
+            g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1],
+                                     facecolor='purple', alpha=0.3)
+            g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2],
+                                     facecolor='grey', alpha=0.3)
+            g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1],
+                                     facecolor='purple', alpha=0.3)
+            g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey',
+                                     alpha=0.3)
             kde_data = g.ax_marg_y.get_lines()[0].get_data()
             kde_xx = kde_data[0]
             kde_yy = kde_data[1]
@@ -1057,7 +1193,9 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             colors = cm.Reds_r(norm(kde_yy))
             npts = len(kde_xx)
             for i in range(npts - 1):
-                g.ax_marg_y.fill_betweenx([kde_yy[i], kde_yy[i+1]], [kde_xx[i], kde_xx[i+1]], color=colors[i])
+                g.ax_marg_y.fill_betweenx([kde_yy[i], kde_yy[i+1]],
+                                          [kde_xx[i], kde_xx[i+1]],
+                                          color=colors[i])
             g.fig.tight_layout()
 
 def vis2d_kge(obs, sim, r='pearson', var='std'):
@@ -1091,7 +1229,7 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
 
         # convert to radians
         # (y, x) Trigonometric inverse tangent
-        diag = np.arctan2(kge_alpha, kge_gamma)
+        diag = np.arctan2(kge_alpha - 1, kge_gamma - 1)
 
         # convert temporal correlation to color
         norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
@@ -1140,7 +1278,9 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         theta4, r4 = np.meshgrid(xx4, yy)
 
         # diagnostic polar plot
-        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(6, 6),
+                               subplot_kw=dict(projection='polar'),
+                               constrained_layout=True)
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(-1, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
@@ -1163,11 +1303,13 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.text(-.05, 0.5, r'$\alpha$ [-]', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-        ax.set_xticklabels(['', '', '', '', '', '', r'$\gamma$ [-]', ''])
+        ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
+                rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.set_xticklabels(['', '', '', '', '', '', r'$\gamma$ - 1 [-]', ''])
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
-                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+                            ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+        cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
         cbar.ax.tick_params(direction='in', labelsize=10)
 
@@ -1183,7 +1325,7 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
 
         # convert to radians
         # (y, x) Trigonometric inverse tangent
-        diag = np.arctan2(kge_alpha, kge_beta)
+        diag = np.arctan2(kge_alpha - 1, kge_beta - 1)
 
         # convert temporal correlation to color
         norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
@@ -1232,7 +1374,9 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         theta4, r4 = np.meshgrid(xx4, yy)
 
         # diagnostic polar plot
-        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(6, 6),
+                               subplot_kw=dict(projection='polar'),
+                               constrained_layout=True)
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(-1, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
@@ -1255,15 +1399,17 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.text(-.05, 0.5, r'$\alpha$ [-]', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-        ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$ [-]', ''])
+        ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
+        rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$ - 1[-]', ''])
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
-                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+                            ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+        cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
         cbar.ax.tick_params(direction='in', labelsize=10)
 
-def vis2d_kge_multi(kge_alpha, kge_beta, kge_r, sig_kge, diagextended=False):
+def vis2d_kge_multi_fc(kge_alpha, beta_or_gamma, kge_r, sig_kge, fc, extended=False):
     """
     Multiple polar plot of Kling-Gupta Efficiency (KGE)
 
@@ -1281,6 +1427,9 @@ def vis2d_kge_multi(kge_alpha, kge_beta, kge_r, sig_kge, diagextended=False):
     sig_kge : (N,)array_like
         KGE as 1-D array
 
+    fc : list
+        figure captions
+
     extended : boolean, optional
         If True, density plot is displayed. In addtion, the density plot
         is displayed besides the polar plot. The default is,
@@ -1289,7 +1438,7 @@ def vis2d_kge_multi(kge_alpha, kge_beta, kge_r, sig_kge, diagextended=False):
     sig_min = np.min(sig_kge)
 
     ll_kge_alpha = kge_alpha.tolist()
-    ll_kge_beta = kge_beta.tolist()
+    ll_bg = beta_or_gamma.tolist()
     ll_kge_r = kge_r.tolist()
     ll_sig = sig_kge.tolist()
 
@@ -1343,7 +1492,9 @@ def vis2d_kge_multi(kge_alpha, kge_beta, kge_r, sig_kge, diagextended=False):
 
     # diagnostic polar plot
     if not extended:
-        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(6, 6),
+                               subplot_kw=dict(projection='polar'),
+                               constrained_layout=True)
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(-1, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
@@ -1359,41 +1510,29 @@ def vis2d_kge_multi(kge_alpha, kge_beta, kge_r, sig_kge, diagextended=False):
         # contours of DE
         cp = ax.contour(theta, r, r, colors='black', alpha=.7)
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
-        # threshold efficiency for FBM
-        sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
         # loop over each data point
-        for (bm, bd, ba, r, sig, ang) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_diag):
-            # slope of bias
-            b_slope = calc_bias_slope(ba, bd)
+        for (a, bg, r, sig, txt) in zip(ll_kge_alpha, ll_bg, ll_kge_r, ll_sig, fc):
+            ang = np.arctan2(a - 1, bg - 1)
             # convert temporal correlation to color
             rgba_color = cm.YlGnBu(norm(r))
-            # relation of b_dir which explains the error
-            if abs(ba) > 0:
-                exp_err = (abs(bd) * 2)/abs(ba)
-            elif abs(b_area) == 0:
-                exp_err = 0
-            # diagnose the error
-            if abs(bm) <= lim and exp_err > lim and sig <= sig_lim:
-                c = ax.scatter(ang, sig, color=rgba_color)
-            elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim:
-                c = ax.scatter(ang, sig, color=rgba_color)
-            elif abs(bm) > lim and exp_err> lim and sig <= sig_lim:
-                c = ax.scatter(ang, sig, color=rgba_color)
-            # FBM
-            elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
-                c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
-                c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
-            # FGM
-            elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim:
-                c = ax.scatter(ang, sig, color=rgba_color)
+            c = ax.scatter(ang, sig, color=rgba_color)
+            if ang <= np.pi/2 and ang >= 0:
+                ax.annotate(txt, (ang, sig - .05), color='black', fontsize=13)
+            elif ang < 0 and ang > -np.pi/2:
+                ax.annotate(txt, (ang, sig - .05), color='black', fontsize=13)
+            elif ang <= np.pi and ang > np.pi/2:
+                ax.annotate(txt, (ang, sig + .06), color='black', fontsize=13)
+            elif ang > np.pi or ang < -np.pi/2:
+                ax.annotate(txt, (ang, sig  + .05), color='black', fontsize=13)
+
+        ax.tick_params(labelleft=False, labelright=False, labeltop=False,
+                      labelbottom=True, grid_alpha=.01)  # turn labels and grid off
+        ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
+                rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$/$\gamma$ - 1 [-]', ''])
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
         ax.set_rmax(-ax_lim)
-        ax.tick_params(labelleft=False, labelright=False, labeltop=False,
-                      labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.set_xticklabels(['', '', 'P overestimation', '', '', r'0$^\circ$/360$^\circ$', 'P underestimation', ''])
-        ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-        ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
                             label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
@@ -1420,48 +1559,30 @@ def vis2d_kge_multi(kge_alpha, kge_beta, kge_r, sig_kge, diagextended=False):
             # contours of DE
             cp = ax.contour(theta, r, r, colors='black', alpha=.7)
             cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
-            # threshold efficiency for FBM
-            sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
             # loop over each data point
-            for (bm, bd, ba, r, sig, ang) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_diag):
-                # slope of bias
-                b_slope = calc_bias_slope(ba, bd)
+            for (a, bg, r, sig) in zip(ll_kge_alpha, ll_bg, ll_kge_r, ll_sig):
+                ang = np.arctan2(a - 1, bg - 1)
                 # convert temporal correlation to color
                 rgba_color = cm.YlGnBu(norm(r))
-                # relation of b_dir which explains the error
-                if abs(ba) > 0:
-                    exp_err = (abs(bd) * 2)/abs(ba)
-                elif abs(b_area) == 0:
-                    exp_err = 0
-                # diagnose the error
-                if abs(bm) <= lim and exp_err > lim and sig <= sig_lim:
-                    c = ax.scatter(ang, sig, color=rgba_color)
-                elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim:
-                    c = ax.scatter(ang, sig, color=rgba_color)
-                elif abs(bm) > lim and exp_err> lim and sig <= sig_lim:
-                    c = ax.scatter(ang, sig, color=rgba_color)
-                # FBM
-                elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
-                    c = ax.arrow(0, 0, 0, sig, color=rgba_color, lw=6)
-                    c1 = ax.arrow(0, 0, 3.14, sig, color=rgba_color, lw=6)
-                # FGM
-                elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim:
-                    c = ax.scatter(ang, sig, color=rgba_color)
+                c = ax.scatter(ang, sig, color=rgba_color)
+
+            ax.tick_params(labelleft=False, labelright=False, labeltop=False,
+                          labelbottom=True, grid_alpha=.01)  # turn labels and grid off
+            ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
+                    rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+            ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$/$\gamma$ - 1 [-]', ''])
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
             ax.set_rmax(-ax_lim)
-            ax.tick_params(labelleft=False, labelright=False, labeltop=False,
-                          labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-            ax.set_xticklabels(['', '', 'P overestimation', '', '', r'0$^\circ$/360$^\circ$', 'P underestimation', ''])
-            ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-            ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation', va='center', ha='center', rotation=90, rotation_mode='anchor', transform=ax.transAxes)
             # add colorbar for temporal correlation
             cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
-                                label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+                                ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+            cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
             cbar.ax.tick_params(direction='in', labelsize=10)
 
             # convert to degrees
+            diag = np.arctan2(kge_alpha - 1, beta_or_gamma - 1)
             diag_deg = (diag  * (180 / np.pi)) + 135
             diag_deg[diag_deg < 0] = 360 - diag_deg[diag_deg < 0]
 
@@ -1485,8 +1606,10 @@ def vis2d_kge_multi(kge_alpha, kge_beta, kge_r, sig_kge, diagextended=False):
 
             # 2-D density plot
             # g = (sns.jointplot(diag_deg, sig_de, color='k', marginal_kws={'color':'k'}).plot_joint(sns.kdeplot, zorder=0, n_levels=10))
-            g = (sns.jointplot(diag_deg, sig_de, kind='kde', zorder=0, alpha=.5, n_levels=20, cmap='Greens_d', joint_kws={'shade':False}, marginal_kws={'color':'k', 'shade':False}).plot_joint(sns.scatterplot, color='k', alpha=.5))
-            g.set_axis_labels(r'[$^\circ$]', r'DE [-]')
+            g = (sns.jointplot(diag_deg, sig_kge, kind='kde', zorder=1,
+                               n_levels=20, cmap='Greens',
+                               marginal_kws={'color':'k', 'shade':False}).plot_joint(sns.scatterplot, color='k', alpha=.5, zorder=2))
+            g.set_axis_labels(r'[$^\circ$]', r'KGE [-]')
             g.ax_joint.set_xticks([0, 90, 180, 270, 360])
             g.ax_joint.set_xlim(0, 360)
             g.ax_joint.set_ylim(-ax_lim, 1)
@@ -1510,6 +1633,221 @@ def vis2d_kge_multi(kge_alpha, kge_beta, kge_r, sig_kge, diagextended=False):
             for i in range(npts - 1):
                 g.ax_marg_y.fill_betweenx([kde_yy[i], kde_yy[i+1]], [kde_xx[i], kde_xx[i+1]], color=colors[i])
             g.fig.tight_layout()
+
+def vis2d_kge_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=False):
+    """
+    Multiple polar plot of Kling-Gupta Efficiency (KGE)
+
+    Parameters
+    ----------
+    kge_alpha: (N,)array_like
+        KGE alpha as 1-D array
+
+    kge_beta : (N,)array_like
+        KGE beta as 1-D array
+
+    kge_r : (N,)array_like
+        KGE r as 1-D array
+
+    sig_kge : (N,)array_like
+        KGE as 1-D array
+
+    extended : boolean, optional
+        If True, density plot is displayed. In addtion, the density plot
+        is displayed besides the polar plot. The default is,
+        that only the diagnostic polar plot is displayed.
+    """
+    sig_min = np.min(sig_kge)
+
+    ll_kge_alpha = kge_alpha.tolist()
+    ll_bg = beta_or_gamma.tolist()
+    ll_kge_r = kge_r.tolist()
+    ll_sig = sig_kge.tolist()
+
+    # convert temporal correlation to color
+    norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
+
+    delta = 0.01  # for spacing
+
+    # determine axis limits
+    if sig_min > 0:
+        yy = np.arange(0, 1, delta)[::-1]
+        ax_lim = 0
+    elif sig_min <= 0 and sig_min > -1:
+        yy = np.arange(-1, 1, delta)[::-1]
+        ax_lim = 1
+    elif sig_min <= -1:
+        yy = np.arange(-2, 1, delta)[::-1]
+        ax_lim = 2
+    elif sig_min <= -2:
+        yy = np.arange(-3, 1, delta)[::-1]
+        ax_lim = 3
+
+    len_yy = len(yy)
+
+    # arrays to plot contour lines of DE
+    xx = np.radians(np.linspace(0, 360, len_yy))
+    theta, r = np.meshgrid(xx, yy)
+
+    # arrays to plot contours of P overestimation
+    xx1 = np.radians(np.linspace(45, 135, len_yy))
+    theta1, r1 = np.meshgrid(xx1, yy)
+
+    # arrays to plot contours of P underestimation
+    xx2 = np.radians(np.linspace(225, 315, len_yy))
+    theta2, r2 = np.meshgrid(xx2, yy)
+
+    # arrays to plot contours of model errors
+    xx3 = np.radians(np.linspace(135, 225, len_yy))
+    theta3, r3 = np.meshgrid(xx3, yy)
+
+    # arrays to plot contours of model errors
+    len_yy2 = int(len_yy/2)
+    if len_yy != len_yy2 + len_yy2:
+        xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+    else:
+        xx0 = np.radians(np.linspace(0, 45, len_yy2))
+
+    xx360 = np.radians(np.linspace(315, 360, len_yy2))
+    xx4 = np.concatenate((xx360, xx0), axis=None)
+    theta4, r4 = np.meshgrid(xx4, yy)
+
+    # diagnostic polar plot
+    if not extended:
+        fig, ax = plt.subplots(figsize=(6, 6),
+                               subplot_kw=dict(projection='polar'),
+                               constrained_layout=True)
+        # dummie plot for colorbar of temporal correlation
+        cs = np.arange(-1, 1.1, 0.1)
+        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+        # Clear axis
+        ax.cla()
+        # contours P overestimation
+        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
+        # contours P underestimation
+        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
+        # contours model errors
+        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
+        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+        # contours of DE
+        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
+        cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+        # loop over each data point
+        for (a, bg, r, sig) in zip(ll_kge_alpha, ll_bg, ll_kge_r, ll_sig):
+            ang = np.arctan2(a - 1, bg - 1)
+            # convert temporal correlation to color
+            rgba_color = cm.YlGnBu(norm(r))
+            c = ax.scatter(ang, sig, color=rgba_color)
+
+        ax.tick_params(labelleft=False, labelright=False, labeltop=False,
+                      labelbottom=True, grid_alpha=.01)  # turn labels and grid off
+        ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
+                rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$/$\gamma$ - 1 [-]', ''])
+        ax.set_rticks([])  # turn default ticks off
+        ax.set_rmin(1)
+        ax.set_rmax(-ax_lim)
+        # add colorbar for temporal correlation
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+                            label='r [-]', ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+        cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
+        cbar.ax.tick_params(direction='in', labelsize=10)
+
+    elif extended:
+            fig = plt.figure(figsize=(12, 6), constrained_layout=True)
+            gs = fig.add_gridspec(1, 2)
+            ax = fig.add_subplot(gs[0, 0], projection='polar')
+            ax1 = fig.add_axes([.64, .3, .33, .33], frameon=True)
+            # dummie plot for colorbar of temporal correlation
+            cs = np.arange(-1, 1.1, 0.1)
+            dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+            # Clear axis
+            ax.cla()
+            # contours P overestimation
+            cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
+            # contours P underestimation
+            cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
+            # contours model errors
+            cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
+            cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+            # contours of DE
+            cp = ax.contour(theta, r, r, colors='black', alpha=.7)
+            cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+            # loop over each data point
+            for (a, bg, r, sig) in zip(ll_kge_alpha, ll_bg, ll_kge_r, ll_sig):
+                ang = np.arctan2(a - 1, bg - 1)
+                # convert temporal correlation to color
+                rgba_color = cm.YlGnBu(norm(r))
+                c = ax.scatter(ang, sig, color=rgba_color)
+
+            ax.tick_params(labelleft=False, labelright=False, labeltop=False,
+                          labelbottom=True, grid_alpha=.01)  # turn labels and grid off
+            ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
+                    rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+            ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$/$\gamma$ - 1 [-]', ''])
+            ax.set_rticks([])  # turn default ticks off
+            ax.set_rmin(1)
+            ax.set_rmax(-ax_lim)
+            # add colorbar for temporal correlation
+            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+                                ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+            cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
+            cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
+            cbar.ax.tick_params(direction='in', labelsize=10)
+
+            # convert to degrees
+            diag = np.arctan2(kge_alpha - 1, beta_or_gamma - 1)
+            diag_deg = (diag  * (180 / np.pi)) + 135
+            diag_deg[diag_deg < 0] = 360 - diag_deg[diag_deg < 0]
+
+            # 1-D density plot
+            g = sns.kdeplot(diag_deg, color='k', ax=ax1)
+            kde_data = g.get_lines()[0].get_data()
+            kde_xx = kde_data[0]
+            kde_yy = kde_data[1]
+            x1 = np.where(kde_xx <= 90)[-1][-1]
+            x2 = np.where(kde_xx <= 180)[-1][-1]
+            x3 = np.where(kde_xx <= 270)[-1][-1]
+            ax1.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.3)
+            ax1.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.3)
+            ax1.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.3)
+            ax1.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.3)
+            ax1.set_xticks([0, 90, 180, 270, 360])
+            ax1.set_xlim(0, 360)
+            ax1.set_ylim(0, )
+            ax1.set(ylabel=r'[-]',
+                    xlabel='[$^\circ$]')
+
+            # 2-D density plot
+            # g = (sns.jointplot(diag_deg, sig_de, color='k', marginal_kws={'color':'k'}).plot_joint(sns.kdeplot, zorder=0, n_levels=10))
+            g = (sns.jointplot(diag_deg, sig_kge, kind='kde', zorder=1,
+                               n_levels=20, cmap='Greens',
+                               marginal_kws={'color':'k', 'shade':False}).plot_joint(sns.scatterplot, color='k', alpha=.5, zorder=2))
+            g.set_axis_labels(r'[$^\circ$]', r'KGE [-]')
+            g.ax_joint.set_xticks([0, 90, 180, 270, 360])
+            g.ax_joint.set_xlim(0, 360)
+            g.ax_joint.set_ylim(-ax_lim, 1)
+            g.ax_marg_x.set_xticks([0, 90, 180, 270, 360])
+            kde_data = g.ax_marg_x.get_lines()[0].get_data()
+            kde_xx = kde_data[0]
+            kde_yy = kde_data[1]
+            x1 = np.where(kde_xx <= 90)[-1][-1]
+            x2 = np.where(kde_xx <= 180)[-1][-1]
+            x3 = np.where(kde_xx <= 270)[-1][-1]
+            g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.3)
+            g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.3)
+            g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.3)
+            g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.3)
+            kde_data = g.ax_marg_y.get_lines()[0].get_data()
+            kde_xx = kde_data[0]
+            kde_yy = kde_data[1]
+            norm = matplotlib.colors.Normalize(vmin=-ax_lim, vmax=1.0)
+            colors = cm.Reds_r(norm(kde_yy))
+            npts = len(kde_xx)
+            for i in range(npts - 1):
+                g.ax_marg_y.fill_betweenx([kde_yy[i], kde_yy[i+1]], [kde_xx[i], kde_xx[i+1]], color=colors[i])
+            g.fig.tight_layout()
+
 
 def pos_shift_ts(ts, offset=1.5, multi=True):
     """
@@ -1562,8 +1900,8 @@ def neg_shift_ts(ts, offset=0.5, multi=True):
         has to be greater than 1. The default is 25 % of P underestimation.
 
     multi : boolean, optional
-        If True, offset is multiplied. If False, offset is subtracted. The default
-        is multiplication.
+        If True, offset is multiplied. If False, offset is subtracted. The
+        default is multiplication.
 
     Returns
     ----------

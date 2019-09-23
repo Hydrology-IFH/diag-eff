@@ -25,19 +25,19 @@ if __name__ == "__main__":
         # windows directories
         db_Qobs_meta_dir = '//fuhys013/Schwemmle/Data/Runoff/observed/' \
                            'summary_near_nat.csv'
-        Q_dir = '//fuhys013/Schwemmle/Data/Runoff/Q_paired/wrr1/'
+        Q_dir = '//fuhys013/Schwemmle/Data/Runoff/Q_paired/wrr2/'
 
     elif OS == 'unix_server':
         # unix directories server
         db_Qobs_meta_dir = '/Volumes/Schwemmle/Data/Runoff/observed/' \
                            'summary_near_nat.csv'
-        Q_dir = '/Volumes/Schwemmle/Data/Runoff/Q_paired/wrr1/'
+        Q_dir = '/Volumes/Schwemmle/Data/Runoff/Q_paired/wrr2/'
 
     elif OS == 'unix_local':
         # unix directories local
         db_Qobs_meta_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data'\
                            '/Runoff/observed/summary_near_nat.csv'
-        Q_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data/Runoff/Q_paired/wrr1/'
+        Q_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data/Runoff/Q_paired/wrr2/'
 
     df_meta = pd.read_csv(db_Qobs_meta_dir, sep=',', na_values=-9999, index_col=0)
     ll_catchs = os.listdir(Q_dir)
@@ -58,6 +58,8 @@ if __name__ == "__main__":
     meta['kge'] = np.nan
     meta['alpha'] = np.nan
     meta['beta'] = np.nan
+    
+    meta['nse'] = np.nan
 
     with tqdm(total=len(meta.index)) as pbar:
         for i, catch in enumerate(meta.index):
@@ -102,6 +104,9 @@ if __name__ == "__main__":
             meta.iloc[i, 11] = de.calc_kge_alpha(obs_arr, sim_arr)
             # KGE beta
             meta.iloc[i, 12] = de.calc_kge_beta(obs_arr, sim_arr)
+            
+            # NSE
+            meta.iloc[i, 13] = de.calc_nse(obs_arr, sim_arr)
             pbar.update(1)
 
         # remove outliers
@@ -115,12 +120,19 @@ if __name__ == "__main__":
         b_dir_arr = meta['b_dir'].values
         sig_de_arr = meta['de'].values
         diag_arr = meta['diag'].values
+        b_slope_arr = meta['b_slope'].values
 
         # multi polar plot
         de.vis2d_de_multi(brel_mean_arr, b_area_arr, temp_cor_arr, sig_de_arr,
                           b_dir_arr, diag_arr, extended=True)
 
-        b_slope_arr = meta['b_slope'].values
+        # make arrays
+        alpha_arr = meta['alpha'].values
+        beta_arr = meta['beta'].values
+        kge_arr = meta['kge'].values
+        
+        # multi KGE plot
+        de.vis2d_kge_multi(alpha_arr, beta_arr, temp_cor_arr, kge_arr, extended=True)
 
         # global map
         x = meta['lon'].values
