@@ -58,7 +58,7 @@ if __name__ == "__main__":
     meta['kge'] = np.nan
     meta['alpha'] = np.nan
     meta['beta'] = np.nan
-    
+
     meta['nse'] = np.nan
 
     with tqdm(total=len(meta.index)) as pbar:
@@ -81,7 +81,7 @@ if __name__ == "__main__":
             # remaining relative bias
             brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
             # area of relative remaing bias
-            b_area = de.calc_b_area(brel_rest)
+            b_area = de.calc_bias_area(brel_rest)
             meta.iloc[i, 4] = b_area
             # temporal correlation
             temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -104,7 +104,7 @@ if __name__ == "__main__":
             meta.iloc[i, 11] = de.calc_kge_alpha(obs_arr, sim_arr)
             # KGE beta
             meta.iloc[i, 12] = de.calc_kge_beta(obs_arr, sim_arr)
-            
+
             # NSE
             meta.iloc[i, 13] = de.calc_nse(obs_arr, sim_arr)
             pbar.update(1)
@@ -130,7 +130,7 @@ if __name__ == "__main__":
         alpha_arr = meta['alpha'].values
         beta_arr = meta['beta'].values
         kge_arr = meta['kge'].values
-        
+
         # multi KGE plot
         de.vis2d_kge_multi(alpha_arr, beta_arr, temp_cor_arr, kge_arr, extended=True)
 

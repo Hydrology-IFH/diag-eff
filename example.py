@@ -4,6 +4,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 from de import de
 from de import util
 import seaborn as sns
@@ -24,6 +25,10 @@ if __name__ == "__main__":
     fig_ts.text(0.5, 0.06, 'Time [Years]', ha='center', va='center')
     fig_ts.text(0.1, 0.5, r'[$m^{3}$ $s^{-1}$]', ha='center', va='center', rotation='vertical')
     axes_ts[2,4].remove()
+    # axes_ts[2,4].axes.get_xaxis().set_visible(False)
+    # axes_ts[2,4].axes.get_yaxis().set_visible(False)
+    # axes_ts[2,4].axes.get_xaxis().set_ticks([])
+    # axes_ts[2,4].axes.get_yaxis().set_ticks([])
 
     # dataframe efficiency measures
     idx = ['1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
@@ -49,7 +54,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[0, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -81,8 +86,8 @@ if __name__ == "__main__":
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     tsd = de.highover_lowunder(df_ts.copy(), prop=0.5)
     obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qsim']  # disaggregated time series
-    de.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 0], fig_num_fdc[0])
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 0], fig_num_ts[0])
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 0], fig_num_fdc[0])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 0], fig_num_ts[0])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -94,7 +99,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[1, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -126,8 +131,8 @@ if __name__ == "__main__":
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)
     obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qsim']  # smoothed time series
-    de.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 1], fig_num_fdc[1])
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 1], fig_num_ts[1])
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 1], fig_num_fdc[1])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 1], fig_num_ts[1])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -139,7 +144,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[2, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -170,8 +175,8 @@ if __name__ == "__main__":
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     obs_sim.loc[:, 'Qsim'] = de.pos_shift_ts(df_ts['Qobs'].values)  # positive offset
-    de.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 2], fig_num_fdc[2])
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 2], fig_num_ts[2])
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 2], fig_num_fdc[2])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 2], fig_num_ts[2])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -183,7 +188,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[3, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -214,8 +219,8 @@ if __name__ == "__main__":
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     obs_sim.loc[:, 'Qsim'] = de.neg_shift_ts(df_ts['Qobs'].values)  # negative offset
-    de.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 3], fig_num_fdc[3])
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 3], fig_num_ts[3])
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 3], fig_num_fdc[3])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 3], fig_num_ts[3])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -227,7 +232,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[4, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -259,8 +264,9 @@ if __name__ == "__main__":
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     tss = de.time_shift(df_ts.copy(), random=True)  # shuffled time series
     obs_sim.loc[:, 'Qsim'] = tss.iloc[:, 0].values
-    de.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 4], fig_num_fdc[4])
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 4], fig_num_ts[4])
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 4], fig_num_fdc[4])
+    axes_fdc[0, 4].legend(loc=2, frameon=False)
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 4], fig_num_ts[4])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -272,7 +278,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[5, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -304,8 +310,8 @@ if __name__ == "__main__":
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     tsd = de.highunder_lowover(df_ts.copy(), prop=0.34)  # smoothed time series
     obs_sim.loc[:, 'Qsim'] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
-    de.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 0], fig_num_fdc[5])
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 0], fig_num_ts[5])
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 0], fig_num_fdc[5])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 0], fig_num_ts[5])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -317,7 +323,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[6, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -349,8 +355,8 @@ if __name__ == "__main__":
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
     obs_sim.loc[:, 'Qsim'] = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
-    de.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 1], fig_num_fdc[6])
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 1], fig_num_ts[6])
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 1], fig_num_fdc[6])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 1], fig_num_ts[6])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -362,7 +368,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[7, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -396,8 +402,8 @@ if __name__ == "__main__":
     tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
     tsp.iloc[:, 0] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
     obs_sim.loc[:, 'Qsim'] = tsp.iloc[:, 0].values  # positive offset
-    de.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 2], fig_num_fdc[7])
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 2], fig_num_ts[7])
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 2], fig_num_fdc[7])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 2], fig_num_ts[7])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -409,7 +415,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[8, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -441,8 +447,8 @@ if __name__ == "__main__":
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     tsd = de.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
     obs_sim.loc[:, 'Qsim'] = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
-    de.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 3], fig_num_fdc[8])
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 3], fig_num_ts[8])
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 3], fig_num_fdc[8])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 3], fig_num_ts[8])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -454,7 +460,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[9, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -489,7 +495,7 @@ if __name__ == "__main__":
     tsp.iloc[:, 0] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
     tst = de.time_shift(tsp, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 0], fig_num_ts[9])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 0], fig_num_ts[9])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -501,7 +507,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[10, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -536,7 +542,7 @@ if __name__ == "__main__":
     tsn.iloc[:, 0]  = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
     tst = de.time_shift(tsn, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 1], fig_num_ts[10])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 1], fig_num_ts[10])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -548,7 +554,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[11, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -583,7 +589,7 @@ if __name__ == "__main__":
     tsp.iloc[:, 0] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
     tst = de.time_shift(tsp, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 2], fig_num_ts[11])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 2], fig_num_ts[11])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -595,7 +601,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[12, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -630,7 +636,7 @@ if __name__ == "__main__":
     tsn.iloc[:, 0] = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
     tst = de.time_shift(tsn, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 3], fig_num_ts[12])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 3], fig_num_ts[12])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -642,7 +648,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[13, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -674,8 +680,8 @@ if __name__ == "__main__":
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     obs_mean = np.mean(obs_sim['Qobs'].values)
     obs_sim.loc[:, 'Qsim'] = np.repeat(obs_mean, len(obs_sim['Qobs'].values))
-    de.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 4], fig_num_fdc[9])
-    de.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 4], fig_num_ts[9])
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 4], fig_num_fdc[9])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 4], fig_num_ts[9])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -687,7 +693,7 @@ if __name__ == "__main__":
     # remaining relative bias
     brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_b_area(brel_rest)
+    b_area = de.calc_bias_area(brel_rest)
     df_es.iloc[14, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -714,6 +720,11 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[14, 10] = de.calc_nse(obs_arr, sim_arr)
 
+    axes_ts[2, 3].legend(loc=6, bbox_to_anchor=(1.3, .85))
+
+    fig_fdc.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/fdc_errors.png', dpi=250)
+    fig_ts.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/ts_errors.png', dpi=250)
+
     ### multi diagnostic plot ###
     # make arrays
     brel_mean_arr = df_es['brel_mean'].values
@@ -724,8 +735,10 @@ if __name__ == "__main__":
     diag_arr = df_es['diag'].values
     b_slope_arr = df_es['b_slope'].values
 
-    de.vis2d_de_multi(brel_mean_arr, b_area_arr, temp_cor_arr, de_arr,
-                      b_dir_arr, diag_arr, extended=False)
+    fig_de = util.vis2d_de_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
+                                    de_arr, b_dir_arr, diag_arr, idx)
+    fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/de_diag.png', dpi=250)
+
 
     ### multi KGE plot ###
     # make arrays
@@ -733,36 +746,43 @@ if __name__ == "__main__":
     beta_arr = df_es['beta'].values
     kge_arr = df_es['kge'].values
 
-    de.vis2d_kge_multi_fc(alpha_arr, beta_arr, temp_cor_arr, kge_arr, idx, extended=False)
+    fig_kge = util.vis2d_kge_multi_fc(alpha_arr, beta_arr, temp_cor_arr,
+                                      kge_arr, idx)
+    fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/kge_diag.png', dpi=250)
+
 
     nse_arr = df_es['nse'].values
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,5))
     # scatterplots efficiencies
-    fig, ax = plt.subplots(figsize=(6,6))
-    sc = sns.scatterplot(kge_arr, de_arr, color='black', ax=ax)
-    sc1 = sns.scatterplot(nse_arr, de_arr, color='red', ax=ax)
-    ax.plot([-1.05, 1.05], [-1.05, 1.05], ls="--", c=".3")
-    ax.set_ylim(-1.05, 1.05)
-    ax.set_xlim(-1.05, 1.05)
-    ax.set(ylabel='DE [-]', xlabel='KGE [-]')
-    ax.text(.455, -.12, 'NSE [-]', color='red', transform=ax.transAxes)
-    for i, txt in enumerate(df_es.index):
-        ax.annotate(txt, (kge_arr[i], de_arr[i]), color='black', fontsize=15)
-        ax.annotate(txt, (nse_arr[i], de_arr[i]), color='red', fontsize=15)
+    sc = sns.scatterplot(kge_arr, de_arr, color='black', ax=ax1)
+    sc1 = sns.scatterplot(nse_arr, de_arr, color='red', ax=ax1)
+    ax1.plot([-1.05, 1.05], [-1.05, 1.05], ls="--", c=".3")
+    ax1.set_ylim(-1.05, 1.05)
+    ax1.set_xlim(-1.05, 1.05)
+    ax1.set(ylabel='DE [-]', xlabel='KGE [-]')
+    ax1.text(.44, -.16, 'NSE [-]', color='red', transform=ax1.transAxes)
+    ax1.text(.025, .95, '(a)', transform=ax1.transAxes)
+    ax1.text(.05, .08, '1:1', rotation=45, transform=ax1.transAxes)
+    # for i, txt in enumerate(df_es.index):
+    #     ax.annotate(txt, (kge_arr[i], de_arr[i]), color='black', fontsize=15)
+    #     ax.annotate(txt, (nse_arr[i], de_arr[i]), color='red', fontsize=15)
 
     # scatterplots components
-    fig, ax = plt.subplots(figsize=(6,6))
-    fig.subplots_adjust(left=.2)
-    sc = sns.scatterplot(alpha_arr - 1, brel_mean_arr, color='black', ax=ax)
-    sc1 = sns.scatterplot(beta_arr - 1, b_slope_arr, color='red', ax=ax)
-    ax.plot([-1.05, 1.05], [-1.05, 1.05], ls="--", c=".3")
-    ax.set_ylim(-1.05, 1.05)
-    ax.set_xlim(-1.05, 1.05)
-    ax.set(ylabel=r'$\overline{B_{rel}}$ [-]', xlabel=r'$\alpha$ [-]')
-    ax.text(-.22, .455, r'$B_{slope}$ [-]', color='red', transform=ax.transAxes, rotation=90)
-    ax.text(.47, -.12, r'$\beta$ [-]', color='red', transform=ax.transAxes)
-    for i, txt in enumerate(df_es.index):
-        ax.annotate(txt, (alpha_arr[i] - 1, brel_mean_arr[i]), color='black', fontsize=15)
-        ax.annotate(txt, (beta_arr[i] - 1, b_slope_arr[i]), color='red', fontsize=15)
+    sc = sns.scatterplot(alpha_arr - 1, brel_mean_arr, color='black', ax=ax2)
+    sc1 = sns.scatterplot(beta_arr - 1, b_slope_arr, color='red', ax=ax2)
+    ax2.plot([-1.05, 1.05], [-1.05, 1.05], ls="--", c=".3")
+    ax2.set_ylim(-1.05, 1.05)
+    ax2.set_xlim(-1.05, 1.05)
+    ax2.set(ylabel=r'$\overline{B_{rel}}$ [-]', xlabel=r'$\alpha$ - 1 [-]')
+    ax2.text(-.24, .435, r'$B_{slope}$ [-]', color='red', transform=ax2.transAxes, rotation=90)
+    ax2.text(.44, -.16, r'$\beta$ - 1 [-]', color='red', transform=ax2.transAxes)
+    ax2.text(.03, .95, '(b)', transform=ax2.transAxes)
+    ax2.text(.05, .08, '1:1', rotation=45, transform=ax2.transAxes)
+    fig.subplots_adjust(wspace=.35, bottom=.2)
+    fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/scatter_eff_comp.png', dpi=250)
+    # for i, txt in enumerate(df_es.index):
+    #     ax.annotate(txt, (alpha_arr[i] - 1, brel_mean_arr[i]), color='black', fontsize=15)
+    #     ax.annotate(txt, (beta_arr[i] - 1, b_slope_arr[i]), color='red', fontsize=15)
 
     # export table
     path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/table_eff.csv'
@@ -771,34 +791,50 @@ if __name__ == "__main__":
     df_es_t = df_es_t.round(2)
     df_es_t.to_csv(path_csv, header=True, index=True, sep=';')
 
-#    ### Tier-1 ###
-#    path_wrr1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/GRDC_4103631_wrr1.csv'
-#    df_wrr1 = util.import_ts(path_wrr1, sep=';')
-#    de.fdc_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
-#    de.plot_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
-#
-#    obs_arr = df_wrr1['Qobs'].values
-#    sim_arr = df_wrr1['Qsim'].values
-#
-#    sig_de = de.calc_de(obs_arr, sim_arr)
-#    sig_kge = de.calc_kge(obs_arr, sim_arr)
-#    sig_nse = de.calc_nse(obs_arr, sim_arr)
-#
-#    de.vis2d_de(obs_arr, sim_arr)
-#    de.vis2d_kge(obs_arr, sim_arr)
-#
-#    ### Tier-2 ###
-#    path_wrr2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/GRDC_4103631_wrr2.csv'
-#    df_wrr2 = util.import_ts(path_wrr2, sep=';')
-#    de.fdc_obs_sim(df_wrr2['Qobs'], df_wrr2['Qsim'])
-#    de.plot_obs_sim(df_wrr2['Qobs'], df_wrr2['Qsim'])
-#
-#    obs_arr = df_wrr2['Qobs'].values
-#    sim_arr = df_wrr2['Qsim'].values
-#
-#    sig_de = de.calc_de(obs_arr, sim_arr)
-#    sig_kge = de.calc_kge(obs_arr, sim_arr)
-#    sig_nse = de.calc_nse(obs_arr, sim_arr)
-#
-#    de.vis2d_de(obs_arr, sim_arr)
-#    de.vis2d_kge(obs_arr, sim_arr)
+    ### Tier-1 ###
+    path_wrr1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/GRDC_4103631_wrr1.csv'
+    df_wrr1 = util.import_ts(path_wrr1, sep=';')
+    de.fdc_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
+    de.plot_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
+
+    obs_arr = df_wrr1['Qobs'].values
+    sim_arr = df_wrr1['Qsim'].values
+
+    sig_de = de.calc_de(obs_arr, sim_arr)
+    sig_kge = de.calc_kge(obs_arr, sim_arr)
+    sig_nse = de.calc_nse(obs_arr, sim_arr)
+
+    de.vis2d_de(obs_arr, sim_arr, extended=True)
+    de.vis2d_kge(obs_arr, sim_arr)
+
+    ### Tier-2 ###
+    path_wrr2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/GRDC_4103631_wrr2.csv'
+    df_wrr2 = util.import_ts(path_wrr2, sep=';')
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9,4))
+    util.plot_obs_sim_ax(df_wrr2['Qobs'], df_wrr2['Qsim'], ax1, '')
+    ax1.text(.93, .95, '(a)', transform=ax1.transAxes)
+    ax1.set_xlabel('Time [Years]')
+    ax1.set_ylabel(r'[$m^{3}$ $s^{-1}$]')
+    # format the ticks
+    years_10 = mdates.YearLocator(10)
+    years_5 = mdates.YearLocator(5)
+    yearsFmt = mdates.DateFormatter('%Y')
+    ax1.xaxis.set_major_locator(years_10)
+    ax1.xaxis.set_major_formatter(yearsFmt)
+    ax1.xaxis.set_minor_locator(years_5)
+    util.fdc_obs_sim_ax(df_wrr2['Qobs'], df_wrr2['Qsim'], ax2, '')
+    ax2.set_xlabel('Exceedence probabilty [-]')
+    ax2.set_ylabel(r'[$m^{3}$ $s^{-1}$]')
+    ax2.text(.93, .95, '(b)', transform=ax2.transAxes)
+    fig.tight_layout()
+    fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/ts_fdc_real_case.png', dpi=250)
+
+    obs_arr = df_wrr2['Qobs'].values
+    sim_arr = df_wrr2['Qsim'].values
+
+    sig_de = de.calc_de(obs_arr, sim_arr)
+    sig_kge = de.calc_kge(obs_arr, sim_arr)
+    sig_nse = de.calc_nse(obs_arr, sim_arr)
+
+    de.vis2d_de(obs_arr, sim_arr, extended=True)
+    de.vis2d_kge(obs_arr, sim_arr)
