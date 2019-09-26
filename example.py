@@ -10,25 +10,22 @@ from de import util
 import seaborn as sns
 # controlling figure aesthetics
 sns.set_style('ticks', {'xtick.major.size': 8, 'ytick.major.size': 8})
+sns.set_context("paper", font_scale=1.5)
 
 if __name__ == "__main__":
-    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/9960682_Q_1970_2012.csv'
-#    path = '/Users/robo/Desktop/PhD/de/examples/data/9960682_Q_1970_2012.csv'
+    # 134.29 km2
+    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/07373000_streamflow_qc.csv'
 
     fig_num_fdc = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)']
     fig_fdc, axes_fdc = plt.subplots(2, 5, sharey=True, sharex=True, figsize=(14,6))
-    fig_fdc.text(0.5, 0.04, 'Exceedence probabilty [-]', ha='center', va='center')
-    fig_fdc.text(0.09, 0.5, r'[$m^{3}$ $s^{-1}$]', ha='center', va='center', rotation='vertical')
+    fig_fdc.text(0.5, 0.02, 'Exceedence probabilty [-]', ha='center', va='center')
+    fig_fdc.text(0.08, 0.5, r'[mm $d^{-1}$]', ha='center', va='center', rotation='vertical')
 
     fig_num_ts = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)', '(k)', '(l)', '(m)', '(n)']
     fig_ts, axes_ts = plt.subplots(3, 5, sharey=True, sharex=True, figsize=(14,9))
-    fig_ts.text(0.5, 0.06, 'Time [Years]', ha='center', va='center')
-    fig_ts.text(0.1, 0.5, r'[$m^{3}$ $s^{-1}$]', ha='center', va='center', rotation='vertical')
+    fig_ts.text(0.5, 0.05, 'Time [Years]', ha='center', va='center')
+    fig_ts.text(0.08, 0.5, r'[mm $d^{-1}$]', ha='center', va='center', rotation='vertical')
     axes_ts[2,4].remove()
-    # axes_ts[2,4].axes.get_xaxis().set_visible(False)
-    # axes_ts[2,4].axes.get_yaxis().set_visible(False)
-    # axes_ts[2,4].axes.get_xaxis().set_ticks([])
-    # axes_ts[2,4].axes.get_yaxis().set_ticks([])
 
     # dataframe efficiency measures
     idx = ['1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
@@ -36,7 +33,7 @@ if __name__ == "__main__":
     df_es = pd.DataFrame(index=idx, columns=cols, dtype=np.float64)
 
     # import observed time series
-    df_ts = util.import_ts(path, sep=';')
+    df_ts = util.import_camels_ts(path)
     de.plot_ts(df_ts)
 
     ### perfect simulation ###
@@ -720,7 +717,7 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[14, 10] = de.calc_nse(obs_arr, sim_arr)
 
-    axes_ts[2, 3].legend(loc=6, bbox_to_anchor=(1.3, .85))
+    axes_ts[2, 3].legend(loc=6, bbox_to_anchor=(1.18, .85))
 
     fig_fdc.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/fdc_errors.png', dpi=250)
     fig_ts.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/ts_errors.png', dpi=250)
@@ -737,7 +734,7 @@ if __name__ == "__main__":
 
     fig_de = util.vis2d_de_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
                                     de_arr, b_dir_arr, diag_arr, idx)
-    fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/de_diag.png', dpi=250)
+    fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/de_diag.pdf', dpi=250)
 
 
     ### multi KGE plot ###
@@ -748,7 +745,7 @@ if __name__ == "__main__":
 
     fig_kge = util.vis2d_kge_multi_fc(alpha_arr, beta_arr, temp_cor_arr,
                                       kge_arr, idx)
-    fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/kge_diag.png', dpi=250)
+    fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/kge_diag.pdf', dpi=250)
 
 
     nse_arr = df_es['nse'].values
@@ -760,9 +757,9 @@ if __name__ == "__main__":
     ax1.set_ylim(-1.05, 1.05)
     ax1.set_xlim(-1.05, 1.05)
     ax1.set(ylabel='DE [-]', xlabel='KGE [-]')
-    ax1.text(.44, -.16, 'NSE [-]', color='red', transform=ax1.transAxes)
-    ax1.text(.025, .95, '(a)', transform=ax1.transAxes)
-    ax1.text(.05, .08, '1:1', rotation=45, transform=ax1.transAxes)
+    ax1.text(.42, -.22, 'NSE [-]', color='red', transform=ax1.transAxes)
+    ax1.text(.025, .93, '(a)', transform=ax1.transAxes)
+    ax1.text(.05, .1, '1:1', rotation=45, transform=ax1.transAxes)
     # for i, txt in enumerate(df_es.index):
     #     ax.annotate(txt, (kge_arr[i], de_arr[i]), color='black', fontsize=15)
     #     ax.annotate(txt, (nse_arr[i], de_arr[i]), color='red', fontsize=15)
@@ -774,10 +771,10 @@ if __name__ == "__main__":
     ax2.set_ylim(-1.05, 1.05)
     ax2.set_xlim(-1.05, 1.05)
     ax2.set(ylabel=r'$\overline{B_{rel}}$ [-]', xlabel=r'$\alpha$ - 1 [-]')
-    ax2.text(-.24, .435, r'$B_{slope}$ [-]', color='red', transform=ax2.transAxes, rotation=90)
-    ax2.text(.44, -.16, r'$\beta$ - 1 [-]', color='red', transform=ax2.transAxes)
-    ax2.text(.03, .95, '(b)', transform=ax2.transAxes)
-    ax2.text(.05, .08, '1:1', rotation=45, transform=ax2.transAxes)
+    ax2.text(-.29, .415, r'$B_{slope}$ [-]', color='red', transform=ax2.transAxes, rotation=90)
+    ax2.text(.42, -.22, r'$\beta$ - 1 [-]', color='red', transform=ax2.transAxes)
+    ax2.text(.03, .93, '(b)', transform=ax2.transAxes)
+    ax2.text(.05, .1, '1:1', rotation=45, transform=ax2.transAxes)
     fig.subplots_adjust(wspace=.35, bottom=.2)
     fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/scatter_eff_comp.png', dpi=250)
     # for i, txt in enumerate(df_es.index):
@@ -791,30 +788,14 @@ if __name__ == "__main__":
     df_es_t = df_es_t.round(2)
     df_es_t.to_csv(path_csv, header=True, index=True, sep=';')
 
-    ### Tier-1 ###
-    path_wrr1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/GRDC_4103631_wrr1.csv'
-    df_wrr1 = util.import_ts(path_wrr1, sep=';')
-    de.fdc_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
-    de.plot_obs_sim(df_wrr1['Qobs'], df_wrr1['Qsim'])
-
-    obs_arr = df_wrr1['Qobs'].values
-    sim_arr = df_wrr1['Qsim'].values
-
-    sig_de = de.calc_de(obs_arr, sim_arr)
-    sig_kge = de.calc_kge(obs_arr, sim_arr)
-    sig_nse = de.calc_nse(obs_arr, sim_arr)
-
-    de.vis2d_de(obs_arr, sim_arr, extended=True)
-    de.vis2d_kge(obs_arr, sim_arr)
-
-    ### Tier-2 ###
-    path_wrr2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/GRDC_4103631_wrr2.csv'
-    df_wrr2 = util.import_ts(path_wrr2, sep=';')
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9,4))
-    util.plot_obs_sim_ax(df_wrr2['Qobs'], df_wrr2['Qsim'], ax1, '')
-    ax1.text(.93, .95, '(a)', transform=ax1.transAxes)
+    ### camels
+    path_cam = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/07373000_05_model_output.csv'
+    df_cam = util.import_camels_obs_sim(path_cam)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10,5))
+    util.plot_obs_sim_ax(df_cam['Qobs'], df_cam['Qsim'], ax1, '')
+    ax1.text(.9, .93, '(a)', transform=ax1.transAxes)
     ax1.set_xlabel('Time [Years]')
-    ax1.set_ylabel(r'[$m^{3}$ $s^{-1}$]')
+    ax1.set_ylabel(r'[mm $d^{-1}$]')
     # format the ticks
     years_10 = mdates.YearLocator(10)
     years_5 = mdates.YearLocator(5)
@@ -822,15 +803,16 @@ if __name__ == "__main__":
     ax1.xaxis.set_major_locator(years_10)
     ax1.xaxis.set_major_formatter(yearsFmt)
     ax1.xaxis.set_minor_locator(years_5)
-    util.fdc_obs_sim_ax(df_wrr2['Qobs'], df_wrr2['Qsim'], ax2, '')
+    util.fdc_obs_sim_ax(df_cam['Qobs'], df_cam['Qsim'], ax2, '')
     ax2.set_xlabel('Exceedence probabilty [-]')
-    ax2.set_ylabel(r'[$m^{3}$ $s^{-1}$]')
-    ax2.text(.93, .95, '(b)', transform=ax2.transAxes)
-    fig.tight_layout()
+    ax2.set_ylabel(r'[mm $d^{-1}$]')
+    ax2.text(.9, .93, '(b)', transform=ax2.transAxes)
+    ax2.legend(loc=2, labels=['Observed', 'Simulated'], ncol=2, frameon=False, bbox_to_anchor=(-0.7, 1.15))
+    fig.subplots_adjust(wspace=0.3)
     fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/ts_fdc_real_case.png', dpi=250)
 
-    obs_arr = df_wrr2['Qobs'].values
-    sim_arr = df_wrr2['Qsim'].values
+    obs_arr = df_cam['Qobs'].values
+    sim_arr = df_cam['Qsim'].values
 
     sig_de = de.calc_de(obs_arr, sim_arr)
     sig_kge = de.calc_kge(obs_arr, sim_arr)

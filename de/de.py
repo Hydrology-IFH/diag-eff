@@ -29,6 +29,7 @@ import scipy.integrate as integrate
 import seaborn as sns
 # controlling figure aesthetics
 sns.set_style('ticks', {'xtick.major.size': 8, 'ytick.major.size': 8})
+sns.set_context("paper", font_scale=1.5)
 
 __title__ = 'de'
 __version__ = '0.1'
@@ -42,7 +43,7 @@ __license__ = 'GNU GPLv3'
 
 _mmd = r'[mm $d^{-1}$]'
 _m3s = r'[$m^{3}$ $s^{-1}$]'
-_q_lab = _m3s
+_q_lab = _mmd
 _sim_lab = 'Manipulated'
 
 def plot_ts(ts):
@@ -997,15 +998,15 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
-        cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
+        cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
-        cbar.ax.tick_params(direction='in', labelsize=10)
+        cbar.ax.tick_params(direction='in')
 
     elif extended:
             fig = plt.figure(figsize=(12, 6), constrained_layout=True)
             gs = fig.add_gridspec(1, 2)
             ax = fig.add_subplot(gs[0, 0], projection='polar')
-            ax1 = fig.add_axes([.64, .3, .33, .33], frameon=True)
+            ax1 = fig.add_axes([.65, .3, .33, .33], frameon=True)
             # dummie plot for colorbar of temporal correlation
             cs = np.arange(-1, 1.1, 0.1)
             dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
@@ -1062,9 +1063,9 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
             # add colorbar for temporal correlation
             cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
-            cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
+            cbar.set_label('r [-]', labelpad=4)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
-            cbar.ax.tick_params(direction='in', labelsize=10)
+            cbar.ax.tick_params(direction='in')
 
             # plot B_rest
             # calculate exceedence probability
@@ -1238,9 +1239,9 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
-        cbar.set_label('r [-]', fontsize=12, labelpad=8)
+        cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
-        cbar.ax.tick_params(direction='in', labelsize=10)
+        cbar.ax.tick_params(direction='in')
 
     elif extended:
             fig = plt.figure(figsize=(12, 6), constrained_layout=True)
@@ -1308,9 +1309,9 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             # add colorbar for temporal correlation
             cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
-            cbar.set_label('r [-]', fontsize=12, labelpad=8)
+            cbar.set_label('r [-]', labelpad=4)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
-            cbar.ax.tick_params(direction='in', labelsize=10)
+            cbar.ax.tick_params(direction='in')
 
             # convert to degrees
             diag_deg = (diag  * (180 / np.pi)) + 135
@@ -1496,9 +1497,9 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
-        cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
+        cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
-        cbar.ax.tick_params(direction='in', labelsize=10)
+        cbar.ax.tick_params(direction='in')
 
     # calculate beta term
     elif var == 'std':
@@ -1592,9 +1593,9 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
-        cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
+        cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
-        cbar.ax.tick_params(direction='in', labelsize=10)
+        cbar.ax.tick_params(direction='in')
 
 def vis2d_kge_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=False):
     """Multiple polar plot of Kling-Gupta Efficiency (KGE)
@@ -1710,9 +1711,9 @@ def vis2d_kge_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=False):
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
-        cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
+        cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
-        cbar.ax.tick_params(direction='in', labelsize=10)
+        cbar.ax.tick_params(direction='in')
 
     elif extended:
             fig = plt.figure(figsize=(12, 6), constrained_layout=True)
@@ -1752,9 +1753,9 @@ def vis2d_kge_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=False):
             # add colorbar for temporal correlation
             cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
-            cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
+            cbar.set_label('r [-]', labelpad=4)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
-            cbar.ax.tick_params(direction='in', labelsize=10)
+            cbar.ax.tick_params(direction='in')
 
             # convert to degrees
             diag = np.arctan2(kge_alpha - 1, beta_or_gamma - 1)

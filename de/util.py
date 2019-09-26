@@ -38,7 +38,7 @@ __license__ = 'GNU GPLv3'
 
 _mmd = r'[mm $d^{-1}$]'
 _m3s = r'[$m^{3}$ $s^{-1}$]'
-_q_lab = _m3s
+_q_lab = _mmd
 _sim_lab = 'Manipulated'
 
 def import_ts(path, sep=','):
@@ -64,6 +64,65 @@ def import_ts(path, sep=','):
     df_ts = df_ts.dropna()
 
     return df_ts
+
+def import_camels_ts(path, sep=';', catch_area=134.29):
+    """
+    Import .csv-file with streamflow time series from CAMELS dataset (cubic feet
+    per second).
+
+    Parameters
+    ----------
+    path : str
+        Path to .csv-file which contains time series
+
+    sep : str, optional
+        Delimeter to use. The default is ‘,’.
+
+    catch_area : float, optional
+        catchment area in km2 to convert runoff to mm/day
+
+    Returns
+    ----------
+    df_ts : dataframe
+        Imported time series in m3/s
+    """
+    df_ts = pd.read_csv(path, sep=sep, na_values=-999, header=None, parse_dates=[[1,2,3]], index_col=0)
+    df_ts.drop(df_ts.columns[[0, 2]], axis=1, inplace=True)
+    df_ts.columns = ['Qobs']
+    df_ts = df_ts.dropna()
+
+    # convert to m3/s
+    df_ts['Qobs'] = df_ts['Qobs'].values/35.3
+    # convert to mm/day
+    df_ts['Qobs'] = (df_ts['Qobs'].values*(24*60*60)*1000) / (catch_area*1000*1000)
+
+    return df_ts
+
+def import_camels_obs_sim(path, sep=';'):
+    """
+    Import .csv-file with streamflow time series from CAMELS dataset (cubic feet
+    per second).
+
+    Parameters
+    ----------
+    path : str
+        Path to .csv-file which contains time series
+
+    sep : str, optional
+        Delimeter to use. The default is ‘,’.
+
+    Returns
+    ----------
+    obs_sim : dataframe
+        observed and simulated time series in m3/s
+    """
+    obs_sim = pd.read_csv(path, sep=sep, na_values=-999, header=0, parse_dates=[[0, 1, 2]], index_col=0)
+    obs_sim.drop(['HR', 'SWE', 'PRCP', 'RAIM', 'TAIR', 'PET', 'ET'], axis=1, inplace=True)
+    obs_sim.columns = ['Qsim', 'Qobs']
+    obs_sim = obs_sim[['Qobs', 'Qsim']]
+    obs_sim = obs_sim.dropna()
+
+    return obs_sim
 
 def sort_obs(ts):
     """
@@ -173,7 +232,7 @@ def fdc_obs_sim_ax(obs, sim, ax, fig_num):
 
     ax.plot(prob_obs, obs['obs'], lw=2, color='blue', alpha=.7, label='Observed')
     ax.plot(prob_sim, sim['sim'], lw=2, ls='-.', color='red', label='Manipulated')
-    ax.text(.88, .93, fig_num, transform=ax.transAxes)
+    ax.text(.96, .95, fig_num, transform=ax.transAxes, ha='right', va='top')
     ax.set(yscale='log')
     ax.set_ylim(0, )
     ax.set_xlim(0, 1)
@@ -196,7 +255,7 @@ def plot_obs_sim_ax(obs, sim, ax, fig_num):
     ax.plot(sim.index, sim, lw=1, ls='-.', color='red', alpha=.8, label='Manipulated')  # simulated time series
     ax.set_ylim(0, )
     ax.set_xlim(obs.index[0], obs.index[-1])
-    ax.text(.88, .93, fig_num, transform=ax.transAxes)
+    ax.text(.96, .95, fig_num, transform=ax.transAxes, ha='right', va='top')
     # format the ticks
     years_20 = mdates.YearLocator(20)
     years_5 = mdates.YearLocator(5)
