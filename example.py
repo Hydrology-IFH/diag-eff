@@ -14,7 +14,7 @@ sns.set_context("paper", font_scale=1.5)
 
 if __name__ == "__main__":
     # 134.29 km2
-    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/07373000_streamflow_qc.csv'
+    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/07373000_streamflow_qc.csv'
 
     fig_num_fdc = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)']
     fig_fdc, axes_fdc = plt.subplots(2, 5, sharey=True, sharex=True, figsize=(14,6))
@@ -483,16 +483,14 @@ if __name__ == "__main__":
 
     # NSE
     df_es.iloc[9, 10] = de.calc_nse(obs_arr, sim_arr)
-
-    ### Decrease high flows - Increase low flows, precipitation surplus and shuffling ###
+    
+    ### mean flow benchmark ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highunder_lowover(df_ts.copy(), prop=0.34)  # smoothed time series
-    tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tsp.iloc[:, 0] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
-    tst = de.time_shift(tsp, random=True)  # shuffling
-    obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
-    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 0], fig_num_ts[9])
+    obs_mean = np.mean(obs_sim['Qobs'].values)
+    obs_sim.loc[:, 'Qsim'] = np.repeat(obs_mean, len(obs_sim['Qobs'].values))
+    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 4], fig_num_fdc[9])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 4], fig_num_ts[9])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -531,15 +529,15 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[10, 10] = de.calc_nse(obs_arr, sim_arr)
 
-    ### Decrease high flows - Increase low flows, precipitation shortage and shuffling ###
+    ### Decrease high flows - Increase low flows, precipitation surplus and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
-    tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tsn.iloc[:, 0]  = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
-    tst = de.time_shift(tsn, random=True)  # shuffling
+    tsd = de.highunder_lowover(df_ts.copy(), prop=0.34)  # smoothed time series
+    tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
+    tsp.iloc[:, 0] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
+    tst = de.time_shift(tsp, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
-    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 1], fig_num_ts[10])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 0], fig_num_ts[9])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -578,15 +576,15 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[11, 10] = de.calc_nse(obs_arr, sim_arr)
 
-    ### Increase high flows - Decrease low flows, precipitation surplus and shuffling ###
+    ### Decrease high flows - Increase low flows, precipitation shortage and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highover_lowunder(df_ts.copy(), prop=0.34)  # disaggregated time series
-    tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tsp.iloc[:, 0] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
-    tst = de.time_shift(tsp, random=True)  # shuffling
+    tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
+    tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
+    tsn.iloc[:, 0]  = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
+    tst = de.time_shift(tsn, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
-    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 2], fig_num_ts[11])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 1], fig_num_ts[10])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -625,15 +623,15 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[12, 10] = de.calc_nse(obs_arr, sim_arr)
 
-    ### Increase high flows - Decrease low flows, precipitation shortage and shuffling ###
+    ### Increase high flows - Decrease low flows, precipitation surplus and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
-    tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tsn.iloc[:, 0] = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
-    tst = de.time_shift(tsn, random=True)  # shuffling
+    tsd = de.highover_lowunder(df_ts.copy(), prop=0.34)  # disaggregated time series
+    tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
+    tsp.iloc[:, 0] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
+    tst = de.time_shift(tsp, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
-    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 3], fig_num_ts[12])
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 2], fig_num_ts[11])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -672,13 +670,15 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[13, 10] = de.calc_nse(obs_arr, sim_arr)
 
-    ### mean flow benchmark ###
+    ### Increase high flows - Decrease low flows, precipitation shortage and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    obs_mean = np.mean(obs_sim['Qobs'].values)
-    obs_sim.loc[:, 'Qsim'] = np.repeat(obs_mean, len(obs_sim['Qobs'].values))
-    util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 4], fig_num_fdc[9])
-    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 4], fig_num_ts[9])
+    tsd = de.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
+    tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
+    tsn.iloc[:, 0] = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
+    tst = de.time_shift(tsn, random=True)  # shuffling
+    obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
+    util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 3], fig_num_ts[12])
 
     # make arrays
     obs_arr = obs_sim['Qobs'].values
@@ -789,7 +789,7 @@ if __name__ == "__main__":
     df_es_t.to_csv(path_csv, header=True, index=True, sep=';')
 
     ### camels
-    path_cam = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/data/07373000_05_model_output.csv'
+    path_cam = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/07373000_05_model_output.csv'
     df_cam = util.import_camels_obs_sim(path_cam)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10,5))
     util.plot_obs_sim_ax(df_cam['Qobs'], df_cam['Qsim'], ax1, '')

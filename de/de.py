@@ -858,9 +858,6 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
     # mean relative bias
     brel_mean = calc_brel_mean(obs, sim, sort=sort)
 
-    str_brel_mean = 'Brel_mean: {}'.format(np.round(brel_mean, decimals=3))
-    print(str_brel_mean)
-
     # remaining relative bias
     brel_rest = calc_brel_rest(obs, sim, sort=sort)
     # area of relative remaing bias
@@ -874,21 +871,12 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
     # direction of bias
     b_dir = calc_bias_dir(brel_rest)
 
-    str_b_dir = 'B_dir: {}'.format(np.round(b_dir, decimals=3))
-    print(str_b_dir)
-
     # slope of bias
     b_slope = calc_bias_slope(b_area, b_dir)
-
-    str_b_slope = 'B_slope: {}'.format(np.round(b_slope, decimals=3))
-    print(str_b_slope)
 
     # convert to radians
     # (y, x) Trigonometric inverse tangent
     diag = np.arctan2(brel_mean, b_slope)
-
-    str_diag = 'diag: {}'.format(np.round(diag, decimals=3))
-    print(str_diag)
 
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
@@ -967,19 +955,20 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
             exp_err = 0
         # diagnose the error
         if abs(brel_mean) <= lim and exp_err > lim and sig <= sig_lim:
-            c = ax.scatter(diag, sig, color=rgba_color)
+            ax.annotate("", xytext=(0, 1), xy=(diag, sig),
+                        arrowprops=dict(facecolor=rgba_color))
         elif abs(brel_mean) > lim and exp_err <= lim and sig <= sig_lim:
-            c = ax.scatter(diag, sig, color=rgba_color)
+            ax.annotate("", xytext=(0, 1), xy=(diag, sig),
+                        arrowprops=dict(facecolor=rgba_color))
         elif abs(brel_mean) > lim and exp_err > lim and sig <= sig_lim:
-            c = ax.scatter(diag, sig, color=rgba_color)
+            ax.annotate("", xytext=(0, 1), xy=(diag, sig),
+                        arrowprops=dict(facecolor=rgba_color))
         # FBM
         elif abs(brel_mean) <= lim and exp_err <= lim and sig <= sig_lim:
-            c = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5, zorder=1,
-                         width=.05, length_includes_head=True,
-                         transform=mtransforms.Affine2D().translate(0, 0) + ax.transData)
-            c1 = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5,
-                          zorder=1, width=.05, length_includes_head=True,
-                          transform=mtransforms.Affine2D().translate(np.pi, 0) + ax.transData)
+            ax.annotate("", xytext=(0, 1), xy=(0, sig),
+                        arrowprops=dict(facecolor=rgba_color))
+            ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
+                        arrowprops=dict(facecolor=rgba_color))
         # FGM
         elif abs(brel_mean) <= lim and exp_err <= lim and sig > sig_lim:
             c = ax.scatter(diag, sig, color=rgba_color)
@@ -1032,19 +1021,20 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
                 exp_err = 0
             # diagnose the error
             if abs(brel_mean) <= lim and exp_err > lim and sig <= sig_lim:
-                c = ax.scatter(diag, sig, color=rgba_color)
+                ax.annotate("", xytext=(0, 1), xy=(diag, sig),
+                            arrowprops=dict(facecolor=rgba_color))
             elif abs(brel_mean) > lim and exp_err <= lim and sig <= sig_lim:
-                c = ax.scatter(diag, sig, color=rgba_color)
+                ax.annotate("", xytext=(0, 1), xy=(diag, sig),
+                            arrowprops=dict(facecolor=rgba_color))
             elif abs(brel_mean) > lim and exp_err > lim and sig <= sig_lim:
-                c = ax.scatter(diag, sig, color=rgba_color)
+                ax.annotate("", xytext=(0, 1), xy=(diag, sig),
+                            arrowprops=dict(facecolor=rgba_color))
             # FBM
             elif abs(brel_mean) <= lim and exp_err <= lim and sig <= sig_lim:
-                c = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5, zorder=1,
-                             width=.05, length_includes_head=True,
-                             transform=mtransforms.Affine2D().translate(0, 0) + ax.transData)
-                c1 = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5,
-                              zorder=1, width=.05, length_includes_head=True,
-                              transform=mtransforms.Affine2D().translate(np.pi, 0) + ax.transData)
+                ax.annotate("", xytext=(0, 1), xy=(0, sig),
+                            arrowprops=dict(facecolor=rgba_color))
+                ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
+                            arrowprops=dict(facecolor=rgba_color))
             # FGM
             elif abs(brel_mean) <= lim and exp_err <= lim and sig > sig_lim:
                 c = ax.scatter(diag, sig, color=rgba_color)
@@ -1215,12 +1205,10 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                 c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             # FBM
             elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
-                c = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5, zorder=1,
-                             width=.05, length_includes_head=True,
-                             transform=mtransforms.Affine2D().translate(0, 0) + ax.transData)
-                c1 = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5,
-                              zorder=1, width=.05, length_includes_head=True,
-                              transform=mtransforms.Affine2D().translate(np.pi, 0) + ax.transData)
+                ax.annotate("", xytext=(0, 1), xy=(0, sig),
+                            arrowprops=dict(facecolor=rgba_color))
+                ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
+                            arrowprops=dict(facecolor=rgba_color))
             # FGM
             elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim:
                 c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
@@ -1285,12 +1273,10 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                     c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
                 # FBM
                 elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
-                    c = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5, zorder=1,
-                                 width=.05, length_includes_head=True,
-                                 transform=mtransforms.Affine2D().translate(0, 0) + ax.transData)
-                    c1 = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5,
-                                  zorder=1, width=.05, length_includes_head=True,
-                                  transform=mtransforms.Affine2D().translate(np.pi, 0) + ax.transData)
+                    ax.annotate("", xytext=(0, 1), xy=(0, sig),
+                                arrowprops=dict(facecolor=rgba_color))
+                    ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
+                                arrowprops=dict(facecolor=rgba_color))
                 # FGM
                 elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim:
                     c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
@@ -1485,7 +1471,11 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         cp = ax.contour(theta, r, r, colors='black', alpha=.7)
         cl = ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
         # diagnose the error
-        c = ax.scatter(diag, sig, color=rgba_color)
+        if sig < .9:
+            ax.annotate("", xytext=(0, 1), xy=(diag, sig),
+                        arrowprops=dict(facecolor=rgba_color))
+        elif sig >= .9:
+            ax.scatter(diag, sig, color=rgba_color)
         ax.set_rticks([])  # turn defalut ticks off
         ax.set_rmin(1)
         ax.set_rmax(-ax_lim)
@@ -1531,6 +1521,8 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         elif sig <= -1:
             yy = np.arange(-2, 2 - delta, delta)[::-1]
             ax_lim = 2
+        elif sig <= -2:
+            raise ValueError("Value of 'KGE' is too low for visualization!", sig)
 
         len_yy = len(yy)
 
@@ -1581,7 +1573,11 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         cp = ax.contour(theta, r, r, colors='black', alpha=.7)
         cl = ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
         # diagnose the error
-        c = ax.scatter(diag, sig, color=rgba_color)
+        if sig < .9:
+            ax.annotate("", xytext=(0, 1), xy=(diag, sig),
+                        arrowprops=dict(facecolor=rgba_color))
+        elif sig >= .9:
+            ax.scatter(diag, sig, color=rgba_color)
         ax.set_rticks([])  # turn defalut ticks off
         ax.set_rmin(1)
         ax.set_rmax(-ax_lim)

@@ -2,7 +2,6 @@
 .ipynb_checkpoints/
 de/__pycache__/
 tests/__pycache__/
-paper/
 *.bat
 *.spydata
 figures/

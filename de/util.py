@@ -654,12 +654,10 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
                         ha='center', va='center')
         # FBM
         elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
-            c = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5, zorder=1,
-                         width=.05, length_includes_head=True,
-                         transform=mtransforms.Affine2D().translate(0, 0) + ax.transData)
-            c1 = ax.arrow(0, 1, 0, -abs(1-sig), color=rgba_color, lw=5,
-                          zorder=1, width=.05, length_includes_head=True,
-                          transform=mtransforms.Affine2D().translate(np.pi, 0) + ax.transData)
+            ax.annotate("", xytext=(0, 1), xy=(0, sig),
+                        arrowprops=dict(facecolor=rgba_color), zorder=1)
+            ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
+                        arrowprops=dict(facecolor=rgba_color), zorder=1)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
