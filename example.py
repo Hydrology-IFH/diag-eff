@@ -13,8 +13,8 @@ sns.set_style('ticks', {'xtick.major.size': 8, 'ytick.major.size': 8})
 sns.set_context("paper", font_scale=1.5)
 
 if __name__ == "__main__":
-    # 134.29 km2
-    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/07373000_streamflow_qc.csv'
+    # 299.46 km2
+    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/13331500_streamflow_qc.txt'
 
     fig_num_fdc = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)']
     fig_fdc, axes_fdc = plt.subplots(2, 5, sharey=True, sharex=True, figsize=(14,6))
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     df_es = pd.DataFrame(index=idx, columns=cols, dtype=np.float64)
 
     # import observed time series
-    df_ts = util.import_camels_ts(path)
+    df_ts = util.import_camels_ts(path, sep=r"\s+")
     de.plot_ts(df_ts)
 
     ### perfect simulation ###
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     ### precipitation surplus ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    obs_sim.loc[:, 'Qsim'] = de.pos_shift_ts(df_ts['Qobs'].values)  # positive offset
+    obs_sim.loc[:, 'Qsim'] = de.shift_ts(df_ts['Qobs'].values, offset=1.5)  # positive offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 2], fig_num_fdc[2])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 2], fig_num_ts[2])
 
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     ### precipitation shortage ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    obs_sim.loc[:, 'Qsim'] = de.neg_shift_ts(df_ts['Qobs'].values)  # negative offset
+    obs_sim.loc[:, 'Qsim'] = de.shift_ts(df_ts['Qobs'].values, offset=.5)  # negative offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 3], fig_num_fdc[3])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 3], fig_num_ts[3])
 
@@ -305,8 +305,9 @@ if __name__ == "__main__":
     ### Decrease high flows - Increase low flows and precipitation surplus ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highunder_lowover(df_ts.copy(), prop=0.34)  # smoothed time series
-    obs_sim.loc[:, 'Qsim'] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
+    tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
+    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values + tso  # positive offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 0], fig_num_fdc[5])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 0], fig_num_ts[5])
 
@@ -351,7 +352,8 @@ if __name__ == "__main__":
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
-    obs_sim.loc[:, 'Qsim'] = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
+    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values - tso  # negative offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 1], fig_num_fdc[6])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 1], fig_num_ts[6])
 
@@ -395,10 +397,9 @@ if __name__ == "__main__":
     ### Increase high flows - Decrease low flows and precipitation surplus ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highover_lowunder(df_ts.copy(), prop=0.34)  # disaggregated time series
-    tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tsp.iloc[:, 0] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
-    obs_sim.loc[:, 'Qsim'] = tsp.iloc[:, 0].values  # positive offset
+    tsd = de.highover_lowunder(df_ts.copy(), prop=0.5)  # disaggregated time series
+    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values + tso  # positive offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 2], fig_num_fdc[7])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 2], fig_num_ts[7])
 
@@ -443,7 +444,8 @@ if __name__ == "__main__":
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     tsd = de.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
-    obs_sim.loc[:, 'Qsim'] = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
+    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values - tso  # negative offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 3], fig_num_fdc[8])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 3], fig_num_ts[8])
 
@@ -483,7 +485,7 @@ if __name__ == "__main__":
 
     # NSE
     df_es.iloc[9, 10] = de.calc_nse(obs_arr, sim_arr)
-    
+
     ### mean flow benchmark ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
@@ -532,9 +534,10 @@ if __name__ == "__main__":
     ### Decrease high flows - Increase low flows, precipitation surplus and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highunder_lowover(df_ts.copy(), prop=0.34)  # smoothed time series
+    tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
     tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tsp.iloc[:, 0] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
+    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsp.iloc[:, 0]  = tsd.iloc[:, 0].values + tso  # negative offset
     tst = de.time_shift(tsp, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 0], fig_num_ts[9])
@@ -581,7 +584,8 @@ if __name__ == "__main__":
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
     tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tsn.iloc[:, 0]  = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
+    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsn.iloc[:, 0]  = tsd.iloc[:, 0].values - tso  # negative offset
     tst = de.time_shift(tsn, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 1], fig_num_ts[10])
@@ -626,9 +630,10 @@ if __name__ == "__main__":
     ### Increase high flows - Decrease low flows, precipitation surplus and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highover_lowunder(df_ts.copy(), prop=0.34)  # disaggregated time series
+    tsd = de.highover_lowunder(df_ts.copy(), prop=0.5)  # disaggregated time series
     tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tsp.iloc[:, 0] = de.pos_shift_ts(tsd.iloc[:, 0].values, offset=1.2)  # positive offset
+    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsp.iloc[:, 0]  = tsd.iloc[:, 0].values + tso  # positve offset
     tst = de.time_shift(tsp, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 2], fig_num_ts[11])
@@ -675,7 +680,8 @@ if __name__ == "__main__":
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     tsd = de.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
     tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tsn.iloc[:, 0] = de.neg_shift_ts(tsd.iloc[:, 0].values, offset=0.8)  # negative offset
+    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsn.iloc[:, 0]  = tsd.iloc[:, 0].values - tso  # negative offset
     tst = de.time_shift(tsn, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 3], fig_num_ts[12])
@@ -753,9 +759,9 @@ if __name__ == "__main__":
     # scatterplots efficiencies
     sc = sns.scatterplot(kge_arr, de_arr, color='black', ax=ax1)
     sc1 = sns.scatterplot(nse_arr, de_arr, color='red', ax=ax1)
-    ax1.plot([-1.05, 1.05], [-1.05, 1.05], ls="--", c=".3")
-    ax1.set_ylim(-1.05, 1.05)
-    ax1.set_xlim(-1.05, 1.05)
+    ax1.plot([-2.05, 1.05], [-2.05, 1.05], ls="--", c=".3")
+    ax1.set_ylim(-2.05, 1.05)
+    ax1.set_xlim(-2.05, 1.05)
     ax1.set(ylabel='DE [-]', xlabel='KGE [-]')
     ax1.text(.42, -.22, 'NSE [-]', color='red', transform=ax1.transAxes)
     ax1.text(.025, .93, '(a)', transform=ax1.transAxes)
@@ -767,9 +773,9 @@ if __name__ == "__main__":
     # scatterplots components
     sc = sns.scatterplot(alpha_arr - 1, brel_mean_arr, color='black', ax=ax2)
     sc1 = sns.scatterplot(beta_arr - 1, b_slope_arr, color='red', ax=ax2)
-    ax2.plot([-1.05, 1.05], [-1.05, 1.05], ls="--", c=".3")
-    ax2.set_ylim(-1.05, 1.05)
-    ax2.set_xlim(-1.05, 1.05)
+    ax2.plot([-2.05, 2.05], [-2.05, 2.05], ls="--", c=".3")
+    ax2.set_ylim(-2.05, 2.05)
+    ax2.set_xlim(-2.05, 2.05)
     ax2.set(ylabel=r'$\overline{B_{rel}}$ [-]', xlabel=r'$\alpha$ - 1 [-]')
     ax2.text(-.29, .415, r'$B_{slope}$ [-]', color='red', transform=ax2.transAxes, rotation=90)
     ax2.text(.42, -.22, r'$\beta$ - 1 [-]', color='red', transform=ax2.transAxes)
@@ -789,7 +795,7 @@ if __name__ == "__main__":
     df_es_t.to_csv(path_csv, header=True, index=True, sep=';')
 
     ### camels
-    path_cam = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/07373000_05_model_output.csv'
+    path_cam = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/13331500_05_model_output.txt'
     df_cam = util.import_camels_obs_sim(path_cam)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10,5))
     util.plot_obs_sim_ax(df_cam['Qobs'], df_cam['Qsim'], ax1, '')

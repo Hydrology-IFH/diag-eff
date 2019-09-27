@@ -65,7 +65,7 @@ def import_ts(path, sep=','):
 
     return df_ts
 
-def import_camels_ts(path, sep=';', catch_area=134.29):
+def import_camels_ts(path, sep=r"\s+", catch_area=619.11):
     """
     Import .csv-file with streamflow time series from CAMELS dataset (cubic feet
     per second).
@@ -76,7 +76,7 @@ def import_camels_ts(path, sep=';', catch_area=134.29):
         Path to .csv-file which contains time series
 
     sep : str, optional
-        Delimeter to use. The default is ‘,’.
+        Delimeter to use. The default is ‘;’.
 
     catch_area : float, optional
         catchment area in km2 to convert runoff to mm/day
@@ -98,7 +98,7 @@ def import_camels_ts(path, sep=';', catch_area=134.29):
 
     return df_ts
 
-def import_camels_obs_sim(path, sep=';'):
+def import_camels_obs_sim(path, sep=r"\s+"):
     """
     Import .csv-file with streamflow time series from CAMELS dataset (cubic feet
     per second).
@@ -567,11 +567,11 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
     elif sig_min <= 0 and sig_min > -1:
         yy = np.arange(-1, 1, delta)[::-1]
         ax_lim = 1
-    elif sig_min <= -1:
+    elif sig_min > -2 and sig_min <= -1:
         yy = np.arange(-2, 1, delta)[::-1]
         ax_lim = 2
     elif sig_min <= -2:
-        raise ValueError("Some values of 'DE' are too low for visualization!", sig_min)
+        raise AssertionError("Some values of 'DE' are too low for visualization!", sig_min)
 
     len_yy = len(yy)
 
@@ -727,12 +727,11 @@ def vis2d_kge_multi_fc(kge_alpha, beta_or_gamma, kge_r, sig_kge, fc):
     elif sig_min <= 0 and sig_min > -1:
         yy = np.arange(-1, 1, delta)[::-1]
         ax_lim = 1
-    elif sig_min <= -1:
+    elif sig_min > -2 and sig_min <= -1:
         yy = np.arange(-2, 1, delta)[::-1]
         ax_lim = 2
     elif sig_min <= -2:
-        yy = np.arange(-3, 1, delta)[::-1]
-        ax_lim = 3
+        raise AssertionError("Some values of 'KGE' are too low for visualization!", sig_min)
 
     len_yy = len(yy)
 

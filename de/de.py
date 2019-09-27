@@ -891,11 +891,11 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
     elif sig <= 0 and sig > -1:
         yy = np.arange(-1, 1, delta)[::-1]
         ax_lim = 1
-    elif sig <= -1:
+    elif sig > -2 and sig <= -1:
         yy = np.arange(-2, 1, delta)[::-1]
         ax_lim = 2
     elif sig <= -2:
-        raise ValueError("Value of 'DE' is too low for visualization!", sig)
+        raise AssertionError("Value of 'DE' is too low for visualization!", sig)
 
     len_yy = len(yy)
 
@@ -1127,7 +1127,7 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
     elif sig_min <= 0 and sig_min > -1:
         yy = np.arange(-1, 1, delta)[::-1]
         ax_lim = 1
-    elif sig_min <= -1:
+    elif sig_min > -2 and sig_min <= -1:
         yy = np.arange(-2, 1, delta)[::-1]
         ax_lim = 2
     elif sig_min <= -2:
@@ -1416,11 +1416,11 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         elif sig <= 0 and sig > -1:
             yy = np.arange(-1, 1 - delta, delta)[::-1]
             ax_lim = 1
-        elif sig <= -1:
+        elif sig < -2 and sig <= -1:
             yy = np.arange(-2, 2 - delta, delta)[::-1]
             ax_lim = 2
         elif sig <= -2:
-            raise ValueError("Value of 'KGE'  too low for visualization!", sig)
+            raise AssertionError("Value of 'KGE'  too low for visualization!", sig)
 
         len_yy = len(yy)
 
@@ -1522,7 +1522,7 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
             yy = np.arange(-2, 2 - delta, delta)[::-1]
             ax_lim = 2
         elif sig <= -2:
-            raise ValueError("Value of 'KGE' is too low for visualization!", sig)
+            raise AssertionError("Value of 'KGE' is too low for visualization!", sig)
 
         len_yy = len(yy)
 
@@ -1634,7 +1634,7 @@ def vis2d_kge_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=False):
     elif sig_min <= 0 and sig_min > -1:
         yy = np.arange(-1, 1, delta)[::-1]
         ax_lim = 1
-    elif sig_min <= -1:
+    elif sig_min > -2 and sig_min <= -1:
         yy = np.arange(-2, 1, delta)[::-1]
         ax_lim = 2
     elif sig_min <= -2:
@@ -1807,10 +1807,10 @@ def vis2d_kge_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=False):
             g.fig.tight_layout()
 
 
-def pos_shift_ts(ts, offset=1.5, multi=True):
+def shift_ts(ts, offset=1.5):
     """Generate input data errors.
 
-    Precipitation overestimation.
+    Precipitation overestimation/underestimation.
 
     Mimicking input errors by multiplying/adding with constant offset.
 
@@ -1820,57 +1820,17 @@ def pos_shift_ts(ts, offset=1.5, multi=True):
         Observed time series
 
     offset : float, optional
-        Offset multiplied/added to time series. If multi true, offset
-        has to be greater than 1. The default is 25 % of P overestimation.
-
-    multi : boolean, optional
-        If True, offset is multiplied. If False, offset is added. The default
-        is multiplication.
+        Offset multiplied to time series. If greater than 1 P overestimation
+        and if less than 1 P underestimation.
 
     Returns
     ----------
-    shift_pos : array_like
+    shift_ts : array_like
         Time series with positve offset
     """
-    if multi:
-        shift_pos = ts * offset
-    else:
-        shift_pos = ts + offset
+    shift_ts = ts * offset
 
-    return shift_pos
-
-def neg_shift_ts(ts, offset=0.5, multi=True):
-    """Generate input data errors.
-
-    Precipitation underestimation.
-
-    Mimicking input errors by multiplying/subtracting with constant offset.
-
-    Parameters
-    ----------
-    ts : (N,)array_like
-        Observed time series
-
-    offset : float, optional
-        Offset multiplied/subtracted to time series. If multi true, offset
-        has to be greater than 1. The default is 25 % of P underestimation.
-
-    multi : boolean, optional
-        If True, offset is multiplied. If False, offset is subtracted. The
-        default is multiplication.
-
-    Returns
-    ----------
-    shift_neg : array_like
-        time series with negative offset
-    """
-    if multi:
-        shift_neg = ts * offset
-    else:
-        shift_neg = ts - offset
-        shift_neg[shift_neg < 0] = 0
-
-    return shift_neg
+    return shift_ts
 
 def highunder_lowover(ts, prop=0.5):
     """Generate model errors.
