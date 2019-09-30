@@ -510,7 +510,7 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
     ax.set(ylabel=r'[$m^{3}$ $s^{-1}$]',
            xlabel='Time [Days]')
 
-def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
+def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag, fc,
                       lim=0.05):
     """Multiple polar plot of Diagnostic-Efficiency (DE)
 
@@ -527,6 +527,9 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
 
     sig_de : (N,)array_like
         diagnostic efficiency as 1-D array
+
+    de_mfb : (N,)array_like
+        mean flow benchmark of diagnostic efficiency as 1-D array
 
     b_dir : (N,)array_like
         direction of bias as 1-D array
@@ -552,6 +555,7 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
     ll_b_dir = b_dir.tolist()
     ll_b_area = b_area.tolist()
     ll_sig = sig_de.tolist()
+    ll_mfb = de_mfb.tolist()
     ll_diag = diag.tolist()
     ll_temp_cor = temp_cor.tolist()
 
@@ -561,16 +565,16 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if sig_min > 0:
-        yy = np.arange(0, 1, delta)[::-1]
-        ax_lim = 0
-    elif sig_min <= 0 and sig_min > -1:
-        yy = np.arange(-1, 1, delta)[::-1]
-        ax_lim = 1
-    elif sig_min > -2 and sig_min <= -1:
-        yy = np.arange(-2, 1, delta)[::-1]
+    if sig_min >= 0:
+        ax_lim = 0.1
+        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    elif sig_min < 0 and sig_min >= -1:
+        ax_lim = 1.1
+        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    elif sig_min >= -2 and sig_min < -1:
         ax_lim = 2
-    elif sig_min <= -2:
+        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    elif sig_min < -2:
         raise AssertionError("Some values of 'DE' are too low for visualization!", sig_min)
 
     len_yy = len(yy)
@@ -625,7 +629,8 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
     # threshold efficiency for FBM
     sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
     # loop over each data point
-    for (bm, bd, ba, r, sig, ang, txt) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_diag, fc):
+    for (bm, bd, ba, r, sig, mfb, ang, txt) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_mfb, ll_diag, fc):
+        sig_lim_norm = (sig_lim - mfb)/(1 - mfb)
         # slope of bias
         b_slope = de.calc_bias_slope(ba, bd)
         # convert temporal correlation to color
@@ -637,23 +642,23 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
             exp_err = 0
 
         # diagnose the error
-        if abs(bm) <= lim and exp_err > lim and sig <= sig_lim:
+        if abs(bm) <= lim and exp_err > lim and sig <= sig_lim_norm:
             c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
-        elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim:
+        elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim_norm:
             c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
-        elif abs(bm) > lim and exp_err > lim and sig <= sig_lim:
+        elif abs(bm) > lim and exp_err > lim and sig <= sig_lim_norm:
             c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
         # FBM
-        elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
+        elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim_norm:
             ax.annotate("", xytext=(0, 1), xy=(0, sig),
                         arrowprops=dict(facecolor=rgba_color), zorder=1)
             ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
@@ -662,7 +667,7 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
         # FGM
-        elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim:
+        elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim_norm:
             c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-6, 0), textcoords="offset points",
@@ -672,7 +677,7 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
     ax.set_rmax(-ax_lim)
     ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                   labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-    ax.set_xticklabels(['', '', 'P overestimation', '', '', '', 'P underestimation', ''])
+    ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
     ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
             va='center', ha='center', rotation=90, rotation_mode='anchor',
             transform=ax.transAxes)
@@ -688,8 +693,8 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
 
     return fig
 
-def vis2d_kge_multi_fc(kge_alpha, beta_or_gamma, kge_r, sig_kge, fc):
-    """Multiple polar plot of Kling-Gupta Efficiency (KGE)
+def vis2d_kge_norm_multi_fc(kge_alpha, beta_or_gamma, kge_r, sig_kge, fc):
+    """Multiple polar plot of normalized Kling-Gupta Efficiency (KGE_norm)
 
     Parameters
     ----------
@@ -708,12 +713,13 @@ def vis2d_kge_multi_fc(kge_alpha, beta_or_gamma, kge_r, sig_kge, fc):
     fc : list
         figure captions
     """
-    sig_min = np.min(sig_kge)
+    sig_norm = (sig_kge - (-.41))/(1 - (-.41))
+    sig_min = np.min(sig_norm)
 
     ll_kge_alpha = kge_alpha.tolist()
     ll_bg = beta_or_gamma.tolist()
     ll_kge_r = kge_r.tolist()
-    ll_sig = sig_kge.tolist()
+    ll_sig = sig_norm.tolist()
 
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)

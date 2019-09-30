@@ -497,6 +497,56 @@ def calc_de(obs, sim, sort=True):
     # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
     # diagnostic efficiency
+    sig_de = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    sig_mfb = calc_de_mfb(obs)
+    sig = (sig_de - sig_mfb)/(1 - sig_mfb)
+
+    return sig
+
+def calc_de_mfb(obs, sort=True):
+    r"""
+    Calculate mean flow benchmark of Diagnostic-Efficiency (DE).
+
+    Parameters
+    ----------
+    obs : (N,)array_like
+        Observed time series as 1-D array
+
+    sort : boolean, optional
+        If True, time series are sorted by ascending order. If False, time
+        series are not sorted. The default is to sort.
+
+    Returns
+    ----------
+    sig : float
+        Diagnostic efficiency of mean flow benchmark
+
+    Notes
+    ----------
+    .. math::
+
+        DE = 1 - \sqrt{\overline{B_{rel}}^2 + \vert B_{area}\vert^2 + (r - 1)^2}
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import de
+    >>> import numpy as np
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
+    >>> de.calc_de_mfb(obs)
+    """
+    obs_mean = np.mean(obs)
+    sim = np.repeat(obs_mean, len(obs))
+    # mean relative bias
+    brel_mean = calc_brel_mean(obs, sim, sort=sort)
+    # remaining relative bias
+    brel_rest = calc_brel_rest(obs, sim, sort=sort)
+    # area of relative remaing bias
+    b_area = calc_bias_area(brel_rest)
+    # temporal correlation
+    temp_cor = calc_temp_cor(obs, sim)
+    # diagnostic efficiency
     sig = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
 
     return sig
@@ -765,6 +815,78 @@ def calc_kge(obs, sim, r='pearson', var='std'):
 
     return sig
 
+def calc_kge_norm(obs, sim, r='pearson', var='std'):
+    r"""Calculate the Kling-Gupta-Efficiency (KGE_norm) normalized by the
+    mean flow benchmark.
+
+    Parameters
+    ----------
+    obs : (N,)array_like
+        Observed time series as 1-D array
+
+    sim : (N,)array_like
+        Simulated time series
+
+    r : str, optional
+        Either Ppearman correlation coefficient ('spearman'; Pool et al. 2018)
+        or Pearson correlation coefficient ('pearson'; Gupta et al. 2009) can
+        be used to describe the temporal correlation. The default is to
+        calculate the Pearson correlation.
+
+    var : str, optional
+        Either coefficient of variation ('cv'; Kling et al. 2012) or standard
+        deviation ('std'; Gupta et al. 2009, Pool et al. 2018) to describe the
+        gamma term. The default is to calculate the standard deviation.
+
+    Returns
+    ----------
+    sig : float
+        Kling-Gupta-Efficiency measure normalized by mean flow benchmark
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import de
+    >>> import numpy as np
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
+    >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
+    >>> de.calc_kge_norm(obs, sim)
+
+    Notes
+    ----------
+    .. math::
+
+        KGE_{norm} = \frac{KGE - KGE{mfb}}{1 - KGE{mfb}}
+
+    """
+    if len(obs) != len(sim):
+        raise AssertionError("Arrays are not of equal length!")
+    # calculate alpha term
+    obs_mean = np.mean(obs)
+    sim_mean = np.mean(sim)
+    kge_alpha = sim_mean/obs_mean
+
+    # calculate KGE with gamma term
+    if var == 'cv':
+        kge_gamma = calc_kge_gamma(obs, sim)
+        temp_cor = calc_temp_cor(obs, sim, r=r)
+
+        sig_nn = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma - 1)**2  + (temp_cor - 1)**2)
+        # normalizing KGE with mean flow benchmark
+        sig = (sig_nn - (-.41))/(1 - (-.41))
+
+    # calculate KGE with beta term
+    elif var == 'std':
+        kge_beta = calc_kge_beta(obs, sim)
+        temp_cor = calc_temp_cor(obs, sim, r=r)
+
+        sig_nn = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta - 1)**2  + (temp_cor - 1)**2)
+        # normalizing KGE with mean flow benchmark
+        sig = (sig_nn - (-.41))/(1 - (-.41))
+
+    return sig
+
 def calc_nse(obs, sim):
     """Calculate Nash-Sutcliffe-Efficiency (NSE).
 
@@ -885,15 +1007,15 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if sig > 0:
-        yy = np.arange(0, 1, delta)[::-1]
-        ax_lim = 0
-    elif sig <= 0 and sig > -1:
-        yy = np.arange(-1, 1, delta)[::-1]
-        ax_lim = 1
-    elif sig > -2 and sig <= -1:
-        yy = np.arange(-2, 1, delta)[::-1]
+    if sig_min >= 0:
+        ax_lim = 0.1
+        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    elif sig_min < 0 and sig_min >= -1:
+        ax_lim = 1.1
+        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    elif sig_min >= -2 and sig_min < -1:
         ax_lim = 2
+        yy = np.arange(-ax_lim, 1, delta)[::-1]
     elif sig <= -2:
         raise AssertionError("Value of 'DE' is too low for visualization!", sig)
 
@@ -948,29 +1070,31 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
         # threshold efficiency for FBM
         sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
+        mfb = calc_de_mfb(obs, sim)
+        sig_lim_norm = (sig_lim - mfb)/(1 - mfb)
         # relation of b_dir which explains the error
         if abs(b_area) > 0:
             exp_err = (abs(b_dir) * 2)/abs(b_area)
         elif abs(b_area) == 0:
             exp_err = 0
         # diagnose the error
-        if abs(brel_mean) <= lim and exp_err > lim and sig <= sig_lim:
+        if abs(brel_mean) <= lim and exp_err > lim and sig <= sig_lim_norm:
             ax.annotate("", xytext=(0, 1), xy=(diag, sig),
                         arrowprops=dict(facecolor=rgba_color))
-        elif abs(brel_mean) > lim and exp_err <= lim and sig <= sig_lim:
+        elif abs(brel_mean) > lim and exp_err <= lim and sig <= sig_lim_norm:
             ax.annotate("", xytext=(0, 1), xy=(diag, sig),
                         arrowprops=dict(facecolor=rgba_color))
-        elif abs(brel_mean) > lim and exp_err > lim and sig <= sig_lim:
+        elif abs(brel_mean) > lim and exp_err > lim and sig <= sig_lim_norm:
             ax.annotate("", xytext=(0, 1), xy=(diag, sig),
                         arrowprops=dict(facecolor=rgba_color))
         # FBM
-        elif abs(brel_mean) <= lim and exp_err <= lim and sig <= sig_lim:
+        elif abs(brel_mean) <= lim and exp_err <= lim and sig <= sig_lim_norm:
             ax.annotate("", xytext=(0, 1), xy=(0, sig),
                         arrowprops=dict(facecolor=rgba_color))
             ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
                         arrowprops=dict(facecolor=rgba_color))
         # FGM
-        elif abs(brel_mean) <= lim and exp_err <= lim and sig > sig_lim:
+        elif abs(brel_mean) <= lim and exp_err <= lim and sig > sig_lim_norm:
             c = ax.scatter(diag, sig, color=rgba_color)
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
@@ -1014,29 +1138,31 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
                            inline_spacing=6)
             # threshold efficiency for FBM
             sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
+            mfb = calc_de_mfb(obs, sim)
+            sig_lim_norm = (sig_lim - mfb)/(1 - mfb)
             # relation of b_dir which explains the error
             if abs(b_area) > 0:
                 exp_err = (abs(b_dir) * 2)/abs(b_area)
             elif abs(b_area) == 0:
                 exp_err = 0
             # diagnose the error
-            if abs(brel_mean) <= lim and exp_err > lim and sig <= sig_lim:
+            if abs(brel_mean) <= lim and exp_err > lim and sig <= sig_lim_norm:
                 ax.annotate("", xytext=(0, 1), xy=(diag, sig),
                             arrowprops=dict(facecolor=rgba_color))
-            elif abs(brel_mean) > lim and exp_err <= lim and sig <= sig_lim:
+            elif abs(brel_mean) > lim and exp_err <= lim and sig <= sig_lim_norm:
                 ax.annotate("", xytext=(0, 1), xy=(diag, sig),
                             arrowprops=dict(facecolor=rgba_color))
-            elif abs(brel_mean) > lim and exp_err > lim and sig <= sig_lim:
+            elif abs(brel_mean) > lim and exp_err > lim and sig <= sig_lim_norm:
                 ax.annotate("", xytext=(0, 1), xy=(diag, sig),
                             arrowprops=dict(facecolor=rgba_color))
             # FBM
-            elif abs(brel_mean) <= lim and exp_err <= lim and sig <= sig_lim:
+            elif abs(brel_mean) <= lim and exp_err <= lim and sig <= sig_lim_norm:
                 ax.annotate("", xytext=(0, 1), xy=(0, sig),
                             arrowprops=dict(facecolor=rgba_color))
                 ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
                             arrowprops=dict(facecolor=rgba_color))
             # FGM
-            elif abs(brel_mean) <= lim and exp_err <= lim and sig > sig_lim:
+            elif abs(brel_mean) <= lim and exp_err <= lim and sig > sig_lim_norm:
                 c = ax.scatter(diag, sig, color=rgba_color)
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
@@ -1068,7 +1194,7 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
             ax1.set(ylabel=r'$B_{rest}$ [-]',
                     xlabel='Exceedence probabilty [-]')
 
-def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
+def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
                    lim=0.05, extended=False):
     """Multiple polar plot of Diagnostic-Efficiency (DE)
 
@@ -1085,6 +1211,9 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
 
     sig_de : (N,)array_like
         diagnostic efficiency as 1-D array
+
+    de_mfb : (N,)array_like
+        mean flow benchmark of diagnostic efficiency as 1-D array
 
     b_dir : (N,)array_like
         direction of bias as 1-D array
@@ -1112,6 +1241,7 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
     ll_b_dir = b_dir.tolist()
     ll_b_area = b_area.tolist()
     ll_sig = sig_de.tolist()
+    ll_mfb = de_mfb.tolist()
     ll_diag = diag.tolist()
     ll_temp_cor = temp_cor.tolist()
 
@@ -1121,15 +1251,15 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if sig_min > 0:
-        yy = np.arange(0, 1, delta)[::-1]
-        ax_lim = 0
-    elif sig_min <= 0 and sig_min > -1:
-        yy = np.arange(-1, 1, delta)[::-1]
-        ax_lim = 1
-    elif sig_min > -2 and sig_min <= -1:
-        yy = np.arange(-2, 1, delta)[::-1]
+    if sig_min >= 0:
+        ax_lim = 0.1
+        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    elif sig_min < 0 and sig_min >= -1:
+        ax_lim = 1.1
+        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    elif sig_min >= -2 and sig_min < -1:
         ax_lim = 2
+        yy = np.arange(-ax_lim, 1, delta)[::-1]
     elif sig_min <= -2:
         raise ValueError("Some values of 'DE' are too low for visualization!", sig_min)
 
@@ -1186,7 +1316,8 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
         # threshold efficiency for FBM
         sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
         # loop over each data point
-        for (bm, bd, ba, r, sig, ang) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_diag):
+        for (bm, bd, ba, r, sig, mfb, ang) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_mfb, ll_diag):
+            sig_lim_norm = (sig_lim - mfb)/(1 - mfb)
             # slope of bias
             b_slope = calc_bias_slope(ba, bd)
             # convert temporal correlation to color
@@ -1197,27 +1328,27 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             elif abs(ba) == 0:
                 exp_err = 0
             # diagnose the error
-            if abs(bm) <= lim and exp_err > lim and sig <= sig_lim:
+            if abs(bm) <= lim and exp_err > lim and sig <= sig_lim_norm:
                 c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
-            elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim:
+            elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim_norm:
                 c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
-            elif abs(bm) > lim and exp_err > lim and sig <= sig_lim:
+            elif abs(bm) > lim and exp_err > lim and sig <= sig_lim_norm:
                 c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             # FBM
-            elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
+            elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim_norm:
                 ax.annotate("", xytext=(0, 1), xy=(0, sig),
                             arrowprops=dict(facecolor=rgba_color))
                 ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
                             arrowprops=dict(facecolor=rgba_color))
             # FGM
-            elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim:
+            elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim_norm:
                 c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
         ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.set_xticklabels(['', '', 'P overestimation', '', '', '', 'P underestimation', ''])
+        ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
         ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
                 transform=ax.transAxes)
@@ -1254,7 +1385,8 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             # threshold efficiency for FBM
             sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
             # loop over each data point
-            for (bm, bd, ba, r, sig, ang) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_diag):
+            for (bm, bd, ba, r, sig, mfb, ang) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_mfb, ll_diag):
+                sig_lim_norm = (1 - sig_lim)/(1 - mfb)
                 # slope of bias
                 b_slope = calc_bias_slope(ba, bd)
                 # convert temporal correlation to color
@@ -1265,27 +1397,27 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                 elif abs(ba) == 0:
                     exp_err = 0
                 # diagnose the error
-                if abs(bm) <= lim and exp_err > lim and sig <= sig_lim:
+                if abs(bm) <= lim and exp_err > lim and sig <= sig_lim_norm:
                     c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
-                elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim:
+                elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim_norm:
                     c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
-                elif abs(bm) > lim and exp_err > lim and sig <= sig_lim:
+                elif abs(bm) > lim and exp_err > lim and sig <= sig_lim_norm:
                     c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
                 # FBM
-                elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
+                elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim_norm:
                     ax.annotate("", xytext=(0, 1), xy=(0, sig),
                                 arrowprops=dict(facecolor=rgba_color))
                     ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
                                 arrowprops=dict(facecolor=rgba_color))
                 # FGM
-                elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim:
+                elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim_norm:
                     c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
             ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-            ax.set_xticklabels(['', '', 'P overestimation', '', '', r'0$^\circ$/360$^\circ$ ', 'P underestimation', ''])
+            ax.set_xticklabels(['', '', 'Constant positive offset', '', '', r'0$^\circ$/360$^\circ$ ', 'Constant negative offset', ''])
             ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
                     va='center', ha='center', rotation=90,
                     rotation_mode='anchor', transform=ax.transAxes)
@@ -1361,8 +1493,10 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                                           color=colors[i])
             g.fig.tight_layout()
 
-def vis2d_kge(obs, sim, r='pearson', var='std'):
-    """Polar plot of Kling-Gupta-Efficiency (KGE)
+def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
+    r"""Polar plot of normalized Kling-Gupta-Efficiency ($KGE_{norm}$).
+
+    KGE is normalized by its mean flow benchmark.
 
     Parameters
     ----------
@@ -1380,7 +1514,7 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.vis2d_kge(obs, sim)
+    >>> de.vis2d_kge_norm(obs, sim)
     """
     # calculate alpha term
     obs_mean = np.mean(obs)
@@ -1396,7 +1530,9 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         kge_gamma = sim_cv/obs_cv
         temp_cor = calc_temp_cor(obs, sim, r=r)
 
-        sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma- 1)**2  + (temp_cor - 1)**2)
+        sig_nn = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma- 1)**2  + (temp_cor - 1)**2)
+        # normalizing KGE with mean flow benchmark
+        sig = (sig_nn - (-.41))/(1 - (-.41))
         sig = np.round(sig, decimals=2)
 
         # convert to radians
@@ -1498,7 +1634,9 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         kge_beta = sim_std/obs_std
         temp_cor = calc_temp_cor(obs, sim, r=r)
 
-        sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta- 1)**2  + (temp_cor - 1)**2)
+        sig_nn = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta- 1)**2  + (temp_cor - 1)**2)
+        # normalizing KGE with mean flow benchmark
+        sig = (sig_nn - (-.41))/(1 - (-.41))
         sig = np.round(sig, decimals=2)
 
         # convert to radians
@@ -1593,8 +1731,10 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
         cbar.ax.tick_params(direction='in')
 
-def vis2d_kge_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=False):
-    """Multiple polar plot of Kling-Gupta Efficiency (KGE)
+def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=False):
+    r"""Multiple polar plot of Kling-Gupta Efficiency ($KGE_{norm}$).
+
+    KGE is normalized by its mean flow benchmark.
 
     Parameters
     ----------
@@ -1615,12 +1755,14 @@ def vis2d_kge_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=False):
         is displayed besides the polar plot. The default is,
         that only the diagnostic polar plot is displayed.
     """
-    sig_min = np.min(sig_kge)
+    # normalizing KGE with mean flow benchmark
+    sig_norm = (sig_kge - (-.41))/(1 - (-.41))
+    sig_min = np.min(sig_norm)
 
     ll_kge_alpha = kge_alpha.tolist()
     ll_bg = beta_or_gamma.tolist()
     ll_kge_r = kge_r.tolist()
-    ll_sig = sig_kge.tolist()
+    ll_sig = sig_norm.tolist()
 
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)

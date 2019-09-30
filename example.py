@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     # dataframe efficiency measures
     idx = ['1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
-    cols = ['brel_mean', 'b_area', 'temp_cor', 'de', 'b_dir', 'b_slope', 'diag', 'kge', 'alpha', 'beta', 'nse']
+    cols = ['brel_mean', 'b_area', 'temp_cor', 'de', 'mfb', 'b_dir', 'b_slope', 'diag', 'kge_norm', 'alpha', 'beta', 'nse']
     df_es = pd.DataFrame(index=idx, columns=cols, dtype=np.float64)
 
     # import observed time series
@@ -57,26 +57,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[0, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[0, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[0, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[0, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[0, 4] = b_dir
+    df_es.iloc[0, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[0, 5] = b_slope
+    df_es.iloc[0, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[0, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[0, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[0, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[0, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[0, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[0, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[0, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[0, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[0, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[0, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### increase high flows - decrease low flows ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -102,26 +104,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[1, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[1, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[1, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[1, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[1, 4] = b_dir
+    df_es.iloc[1, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[1, 5] = b_slope
+    df_es.iloc[1, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[1, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[1, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[1, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[1, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[1, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[1, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[1, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[1, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[1, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[1, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### decrease high flows - increase low flows ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -147,26 +151,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[2, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[2, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[2, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[2, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[2, 4] = b_dir
+    df_es.iloc[2, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[2, 5] = b_slope
+    df_es.iloc[2, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[2, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[2, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[2, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[2, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[2, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[2, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[2, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[2, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[2, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[2, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### precipitation surplus ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -191,26 +197,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[3, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[3, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[3, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[3, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[3, 4] = b_dir
+    df_es.iloc[3, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[3, 5] = b_slope
+    df_es.iloc[3, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[3, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[3, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[3, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[3, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[3, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[3, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[3, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[3, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[3, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[3, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### precipitation shortage ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -235,26 +243,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[4, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[4, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[4, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[4, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[4, 4] = b_dir
+    df_es.iloc[4, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[4, 5] = b_slope
+    df_es.iloc[4, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[4, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[4, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[4, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[4, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[4, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[4, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[4, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[4, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[4, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[4, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -281,26 +291,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[5, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[5, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[5, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[5, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[5, 4] = b_dir
+    df_es.iloc[5, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[5, 5] = b_slope
+    df_es.iloc[5, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[5, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[5, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[5, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[5, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[5, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[5, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[5, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[5, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[5, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[5, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### Decrease high flows - Increase low flows and precipitation surplus ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -327,26 +339,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[6, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[6, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[6, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[6, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[6, 4] = b_dir
+    df_es.iloc[6, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[6, 5] = b_slope
+    df_es.iloc[6, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[6, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[6, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[6, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[6, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[6, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[6, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[6, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[6, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[6, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[6, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### Decrease high flows - Increase low flows and precipitation shortage ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -373,26 +387,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[7, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[7, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[7, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[7, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[7, 4] = b_dir
+    df_es.iloc[7, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[7, 5] = b_slope
+    df_es.iloc[7, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[7, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[7, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[7, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[7, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[7, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[7, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[7, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[7, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[7, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[7, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### Increase high flows - Decrease low flows and precipitation surplus ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -419,26 +435,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[8, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[8, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[8, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[8, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[8, 4] = b_dir
+    df_es.iloc[8, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[8, 5] = b_slope
+    df_es.iloc[8, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[8, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[8, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[8, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[8, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[8, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[8, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[8, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[8, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[8, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[8, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### Increase high flows - Decrease low flows and precipitation shortage ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -465,26 +483,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[9, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[9, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[9, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[9, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[9, 4] = b_dir
+    df_es.iloc[9, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[9, 5] = b_slope
+    df_es.iloc[9, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[9, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[9, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[9, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[9, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[9, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[9, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[9, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[9, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[9, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[9, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### mean flow benchmark ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -510,26 +530,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[10, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[10, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[10, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[10, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[10, 4] = b_dir
+    df_es.iloc[10, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[10, 5] = b_slope
+    df_es.iloc[10, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[10, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[10, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[10, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[10, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[10, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[10, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[10, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[10, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[10, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[10, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### Decrease high flows - Increase low flows, precipitation surplus and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -558,26 +580,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[11, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[11, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[11, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[11, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[11, 4] = b_dir
+    df_es.iloc[11, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[11, 5] = b_slope
+    df_es.iloc[11, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[11, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[11, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[11, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[11, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[11, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[11, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[11, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[11, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[11, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[11, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### Decrease high flows - Increase low flows, precipitation shortage and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -606,26 +630,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[12, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[12, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[12, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[12, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[12, 4] = b_dir
+    df_es.iloc[12, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[12, 5] = b_slope
+    df_es.iloc[12, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[12, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[12, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[12, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[12, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[12, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[12, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[12, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[12, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[12, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[12, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### Increase high flows - Decrease low flows, precipitation surplus and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -654,26 +680,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[13, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[13, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[13, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[13, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[13, 4] = b_dir
+    df_es.iloc[13, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[13, 5] = b_slope
+    df_es.iloc[13, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[13, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[13, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[13, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[13, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[13, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[13, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[13, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[13, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[13, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[13, 11] = de.calc_nse(obs_arr, sim_arr)
 
     ### Increase high flows - Decrease low flows, precipitation shortage and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -702,26 +730,28 @@ if __name__ == "__main__":
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
     df_es.iloc[14, 2] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[14, 3] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
+    df_es.iloc[14, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es.iloc[14, 4] = de.calc_de_mfb(obs_arr)
     # direction of bias
     b_dir = de.calc_bias_dir(brel_rest)
-    df_es.iloc[14, 4] = b_dir
+    df_es.iloc[14, 5] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[14, 5] = b_slope
+    df_es.iloc[14, 6] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[14, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.iloc[14, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[14, 7] = de.calc_kge(obs_arr, sim_arr)
+    df_es.iloc[14, 8] = de.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[14, 8] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[14, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[14, 9] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[14, 10] = de.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[14, 10] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[14, 11] = de.calc_nse(obs_arr, sim_arr)
 
     axes_ts[2, 3].legend(loc=6, bbox_to_anchor=(1.18, .85))
 
@@ -735,11 +765,12 @@ if __name__ == "__main__":
     temp_cor_arr = df_es['temp_cor'].values
     b_dir_arr = df_es['b_dir'].values
     de_arr = df_es['de'].values
+    mfb_arr = df_es['mfb'].values
     diag_arr = df_es['diag'].values
     b_slope_arr = df_es['b_slope'].values
 
     fig_de = util.vis2d_de_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
-                                    de_arr, b_dir_arr, diag_arr, idx)
+                                    de_arr, mfb_arr, b_dir_arr, diag_arr, idx)
     fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/de_diag.pdf', dpi=250)
 
 
@@ -747,9 +778,9 @@ if __name__ == "__main__":
     # make arrays
     alpha_arr = df_es['alpha'].values
     beta_arr = df_es['beta'].values
-    kge_arr = df_es['kge'].values
+    kge_arr = df_es['kge_norm'].values
 
-    fig_kge = util.vis2d_kge_multi_fc(alpha_arr, beta_arr, temp_cor_arr,
+    fig_kge = util.vis2d_kge_norm_multi_fc(alpha_arr, beta_arr, temp_cor_arr,
                                       kge_arr, idx)
     fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/kge_diag.pdf', dpi=250)
 
@@ -790,39 +821,215 @@ if __name__ == "__main__":
     # export table
     path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/table_eff.csv'
     df_es_t = df_es.T
-    df_es_t = df_es_t.loc[['de', 'kge', 'nse'], :]
+    df_es_t = df_es_t.loc[['de', 'kge_norm', 'nse'], :]
     df_es_t = df_es_t.round(2)
     df_es_t.to_csv(path_csv, header=True, index=True, sep=';')
 
+    #TODO: add same model run with different parameters
     ### camels
-    path_cam = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/13331500_05_model_output.txt'
-    df_cam = util.import_camels_obs_sim(path_cam)
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10,5))
-    util.plot_obs_sim_ax(df_cam['Qobs'], df_cam['Qsim'], ax1, '')
-    ax1.text(.9, .93, '(a)', transform=ax1.transAxes)
-    ax1.set_xlabel('Time [Years]')
-    ax1.set_ylabel(r'[mm $d^{-1}$]')
+    # dataframe efficiency measures
+    idx = ['05', '48', '94']
+    cols = ['brel_mean', 'b_area', 'temp_cor', 'de', 'mfb', 'b_dir', 'b_slope', 'diag', 'kge_norm', 'alpha', 'beta', 'nse']
+    df_es_cam = pd.DataFrame(index=idx, columns=cols, dtype=np.float64)
+
+    path_cam1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/13331500_05_model_output.txt'
+    path_cam2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/13331500_48_model_output.txt'
+    path_cam3 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/13331500_94_model_output.txt'
+    df_cam1 = util.import_camels_obs_sim(path_cam1)
+    df_cam2 = util.import_camels_obs_sim(path_cam2)
+    df_cam3 = util.import_camels_obs_sim(path_cam3)
+
+    fig, axes = plt.subplots(3, 2, figsize=(10,10), sharex='col')
+    fig.text(0.06, 0.5, r'[mm $d^{-1}$]', ha='center', va='center', rotation='vertical')
+    fig.text(0.5, 0.5, r'[mm $d^{-1}$]', ha='center', va='center', rotation='vertical')
+    fig.text(0.25, 0.05, 'Time [Years]', ha='center', va='center')
+    fig.text(0.75, 0.05, 'Exceedence probabilty [-]', ha='center', va='center')
+
+    util.plot_obs_sim_ax(df_cam1['Qobs'], df_cam1['Qsim'], axes[0,0], '')
+    axes[0,0].text(.95, .95, '(a; {})'.format(idx[0]),
+                   transform=axes[0,0].transAxes, ha='right', va='top')
     # format the ticks
     years_10 = mdates.YearLocator(10)
     years_5 = mdates.YearLocator(5)
     yearsFmt = mdates.DateFormatter('%Y')
-    ax1.xaxis.set_major_locator(years_10)
-    ax1.xaxis.set_major_formatter(yearsFmt)
-    ax1.xaxis.set_minor_locator(years_5)
-    util.fdc_obs_sim_ax(df_cam['Qobs'], df_cam['Qsim'], ax2, '')
-    ax2.set_xlabel('Exceedence probabilty [-]')
-    ax2.set_ylabel(r'[mm $d^{-1}$]')
-    ax2.text(.9, .93, '(b)', transform=ax2.transAxes)
-    ax2.legend(loc=2, labels=['Observed', 'Simulated'], ncol=2, frameon=False, bbox_to_anchor=(-0.7, 1.15))
+    axes[0,0].xaxis.set_major_locator(years_10)
+    axes[0,0].xaxis.set_major_formatter(yearsFmt)
+    axes[0,0].xaxis.set_minor_locator(years_5)
+    util.fdc_obs_sim_ax(df_cam1['Qobs'], df_cam1['Qsim'], axes[0,1], '')
+    axes[0,1].text(.95, .95, '(b; {})'.format(idx[0]),
+                   transform=axes[0,1].transAxes, ha='right', va='top')
+    # legend above plot
+    axes[0,1].legend(loc=2, labels=['Observed', 'Simulated'], ncol=2, frameon=False, bbox_to_anchor=(-0.6, 1.2))
+
+    util.plot_obs_sim_ax(df_cam2['Qobs'], df_cam2['Qsim'], axes[1,0], '')
+    axes[1,0].text(.95, .95, '(c; {})'.format(idx[1]),
+                   transform=axes[1,0].transAxes, ha='right', va='top')
+    # format the ticks
+    years_10 = mdates.YearLocator(10)
+    years_5 = mdates.YearLocator(5)
+    yearsFmt = mdates.DateFormatter('%Y')
+    axes[1,0].xaxis.set_major_locator(years_10)
+    axes[1,0].xaxis.set_major_formatter(yearsFmt)
+    axes[1,0].xaxis.set_minor_locator(years_5)
+    util.fdc_obs_sim_ax(df_cam1['Qobs'], df_cam1['Qsim'], axes[1,1], '')
+    axes[1,1].text(.95, .95, '(d; {})'.format(idx[1]),
+                   transform=axes[1,1].transAxes, ha='right', va='top')
+
+    util.plot_obs_sim_ax(df_cam1['Qobs'], df_cam1['Qsim'], axes[2,0], '')
+    axes[2,0].text(.95, .95, '(e; {})'.format(idx[2]),
+                   transform=axes[2,0].transAxes, ha='right', va='top')
+    # format the ticks
+    years_10 = mdates.YearLocator(10)
+    years_5 = mdates.YearLocator(5)
+    yearsFmt = mdates.DateFormatter('%Y')
+    axes[2,0].xaxis.set_major_locator(years_10)
+    axes[2,0].xaxis.set_major_formatter(yearsFmt)
+    axes[2,0].xaxis.set_minor_locator(years_5)
+    util.fdc_obs_sim_ax(df_cam1['Qobs'], df_cam1['Qsim'], axes[2,1], '')
+    axes[2,1].text(.95, .95, '(f; {})'.format(idx[2]),
+                   transform=axes[2,1].transAxes, ha='right', va='top')
+
     fig.subplots_adjust(wspace=0.3)
     fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/ts_fdc_real_case.png', dpi=250)
 
-    obs_arr = df_cam['Qobs'].values
-    sim_arr = df_cam['Qsim'].values
+    obs_arr = df_cam1['Qobs'].values
+    sim_arr = df_cam1['Qsim'].values
 
-    sig_de = de.calc_de(obs_arr, sim_arr)
-    sig_kge = de.calc_kge(obs_arr, sim_arr)
-    sig_nse = de.calc_nse(obs_arr, sim_arr)
+    # mean relative bias
+    brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
+    df_es_cam.iloc[0, 0] = brel_mean
+    # remaining relative bias
+    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    # area of relative remaing bias
+    b_area = de.calc_bias_area(brel_rest)
+    df_es_cam.iloc[0, 1] = b_area
+    # temporal correlation
+    temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
+    df_es_cam.iloc[0, 2] = temp_cor
+    # diagnostic efficiency
+    df_es_cam.iloc[0, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es_cam.iloc[0, 4] = de.calc_de_mfb(obs_arr)
+    # direction of bias
+    b_dir = de.calc_bias_dir(brel_rest)
+    df_es_cam.iloc[0, 5] = b_dir
+    # slope of bias
+    b_slope = de.calc_bias_slope(b_area, b_dir)
+    df_es_cam.iloc[0, 6] = b_slope
+    # convert to radians
+    # (y, x) Trigonometric inverse tangent
+    df_es_cam.iloc[0, 7] = np.arctan2(brel_mean, b_slope)
 
-    de.vis2d_de(obs_arr, sim_arr, extended=True)
-    de.vis2d_kge(obs_arr, sim_arr)
+    # KGE
+    df_es_cam.iloc[0, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    # KGE alpha
+    df_es_cam.iloc[0, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    # KGE beta
+    df_es_cam.iloc[0, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+
+    # NSE
+    df_es_cam.iloc[0, 11] = de.calc_nse(obs_arr, sim_arr)
+
+    obs_arr = df_cam2['Qobs'].values
+    sim_arr = df_cam2['Qsim'].values
+
+    # mean relative bias
+    brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
+    df_es_cam.iloc[1, 0] = brel_mean
+    # remaining relative bias
+    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    # area of relative remaing bias
+    b_area = de.calc_bias_area(brel_rest)
+    df_es_cam.iloc[1, 1] = b_area
+    # temporal correlation
+    temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
+    df_es_cam.iloc[1, 2] = temp_cor
+    # diagnostic efficiency
+    df_es_cam.iloc[1, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es_cam.iloc[1, 4] = de.calc_de_mfb(obs_arr)
+    # direction of bias
+    b_dir = de.calc_bias_dir(brel_rest)
+    df_es_cam.iloc[1, 5] = b_dir
+    # slope of bias
+    b_slope = de.calc_bias_slope(b_area, b_dir)
+    df_es_cam.iloc[1, 6] = b_slope
+    # convert to radians
+    # (y, x) Trigonometric inverse tangent
+    df_es_cam.iloc[1, 7] = np.arctan2(brel_mean, b_slope)
+
+    # KGE
+    df_es_cam.iloc[1, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    # KGE alpha
+    df_es_cam.iloc[1, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    # KGE beta
+    df_es_cam.iloc[1, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+
+    # NSE
+    df_es_cam.iloc[1, 11] = de.calc_nse(obs_arr, sim_arr)
+
+    obs_arr = df_cam3['Qobs'].values
+    sim_arr = df_cam3['Qsim'].values
+
+    # mean relative bias
+    brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
+    df_es_cam.iloc[2, 0] = brel_mean
+    # remaining relative bias
+    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    # area of relative remaing bias
+    b_area = de.calc_bias_area(brel_rest)
+    df_es_cam.iloc[2, 1] = b_area
+    # temporal correlation
+    temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
+    df_es_cam.iloc[2, 2] = temp_cor
+    # diagnostic efficiency
+    df_es_cam.iloc[2, 3] = de.calc_de(obs_arr, sim_arr)
+    # mean flow benchmark of diagnostic efficiency
+    df_es_cam.iloc[2, 4] = de.calc_de_mfb(obs_arr)
+    # direction of bias
+    b_dir = de.calc_bias_dir(brel_rest)
+    df_es_cam.iloc[2, 5] = b_dir
+    # slope of bias
+    b_slope = de.calc_bias_slope(b_area, b_dir)
+    df_es_cam.iloc[2, 6] = b_slope
+    # convert to radians
+    # (y, x) Trigonometric inverse tangent
+    df_es_cam.iloc[2, 7] = np.arctan2(brel_mean, b_slope)
+
+    # KGE
+    df_es_cam.iloc[2, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    # KGE alpha
+    df_es_cam.iloc[2, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    # KGE beta
+    df_es_cam.iloc[2, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+
+    # NSE
+    df_es_cam.iloc[2, 11] = de.calc_nse(obs_arr, sim_arr)
+
+    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/table_eff_real_case.csv'
+    df_es_cam.to_csv(path_csv, header=True, index=True, sep=';')
+
+    ### multi diagnostic plot ###
+    # make arrays
+    brel_mean_arr = df_es_cam['brel_mean'].values
+    b_area_arr = df_es_cam['b_area'].values
+    temp_cor_arr = df_es_cam['temp_cor'].values
+    b_dir_arr = df_es_cam['b_dir'].values
+    de_arr = df_es_cam['de'].values
+    mfb_arr = df_es_cam['mfb'].values
+    diag_arr = df_es_cam['diag'].values
+    b_slope_arr = df_es_cam['b_slope'].values
+
+    fig_de = util.vis2d_de_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
+                                    de_arr, mfb_arr, b_dir_arr, diag_arr, idx)
+    fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/de_diag_real_case.pdf', dpi=250)
+
+    ### multi KGE plot ###
+    # make arrays
+    alpha_arr = df_es_cam['alpha'].values
+    beta_arr = df_es_cam['beta'].values
+    kge_arr = df_es_cam['kge_norm'].values
+
+    fig_kge = util.vis2d_kge_norm_multi_fc(alpha_arr, beta_arr, temp_cor_arr,
+                                      kge_arr, idx)
+    fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/kge_diag_real_case.pdf', dpi=250)
