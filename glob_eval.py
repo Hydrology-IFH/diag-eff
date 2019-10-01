@@ -5,7 +5,9 @@ import os
 os.environ['PROJ_LIB'] = '/Users/robinschwemmle/anaconda3/envs/de/share/proj/'
 import pandas as pd
 import numpy as np
+import scipy as sp
 from tqdm import tqdm
+
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.cm as cm
@@ -25,19 +27,19 @@ if __name__ == "__main__":
         # windows directories
         db_Qobs_meta_dir = '//fuhys013/Schwemmle/Data/Runoff/observed/' \
                            'summary_near_nat.csv'
-        Q_dir = '//fuhys013/Schwemmle/Data/Runoff/Q_paired/wrr1/'
+        Q_dir = '//fuhys013/Schwemmle/Data/Runoff/Q_paired/wrr2/'
 
     elif OS == 'unix_server':
         # unix directories server
         db_Qobs_meta_dir = '/Volumes/Schwemmle/Data/Runoff/observed/' \
                            'summary_near_nat.csv'
-        Q_dir = '/Volumes/Schwemmle/Data/Runoff/Q_paired/wrr1/'
+        Q_dir = '/Volumes/Schwemmle/Data/Runoff/Q_paired/wrr2/'
 
     elif OS == 'unix_local':
         # unix directories local
         db_Qobs_meta_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data'\
                            '/Runoff/observed/summary_near_nat.csv'
-        Q_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data/Runoff/Q_paired/wrr1/'
+        Q_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data/Runoff/Q_paired/wrr2/'
 
     df_meta = pd.read_csv(db_Qobs_meta_dir, sep=',', na_values=-9999, index_col=0)
     ll_catchs = os.listdir(Q_dir)
@@ -50,6 +52,7 @@ if __name__ == "__main__":
     meta['brel_mean'] = np.nan
     meta['b_area'] = np.nan
     meta['temp_cor'] = np.nan
+    meta['de_nn'] = np.nan
     meta['de'] = np.nan
     meta['mfb'] = np.nan
     meta['b_dir'] = np.nan
@@ -61,6 +64,14 @@ if __name__ == "__main__":
     meta['beta'] = np.nan
 
     meta['nse'] = np.nan
+    
+    meta['obs_mean'] = np.nan
+    meta['obs_std'] = np.nan
+    meta['obs_cv'] = np.nan
+    meta['obs_min'] = np.nan
+    meta['obs_max'] = np.nan
+    meta['obs_skew'] = np.nan
+    meta['obs_kurt'] = np.nan
 
     with tqdm(total=len(meta.index)) as pbar:
         for i, catch in enumerate(meta.index):
@@ -87,62 +98,73 @@ if __name__ == "__main__":
             # temporal correlation
             temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
             meta.iloc[i, 5] = temp_cor
+            # non-normalized diagnostic efficiency
+            meta.iloc[i, 6] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
             # diagnostic efficiency
-            meta.iloc[i, 6] = de.calc_de(obs_arr, sim_arr)
+            meta.iloc[i, 7] = de.calc_de(obs_arr, sim_arr)
             # mean flow benchmark of diagnostic efficiency
-            meta.iloc[i, 7] = de.calc_de_mfb(obs_arr)
+            meta.iloc[i, 8] = de.calc_de_mfb(obs_arr)
             # direction of bias
             b_dir = de.calc_bias_dir(brel_rest)
-            meta.iloc[i, 8] = b_dir
+            meta.iloc[i, 9] = b_dir
             # slope of bias
             b_slope = de.calc_bias_slope(b_area, b_dir)
-            meta.iloc[i, 9] = b_slope
+            meta.iloc[i, 10] = b_slope
             # convert to radians
             # (y, x) Trigonometric inverse tangent
-            meta.iloc[i, 10] = np.arctan2(brel_mean, b_slope)
+            meta.iloc[i, 11] = np.arctan2(brel_mean, b_slope)
 
             # KGE
-            meta.iloc[i, 11] = de.calc_kge_norm(obs_arr, sim_arr)
+            meta.iloc[i, 12] = de.calc_kge_norm(obs_arr, sim_arr)
             # KGE alpha
-            meta.iloc[i, 12] = de.calc_kge_alpha(obs_arr, sim_arr)
+            meta.iloc[i, 13] = de.calc_kge_alpha(obs_arr, sim_arr)
             # KGE beta
-            meta.iloc[i, 13] = de.calc_kge_beta(obs_arr, sim_arr)
+            meta.iloc[i, 14] = de.calc_kge_beta(obs_arr, sim_arr)
 
             # NSE
-            meta.iloc[i, 14] = de.calc_nse(obs_arr, sim_arr)
+            meta.iloc[i, 15] = de.calc_nse(obs_arr, sim_arr)
+            
+            # mean, std, min and max of obs
+            meta.iloc[i, 16] = np.mean(obs_arr)
+            meta.iloc[i, 17] = np.std(obs_arr)
+            meta.iloc[i, 18] = np.std(obs_arr)/np.mean(obs_arr)
+            meta.iloc[i, 19] = np.min(obs_arr)
+            meta.iloc[i, 20] = np.max(obs_arr)
+            meta.iloc[i, 21] = sp.stats.skew(obs_arr)
+            meta.iloc[i, 22] = sp.stats.kurtosis(obs_arr)
             pbar.update(1)
 
-#        # remove outliers
-#        sig_de_arr = meta['de'].values
-#        meta = meta.loc[sig_de_arr > -1, :]
-#
-#        # make arrays
-#        brel_mean_arr = meta['brel_mean'].values
-#        b_area_arr = meta['b_area'].values
-#        temp_cor_arr = meta['temp_cor'].values
-#        b_dir_arr = meta['b_dir'].values
-#        sig_de_arr = meta['de'].values
-#        mfb_arr = meta['mfb'].values
-#        diag_arr = meta['diag'].values
-#        b_slope_arr = meta['b_slope'].values
-#
-#        # multi polar plot
-#        de.vis2d_de_multi(brel_mean_arr, b_area_arr, temp_cor_arr, sig_de_arr,
-#                          mfb_arr, b_dir_arr, diag_arr, extended=True)
-#
-#        # make arrays
-#        alpha_arr = meta['alpha'].values
-#        beta_arr = meta['beta'].values
-#        kge_arr = meta['kge_norm'].values
-#
-#        # multi KGE plot
-#        de.vis2d_kge_norm_multi(alpha_arr, beta_arr, temp_cor_arr, kge_arr, extended=True)
-#
-#        # global map
-#        x = meta['lon'].values
-#        y = meta['lat'].values
-#        z = meta['de'].values
-#
+        # remove outliers
+        meta = meta[(meta['de_nn'] >= -1) & (meta['kge_norm'] >= -1)]
+
+        # make arrays
+        brel_mean_arr = meta['brel_mean'].values
+        b_area_arr = meta['b_area'].values
+        temp_cor_arr = meta['temp_cor'].values
+        b_dir_arr = meta['b_dir'].values
+        sig_de_arr = meta['de'].values
+        mfb_arr = meta['mfb'].values
+        diag_arr = meta['diag'].values
+        b_slope_arr = meta['b_slope'].values
+
+        # multi polar plot
+        de.vis2d_de_multi(brel_mean_arr, b_area_arr, temp_cor_arr, sig_de_arr,
+                          mfb_arr, b_dir_arr, diag_arr, extended=True)
+
+        # make arrays
+        alpha_arr = meta['alpha'].values
+        beta_arr = meta['beta'].values
+        kge_arr = meta['kge_norm'].values
+
+        # multi KGE plot
+        de.vis2d_kge_norm_multi(alpha_arr, beta_arr, temp_cor_arr, kge_arr, extended=True)
+
+        # global map
+        x = meta['lon'].values
+        y = meta['lat'].values
+        z = meta['de'].values
+        norm = colors.Normalize(vmin=-1.0, vmax=1.0)
+
 #        # map visualizing the spatial distribution of DE
 #        fig, ax = plt.subplots(figsize=(12, 6))
 #        ax.set_title(r'$DE$ [-]', fontsize=30, pad=12)
@@ -158,7 +180,7 @@ if __name__ == "__main__":
 #        lons, lats = m(x, y)  # projecting the coordinates
 ##        sc = m.scatter(lons, lats, c=z, s=5, cmap='YlGnBu', vmin=-2, vmax=1)
 #        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
-#                     scale=5, scale_units='inches')
+#                     scale=5, scale_units='inches', angles='xy', norm=norm)
 #
 #        cbar_ax = fig.add_axes([.3, 0.02, .4, .04], frameon=False)
 #        cbar = fig.colorbar(q, cax=cbar_ax, orientation='horizontal',
@@ -169,8 +191,6 @@ if __name__ == "__main__":
 #        cbar.ax.xaxis.set_ticks_position('top')
 #        fig.tight_layout(rect=[0, .13, 1, 1])
 #        fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/de_glob.png', dpi=250)
-
-#
 #
 #        # EU map visualizing the spatial distribution of DE
 #        fig, ax = plt.subplots(figsize=(12, 6))
@@ -184,7 +204,7 @@ if __name__ == "__main__":
 #        m.drawparallels(np.arange(40, 75, 10))
 #        lons, lats = m(x, y)  # projecting the coordinates
 #        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
-#                     scale=2, scale_units='inches')
+#                     scale=2, scale_units='inches', angles='xy', norm=norm)
 #        fig.tight_layout(rect=[0, .13, 1, 1])
 #        fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/de_eu.png', dpi=250)
 #
@@ -201,80 +221,82 @@ if __name__ == "__main__":
 #        m.drawparallels(np.arange(20, 75, 10))
 #        lons, lats = m(x, y)  # projecting the coordinates
 #        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
-#                     scale=2, scale_units='inches')
+#                     scale=2, scale_units='inches', angles='xy', norm=norm)
 #        fig.tight_layout(rect=[0, .13, 1, 1])
 #        fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/de_us.png', dpi=250)
 #
-#        # global map with outsets
-#        fig = plt.figure(figsize=(10, 10))
-#        ax1 = plt.subplot2grid((2,2), (1,0), colspan=2)
-#        ax2 = plt.subplot2grid((2,2), (0,0))
-#        ax3 = plt.subplot2grid((2,2), (0,1))
-#
-#        # define EU outcrop
-#        lats_eu = [40, 75, 75, 40]
-#        lons_eu = [-15, -15, 50, 50]
-#
-#        # define US outcrop
-#        lats_us = [20, 75, 75, 20]
-#        lons_us = [-150, -150, -50, -50]
-#
-#        # global map
-#        m = Basemap(resolution='i',
-#                    projection='robin',
-#                    lon_0=0, ax=ax1)
-#        # draw continents
-#        m.drawmapboundary(fill_color='white')
-#        m.drawcoastlines(linewidth=0.5)
-#        # plot grid
-#        m.drawmeridians(np.arange(0, 360, 30))
-#        m.drawparallels(np.arange(-90, 90, 30))
-#        lons, lats = m(x, y)  # projecting the coordinates
-#        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
-#                     scale=5, angles='xy', scale_units='inches')
-#
-#        # mark EU inset
-#        x_eu, y_eu = m(lons_eu, lats_eu)
-#        xy_eu = zip(x_eu, y_eu)
-#        poly_eu = Polygon(list(xy_eu), edgecolor='grey', lw=2, fill=False,
-#                          alpha=.5)
-#        m.ax.add_patch(poly_eu)
-#
-#        # mark US inset
-#        x_us, y_us = m(lons_us, lats_us)
-#        xy_us = zip(x_us, y_us)
-#        poly_us = Polygon(list(xy_us), edgecolor='grey', lw=2, fill=False,
-#                          alpha=.5)
-#        m.ax.add_patch(poly_us)
-#
-#        cbar_ax = fig.add_axes([.3, 0.02, .4, .03], frameon=False)
-#        cbar = fig.colorbar(q, cax=cbar_ax, orientation='horizontal',
-#                            ticks=[-2, -1.5, -1, -0.5, 0, 0.5, 1])
-#        cbar.set_label(r'DE [-]', fontsize=16, labelpad=8)
-#        cbar.set_ticklabels(['-2', '-1.5', '-1', '-0.5', '0', '0.5', '1'])
-#        cbar.ax.tick_params(direction='in', labelsize=14)
-#        cbar.ax.xaxis.set_label_position('top')
-#        cbar.ax.xaxis.set_ticks_position('top')
-#
-#        # EU map
-#        m = Basemap(llcrnrlon=lons_eu[0], llcrnrlat=lats_eu[0], urcrnrlon=lons_eu[-1], urcrnrlat=lats_eu[2],
-#                    lon_0=(lons_eu[0] - lons_eu[-1])/2, lat_0=(lats_eu[0] - lats_eu[2])/2, resolution='i', ax=ax3)
-#        # draw continents
-#        m.drawmapboundary(fill_color='white')
-#        m.drawcoastlines(linewidth=0.5)
-#        lons, lats = m(x, y)  # projecting the coordinates
-#        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
-#                     scale=3, scale_units='inches', width=0.01)
-#
-#        # US map
-#        m = Basemap(llcrnrlon=lons_us[0], llcrnrlat=lats_us[0], urcrnrlon=lons_us[-1], urcrnrlat=lats_us[2],
-#                    lon_0=(lons_us[0] - lons_us[-1])/2, lat_0=(lats_us[0] - lats_us[2])/2, resolution='i', ax=ax2)
-#        # draw continents
-#        m.drawmapboundary(fill_color='white')
-#        m.drawcoastlines(linewidth=0.5)
-#        lons, lats = m(x, y)  # projecting the coordinates
-#        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
-#                     scale=3, scale_units='inches', width=0.01)
-#
-#        fig.tight_layout(rect=[0, .13, 1, 1])
-#        fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/de_glob_us_eu.png', dpi=250)
+        # global map with outsets
+        fig = plt.figure(figsize=(10, 10))
+        ax1 = plt.subplot2grid((2,2), (1,0), colspan=2)
+        ax2 = plt.subplot2grid((2,2), (0,0))
+        ax3 = plt.subplot2grid((2,2), (0,1))
+
+        # define EU outcrop
+        lats_eu = [40, 75, 75, 40]
+        lons_eu = [-15, -15, 50, 50]
+
+        # define US outcrop
+        lats_us = [20, 75, 75, 20]
+        lons_us = [-150, -150, -50, -50]
+
+        # global map
+        m = Basemap(resolution='i',
+                    projection='robin',
+                    lon_0=0, ax=ax1)
+        # draw continents
+        m.drawmapboundary(fill_color='white')
+        m.drawcoastlines(linewidth=0.5)
+        # plot grid
+        m.drawmeridians(np.arange(0, 360, 30))
+        m.drawparallels(np.arange(-90, 90, 30))
+        lons, lats = m(x, y)  # projecting the coordinates
+        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
+                     scale=5, angles='xy', scale_units='inches', norm=norm)
+
+        # mark EU inset
+        x_eu, y_eu = m(lons_eu, lats_eu)
+        xy_eu = zip(x_eu, y_eu)
+        poly_eu = Polygon(list(xy_eu), edgecolor='grey', lw=2, fill=False,
+                          alpha=.5)
+        m.ax.add_patch(poly_eu)
+
+        # mark US inset
+        x_us, y_us = m(lons_us, lats_us)
+        xy_us = zip(x_us, y_us)
+        poly_us = Polygon(list(xy_us), edgecolor='grey', lw=2, fill=False,
+                          alpha=.5)
+        m.ax.add_patch(poly_us)
+
+        cbar_ax = fig.add_axes([.3, 0.02, .4, .03], frameon=False)
+        cbar = fig.colorbar(q, cax=cbar_ax, orientation='horizontal',
+                            ticks=[-1, -0.5, 0, 0.5, 1])
+        cbar.set_label(r'DE [-]', fontsize=16, labelpad=8)
+        cbar.set_ticklabels(['-1', '-0.5', '0', '0.5', '1'])
+        cbar.ax.tick_params(direction='in', labelsize=14)
+        cbar.ax.xaxis.set_label_position('top')
+        cbar.ax.xaxis.set_ticks_position('top')
+
+        # EU map
+        m = Basemap(llcrnrlon=lons_eu[0], llcrnrlat=lats_eu[0], urcrnrlon=lons_eu[-1], urcrnrlat=lats_eu[2],
+                    lon_0=(lons_eu[0] - lons_eu[-1])/2, lat_0=(lats_eu[0] - lats_eu[2])/2, resolution='i', ax=ax3)
+        # draw continents
+        m.drawmapboundary(fill_color='white')
+        m.drawcoastlines(linewidth=0.5)
+        lons, lats = m(x, y)  # projecting the coordinates
+        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
+                     scale=3, scale_units='inches', width=0.01, angles='xy',
+                     norm=norm)
+
+        # US map
+        m = Basemap(llcrnrlon=lons_us[0], llcrnrlat=lats_us[0], urcrnrlon=lons_us[-1], urcrnrlat=lats_us[2],
+                    lon_0=(lons_us[0] - lons_us[-1])/2, lat_0=(lats_us[0] - lats_us[2])/2, resolution='i', ax=ax2)
+        # draw continents
+        m.drawmapboundary(fill_color='white')
+        m.drawcoastlines(linewidth=0.5)
+        lons, lats = m(x, y)  # projecting the coordinates
+        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
+                     scale=3, scale_units='inches', width=0.01, angles='xy',
+                     norm=norm)
+
+        fig.tight_layout(rect=[0, .13, 1, 1])
+        fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/de_glob_us_eu.png', dpi=250)
