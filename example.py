@@ -773,19 +773,55 @@ if __name__ == "__main__":
                                     de_arr, mfb_arr, b_dir_arr, diag_arr, idx)
     fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/de_diag.pdf', dpi=250)
 
+    # plot without 'j'
+    idx = ['1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'k', 'l', 'm', 'n']
+    ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14]
+    brel_mean_arr = df_es['brel_mean'].values[ids]
+    b_area_arr = df_es['b_area'].values[ids]
+    temp_cor_arr = df_es['temp_cor'].values[ids]
+    b_dir_arr = df_es['b_dir'].values[ids]
+    de_arr = df_es['de'].values[ids]
+    mfb_arr = df_es['mfb'].values[ids]
+    diag_arr = df_es['diag'].values[ids]
+    b_slope_arr = df_es['b_slope'].values[ids]
+
+    fig_de = util.vis2d_de_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
+                                    de_arr, mfb_arr, b_dir_arr, diag_arr, idx)
+    fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/de_diag_1.pdf', dpi=250)
+
+    # plot only 'j'
+    idx = ['j']
+    ids = [10]
+    brel_mean_arr = df_es['brel_mean'].values[ids]
+    b_area_arr = df_es['b_area'].values[ids]
+    temp_cor_arr = df_es['temp_cor'].values[ids]
+    b_dir_arr = df_es['b_dir'].values[ids]
+    de_arr = df_es['de'].values[ids]
+    mfb_arr = df_es['mfb'].values[ids]
+    diag_arr = df_es['diag'].values[ids]
+    b_slope_arr = df_es['b_slope'].values[ids]
+
+    fig_de = util.vis2d_de_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
+                                    de_arr, mfb_arr, b_dir_arr, diag_arr, idx)
+    fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/de_diag_2.pdf', dpi=250)
 
     ### multi KGE plot ###
     # make arrays
+    idx = ['1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
     alpha_arr = df_es['alpha'].values
     beta_arr = df_es['beta'].values
+    temp_cor_arr = df_es['temp_cor'].values
     kge_arr = df_es['kge_norm'].values
 
     fig_kge = util.vis2d_kge_norm_multi_fc(alpha_arr, beta_arr, temp_cor_arr,
-                                      kge_arr, idx)
+                                           kge_arr, idx)
     fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/kge_diag.pdf', dpi=250)
 
 
     nse_arr = df_es['nse'].values
+    brel_mean_arr = df_es['brel_mean'].values
+    b_slope_arr = df_es['b_slope'].values
+    de_arr = df_es['de'].values
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,5))
     # scatterplots efficiencies
     sc = sns.scatterplot(kge_arr, de_arr, color='black', ax=ax1)
@@ -825,7 +861,6 @@ if __name__ == "__main__":
     df_es_t = df_es_t.round(2)
     df_es_t.to_csv(path_csv, header=True, index=True, sep=';')
 
-    #TODO: add same model run with different parameters
     ### camels
     # dataframe efficiency measures
     idx = ['05', '48', '94']

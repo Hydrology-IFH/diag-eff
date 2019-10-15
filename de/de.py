@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+'Density'#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -7,7 +7,7 @@ de.de
 Diagnosing model performance using an efficiency measure based on flow
 duration curve and temoral correlation. The efficiency measure can be
 visualized in 2D-Plot which facilitates decomposing potential error origins
-(model errors vs. input data erros)
+(dynamic model errors vs. input data erros)
 :2019 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
@@ -1063,15 +1063,23 @@ def vis2d_de_nn(obs, sim, sort=True, lim=0.05, extended=False):
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if sig >= 0:
-        ax_lim = 0.1
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    if sig > 0:
+        ax_lim = sig - .1
+        ax_lim = np.around(ax_lim, decimals=1)
+        yy = np.arange(ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(ax_lim+.1, 1.1, .1)
+    elif sig >= 0:
+        ax_lim = 0.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(0, 1, .2)
     elif sig < 0 and sig >= -1:
-        ax_lim = 1.1
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+        ax_lim = 1.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(-1, 1, .2)
     elif sig >= -2 and sig < -1:
-        ax_lim = 2
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+        ax_lim = 2.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(-2, 1, .2)
     elif sig <= -2:
         raise AssertionError("Value of 'DE' is too low for visualization!", sig)
 
@@ -1081,28 +1089,28 @@ def vis2d_de_nn(obs, sim, sort=True, lim=0.05, extended=False):
     xx = np.radians(np.linspace(0, 360, len_yy))
     theta, r = np.meshgrid(xx, yy)
 
-    # arrays to plot contours of P overestimation
-    xx1 = np.radians(np.linspace(45, 135, len_yy))
-    theta1, r1 = np.meshgrid(xx1, yy)
-
-    # arrays to plot contours of P underestimation
-    xx2 = np.radians(np.linspace(225, 315, len_yy))
-    theta2, r2 = np.meshgrid(xx2, yy)
-
-    # arrays to plot contours of model errors
-    xx3 = np.radians(np.linspace(135, 225, len_yy))
-    theta3, r3 = np.meshgrid(xx3, yy)
-
-    # arrays to plot contours of model errors
-    len_yy2 = int(len_yy/2)
-    if len_yy != len_yy2 + len_yy2:
-        xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
-    else:
-        xx0 = np.radians(np.linspace(0, 45, len_yy2))
-
-    xx360 = np.radians(np.linspace(315, 360, len_yy2))
-    xx4 = np.concatenate((xx360, xx0), axis=None)
-    theta4, r4 = np.meshgrid(xx4, yy)
+    # # arrays to plot contours of positive constant offset
+    # xx1 = np.radians(np.linspace(45, 135, len_yy))
+    # theta1, r1 = np.meshgrid(xx1, yy)
+    #
+    # # arrays to plot contours of negative constant offset
+    # xx2 = np.radians(np.linspace(225, 315, len_yy))
+    # theta2, r2 = np.meshgrid(xx2, yy)
+    #
+    # # arrays to plot contours of dynamic model errors
+    # xx3 = np.radians(np.linspace(135, 225, len_yy))
+    # theta3, r3 = np.meshgrid(xx3, yy)
+    #
+    # # arrays to plot contours of dynamic model errors
+    # len_yy2 = int(len_yy/2)
+    # if len_yy != len_yy2 + len_yy2:
+    #     xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+    # else:
+    #     xx0 = np.radians(np.linspace(0, 45, len_yy2))
+    #
+    # xx360 = np.radians(np.linspace(315, 360, len_yy2))
+    # xx4 = np.concatenate((xx360, xx0), axis=None)
+    # theta4, r4 = np.meshgrid(xx4, yy)
 
     # diagnostic polar plot
     if not extended:
@@ -1114,16 +1122,22 @@ def vis2d_de_nn(obs, sim, sort=True, lim=0.05, extended=False):
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
         # Clear axis
         ax.cla()
-        # contours P overestimation
-        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-        # contours P underestimation
-        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-        # contours model errors
-        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+        # # contours positive constant offset
+        # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+        # # contours negative constant offset
+        # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+        # # contours dynamic model errors
+        # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+        # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+        # plot regions
+        ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
         # contours of DE
-        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+        cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
+        cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
+                       colors='dimgrey')
         # threshold efficiency for FBM
         sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
         # relation of b_dir which explains the error
@@ -1152,7 +1166,10 @@ def vis2d_de_nn(obs, sim, sort=True, lim=0.05, extended=False):
             c = ax.scatter(diag, sig, color=rgba_color)
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
-        ax.set_rmax(-ax_lim)
+        if sig > 0:
+            ax.set_rmax(ax_lim)
+        elif sig <= 0:
+            ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
         ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
@@ -1163,7 +1180,7 @@ def vis2d_de_nn(obs, sim, sort=True, lim=0.05, extended=False):
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
                 transform=ax.transAxes)
         # add colorbar for temporal correlation
-        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
         cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -1179,17 +1196,22 @@ def vis2d_de_nn(obs, sim, sort=True, lim=0.05, extended=False):
             dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
             # Clear axis
             ax.cla()
-            # contours P overestimation
-            cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-            # contours P underestimation
-            cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-            # contours model errors
-            cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-            cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+            # # contours positive constant offset
+            # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+            # # contours negative constant offset
+            # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+            # # contours dynamic model errors
+            # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+            # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+            # plot regions
+            ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
             # contours of DE
-            cp = ax.contour(theta, r, r, colors='black', alpha=.7)
+            cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
             cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
-                           inline_spacing=6)
+                           colors='dimgrey')
             # threshold efficiency for FBM
             sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
             # relation of b_dir which explains the error
@@ -1218,7 +1240,10 @@ def vis2d_de_nn(obs, sim, sort=True, lim=0.05, extended=False):
                 c = ax.scatter(diag, sig, color=rgba_color)
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
-            ax.set_rmax(-ax_lim)
+            if sig > 0:
+                ax.set_rmax(ax_lim)
+            elif sig <= 0:
+                ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
             ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
@@ -1229,7 +1254,7 @@ def vis2d_de_nn(obs, sim, sort=True, lim=0.05, extended=False):
                     va='center', ha='center', rotation=90,
                     rotation_mode='anchor', transform=ax.transAxes)
             # add colorbar for temporal correlation
-            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
             cbar.set_label('r [-]', labelpad=4)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -1299,15 +1324,23 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if sig_min >= 0:
-        ax_lim = 0.1
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    if sig_min > 0:
+        ax_lim = sig_min - .1
+        ax_lim = np.around(ax_lim, decimals=1)
+        yy = np.arange(ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(ax_lim+.1, 1.1, .1)
+    elif sig_min >= 0:
+        ax_lim = 0.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(0, 1, .2)
     elif sig_min < 0 and sig_min >= -1:
-        ax_lim = 1.1
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+        ax_lim = 1.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(-1, 1, .2)
     elif sig_min >= -2 and sig_min < -1:
-        ax_lim = 2
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+        ax_lim = 2.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(-2, 1, .2)
     elif sig_min <= -2:
         raise ValueError("Some values of 'DE' are too low for visualization!", sig_min)
 
@@ -1317,28 +1350,28 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
     xx = np.radians(np.linspace(0, 360, len_yy))
     theta, r = np.meshgrid(xx, yy)
 
-    # arrays to plot contours of P overestimation
-    xx1 = np.radians(np.linspace(45, 135, len_yy))
-    theta1, r1 = np.meshgrid(xx1, yy)
-
-    # arrays to plot contours of P underestimation
-    xx2 = np.radians(np.linspace(225, 315, len_yy))
-    theta2, r2 = np.meshgrid(xx2, yy)
-
-    # arrays to plot contours of model errors
-    xx3 = np.radians(np.linspace(135, 225, len_yy))
-    theta3, r3 = np.meshgrid(xx3, yy)
-
-    # arrays to plot contours of model errors
-    len_yy2 = int(len_yy/2)
-    if len_yy != len_yy2 + len_yy2:
-        xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
-    else:
-        xx0 = np.radians(np.linspace(0, 45, len_yy2))
-
-    xx360 = np.radians(np.linspace(315, 360, len_yy2))
-    xx4 = np.concatenate((xx360, xx0), axis=None)
-    theta4, r4 = np.meshgrid(xx4, yy)
+    # # arrays to plot contours of positive constant offset
+    # xx1 = np.radians(np.linspace(45, 135, len_yy))
+    # theta1, r1 = np.meshgrid(xx1, yy)
+    #
+    # # arrays to plot contours of negative constant offset
+    # xx2 = np.radians(np.linspace(225, 315, len_yy))
+    # theta2, r2 = np.meshgrid(xx2, yy)
+    #
+    # # arrays to plot contours of dynamic model errors
+    # xx3 = np.radians(np.linspace(135, 225, len_yy))
+    # theta3, r3 = np.meshgrid(xx3, yy)
+    #
+    # # arrays to plot contours of dynamic model errors
+    # len_yy2 = int(len_yy/2)
+    # if len_yy != len_yy2 + len_yy2:
+    #     xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+    # else:
+    #     xx0 = np.radians(np.linspace(0, 45, len_yy2))
+    #
+    # xx360 = np.radians(np.linspace(315, 360, len_yy2))
+    # xx4 = np.concatenate((xx360, xx0), axis=None)
+    # theta4, r4 = np.meshgrid(xx4, yy)
 
     # diagnostic polar plot
     if not extended:
@@ -1350,17 +1383,22 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
         # Clear axis
         ax.cla()
-        # contours P overestimation
-        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-        # contours P underestimation
-        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-        # contours model errors
-        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+        # # contours positive constant offset
+        # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+        # # contours negative constant offset
+        # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+        # # contours dynamic model errors
+        # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+        # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+        # plot regions
+        ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
         # contours of DE
-        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
+        cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
-                       inline_spacing=6)
+                       colors='dimgrey')
         # threshold efficiency for FBM
         sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
         # loop over each data point
@@ -1392,7 +1430,10 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                 c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
-        ax.set_rmax(-ax_lim)
+        if sig_min > 0:
+            ax.set_rmax(ax_lim)
+        elif sig_min <= 0:
+            ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
         ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
@@ -1403,7 +1444,7 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
                 transform=ax.transAxes)
         # add colorbar for temporal correlation
-        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
         cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -1419,16 +1460,22 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
             # Clear axis
             ax.cla()
-            # contours P overestimation
-            cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-            # contours P underestimation
-            cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-            # contours model errors
-            cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-            cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+            # # contours positive constant offset
+            # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+            # # contours negative constant offset
+            # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+            # # contours dynamic model errors
+            # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+            # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+            # plot regions
+            ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
             # contours of DE
-            cp = ax.contour(theta, r, r, colors='black', alpha=.7)
-            cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+            cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
+            cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
+                           colors='dimgrey')
             # threshold efficiency for FBM
             sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
             # loop over each data point
@@ -1460,7 +1507,10 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                     c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
-            ax.set_rmax(-ax_lim)
+            if sig_min > 0:
+                ax.set_rmax(ax_lim)
+            elif sig_min <= 0:
+                ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
             ax.set_xticklabels(['', '', 'Constant positive offset', '', '', r'0$^\circ$/360$^\circ$ ', 'Constant negative offset', ''])
@@ -1471,7 +1521,7 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                     va='center', ha='center', rotation=90,
                     rotation_mode='anchor', transform=ax.transAxes)
             # add colorbar for temporal correlation
-            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
             cbar.set_label('r [-]', labelpad=4)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -1483,24 +1533,24 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
 
             # 1-D density plot
             g = sns.kdeplot(diag_deg, color='k', ax=ax1)
-            kde_data = g.get_lines()[0].get_data()
-            kde_xx = kde_data[0]
-            kde_yy = kde_data[1]
-            x1 = np.where(kde_xx <= 90)[-1][-1]
-            x2 = np.where(kde_xx <= 180)[-1][-1]
-            x3 = np.where(kde_xx <= 270)[-1][-1]
-            ax1.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple',
-                             alpha=0.3)
-            ax1.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey',
-                             alpha=0.3)
-            ax1.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1],
-                             facecolor='purple', alpha=0.3)
-            ax1.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey',
-                             alpha=0.3)
+            # kde_data = g.get_lines()[0].get_data()
+            # kde_xx = kde_data[0]
+            # kde_yy = kde_data[1]
+            # x1 = np.where(kde_xx <= 90)[-1][-1]
+            # x2 = np.where(kde_xx <= 180)[-1][-1]
+            # x3 = np.where(kde_xx <= 270)[-1][-1]
+            # ax1.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple',
+            #                  alpha=0.2)
+            # ax1.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey',
+            #                  alpha=0.2)
+            # ax1.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1],
+            #                  facecolor='purple', alpha=0.2)
+            # ax1.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey',
+            #                  alpha=0.2)
             ax1.set_xticks([0, 90, 180, 270, 360])
             ax1.set_xlim(0, 360)
             ax1.set_ylim(0, )
-            ax1.set(ylabel=r'[-]',
+            ax1.set(ylabel='Density',
                     xlabel='[$^\circ$]')
 
             # 2-D density plot
@@ -1520,13 +1570,13 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             x2 = np.where(kde_xx <= 180)[-1][-1]
             x3 = np.where(kde_xx <= 270)[-1][-1]
             g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1],
-                                     facecolor='purple', alpha=0.3)
+                                     facecolor='purple', alpha=0.2)
             g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2],
-                                     facecolor='grey', alpha=0.3)
+                                     facecolor='grey', alpha=0.2)
             g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1],
-                                     facecolor='purple', alpha=0.3)
+                                     facecolor='purple', alpha=0.2)
             g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey',
-                                     alpha=0.3)
+                                     alpha=0.2)
             kde_data = g.ax_marg_y.get_lines()[0].get_data()
             kde_xx = kde_data[0]
             kde_yy = kde_data[1]
@@ -1610,46 +1660,54 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if sig >= 0:
-        ax_lim = 0.1
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    if sig > 0:
+        ax_lim = sig - .1
+        ax_lim = np.around(ax_lim, decimals=1)
+        yy = np.arange(ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(ax_lim+.1, 1.1, .1)
+    elif sig >= 0:
+        ax_lim = 0.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(0, 1, .2)
     elif sig < 0 and sig >= -1:
-        ax_lim = 1.1
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+        ax_lim = 1.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(-1, 1, .2)
     elif sig >= -2 and sig < -1:
-        ax_lim = 2
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+        ax_lim = 2.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(-2, 1, .2)
     elif sig <= -2:
         raise AssertionError("Value of 'DE' is too low for visualization!", sig)
 
-    len_yy = len(yy)
+    len_yy = 360
 
     # arrays to plot contour lines of DE
     xx = np.radians(np.linspace(0, 360, len_yy))
     theta, r = np.meshgrid(xx, yy)
 
-    # arrays to plot contours of P overestimation
-    xx1 = np.radians(np.linspace(45, 135, len_yy))
-    theta1, r1 = np.meshgrid(xx1, yy)
-
-    # arrays to plot contours of P underestimation
-    xx2 = np.radians(np.linspace(225, 315, len_yy))
-    theta2, r2 = np.meshgrid(xx2, yy)
-
-    # arrays to plot contours of model errors
-    xx3 = np.radians(np.linspace(135, 225, len_yy))
-    theta3, r3 = np.meshgrid(xx3, yy)
-
-    # arrays to plot contours of model errors
-    len_yy2 = int(len_yy/2)
-    if len_yy != len_yy2 + len_yy2:
-        xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
-    else:
-        xx0 = np.radians(np.linspace(0, 45, len_yy2))
-
-    xx360 = np.radians(np.linspace(315, 360, len_yy2))
-    xx4 = np.concatenate((xx360, xx0), axis=None)
-    theta4, r4 = np.meshgrid(xx4, yy)
+    # # arrays to plot contours of positive constant offset
+    # xx1 = np.radians(np.linspace(45, 135, len_yy))
+    # theta1, r1 = np.meshgrid(xx1, yy)
+    #
+    # # arrays to plot contours of negative constant offset
+    # xx2 = np.radians(np.linspace(225, 315, len_yy))
+    # theta2, r2 = np.meshgrid(xx2, yy)
+    #
+    # # arrays to plot contours of dynamic model errors
+    # xx3 = np.radians(np.linspace(135, 225, len_yy))
+    # theta3, r3 = np.meshgrid(xx3, yy)
+    #
+    # # arrays to plot contours of dynamic model errors
+    # len_yy2 = int(len_yy/2)
+    # if len_yy != len_yy2 + len_yy2:
+    #     xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+    # else:
+    #     xx0 = np.radians(np.linspace(0, 45, len_yy2))
+    #
+    # xx360 = np.radians(np.linspace(315, 360, len_yy2))
+    # xx4 = np.concatenate((xx360, xx0), axis=None)
+    # theta4, r4 = np.meshgrid(xx4, yy)
 
     # diagnostic polar plot
     if not extended:
@@ -1661,16 +1719,22 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
         # Clear axis
         ax.cla()
-        # contours P overestimation
-        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-        # contours P underestimation
-        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-        # contours model errors
-        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+        # # contours positive constant offset
+        # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+        # # contours negative constant offset
+        # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+        # # contours dynamic model errors
+        # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+        # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+        # plot regions
+        ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
         # contours of DE
-        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+        cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
+        cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
+                       colors='dimgrey')
         # threshold efficiency for FBM
         sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
         # mean flow becnhmark
@@ -1703,7 +1767,10 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
             c = ax.scatter(diag, sig, color=rgba_color)
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
-        ax.set_rmax(-ax_lim)
+        if sig > 0:
+            ax.set_rmax(ax_lim)
+        elif sig <= 0:
+            ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
         ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
@@ -1714,7 +1781,7 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
                 transform=ax.transAxes)
         # add colorbar for temporal correlation
-        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
         cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -1730,17 +1797,22 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
             dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
             # Clear axis
             ax.cla()
-            # contours P overestimation
-            cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-            # contours P underestimation
-            cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-            # contours model errors
-            cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-            cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+            # # contours positive constant offset
+            # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+            # # contours negative constant offset
+            # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+            # # contours dynamic model errors
+            # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+            # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+            # plot regions
+            ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
             # contours of DE
-            cp = ax.contour(theta, r, r, colors='black', alpha=.7)
+            cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
             cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
-                           inline_spacing=6)
+                           colors='dimgrey')
             # threshold efficiency for FBM
             sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
             # mean flow benchmark
@@ -1773,7 +1845,10 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
                 c = ax.scatter(diag, sig, color=rgba_color)
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
-            ax.set_rmax(-ax_lim)
+            if sig > 0:
+                ax.set_rmax(ax_lim)
+            elif sig <= 0:
+                ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
             ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
@@ -1784,7 +1859,7 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
                     va='center', ha='center', rotation=90,
                     rotation_mode='anchor', transform=ax.transAxes)
             # add colorbar for temporal correlation
-            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
             cbar.set_label('r [-]', labelpad=4)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -1858,15 +1933,23 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if sig_min >= 0:
-        ax_lim = 0.1
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+    if sig_min > 0:
+        ax_lim = sig_min - .1
+        ax_lim = np.around(ax_lim, decimals=1)
+        yy = np.arange(ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(ax_lim+.1, 1.1, .1)
+    elif sig_min >= 0:
+        ax_lim = 0.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(0, 1, .2)
     elif sig_min < 0 and sig_min >= -1:
-        ax_lim = 1.1
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+        ax_lim = 1.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(-1, 1, .2)
     elif sig_min >= -2 and sig_min < -1:
-        ax_lim = 2
-        yy = np.arange(-ax_lim, 1, delta)[::-1]
+        ax_lim = 2.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(-2, 1, .2)
     elif sig_min <= -2:
         raise ValueError("Some values of 'DE' are too low for visualization!", sig_min)
 
@@ -1876,28 +1959,28 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
     xx = np.radians(np.linspace(0, 360, len_yy))
     theta, r = np.meshgrid(xx, yy)
 
-    # arrays to plot contours of P overestimation
-    xx1 = np.radians(np.linspace(45, 135, len_yy))
-    theta1, r1 = np.meshgrid(xx1, yy)
-
-    # arrays to plot contours of P underestimation
-    xx2 = np.radians(np.linspace(225, 315, len_yy))
-    theta2, r2 = np.meshgrid(xx2, yy)
-
-    # arrays to plot contours of model errors
-    xx3 = np.radians(np.linspace(135, 225, len_yy))
-    theta3, r3 = np.meshgrid(xx3, yy)
-
-    # arrays to plot contours of model errors
-    len_yy2 = int(len_yy/2)
-    if len_yy != len_yy2 + len_yy2:
-        xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
-    else:
-        xx0 = np.radians(np.linspace(0, 45, len_yy2))
-
-    xx360 = np.radians(np.linspace(315, 360, len_yy2))
-    xx4 = np.concatenate((xx360, xx0), axis=None)
-    theta4, r4 = np.meshgrid(xx4, yy)
+    # # arrays to plot contours of positive constant offset
+    # xx1 = np.radians(np.linspace(45, 135, len_yy))
+    # theta1, r1 = np.meshgrid(xx1, yy)
+    #
+    # # arrays to plot contours of negative constant offset
+    # xx2 = np.radians(np.linspace(225, 315, len_yy))
+    # theta2, r2 = np.meshgrid(xx2, yy)
+    #
+    # # arrays to plot contours of dynamic model errors
+    # xx3 = np.radians(np.linspace(135, 225, len_yy))
+    # theta3, r3 = np.meshgrid(xx3, yy)
+    #
+    # # arrays to plot contours of dynamic model errors
+    # len_yy2 = int(len_yy/2)
+    # if len_yy != len_yy2 + len_yy2:
+    #     xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+    # else:
+    #     xx0 = np.radians(np.linspace(0, 45, len_yy2))
+    #
+    # xx360 = np.radians(np.linspace(315, 360, len_yy2))
+    # xx4 = np.concatenate((xx360, xx0), axis=None)
+    # theta4, r4 = np.meshgrid(xx4, yy)
 
     # diagnostic polar plot
     if not extended:
@@ -1909,17 +1992,22 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
         # Clear axis
         ax.cla()
-        # contours P overestimation
-        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-        # contours P underestimation
-        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-        # contours model errors
-        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+        # # contours positive constant offset
+        # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+        # # contours negative constant offset
+        # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+        # # contours dynamic model errors
+        # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+        # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+        # plot regions
+        ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
         # contours of DE
-        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
+        cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
-                       inline_spacing=6)
+                       colors='dimgrey')
         # threshold efficiency for FBM
         sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
         # loop over each data point
@@ -1953,7 +2041,10 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
                 c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
-        ax.set_rmax(-ax_lim)
+        if sig_min > 0:
+            ax.set_rmax(ax_lim)
+        elif sig_min <= 0:
+            ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
         ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
@@ -1964,7 +2055,7 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
                 transform=ax.transAxes)
         # add colorbar for temporal correlation
-        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
         cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -1980,16 +2071,22 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
             dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
             # Clear axis
             ax.cla()
-            # contours P overestimation
-            cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-            # contours P underestimation
-            cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-            # contours model errors
-            cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-            cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
+            # # contours positive constant offset
+            # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+            # # contours negative constant offset
+            # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+            # # contours dynamic model errors
+            # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+            # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+            # plot regions
+            ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
             # contours of DE
-            cp = ax.contour(theta, r, r, colors='black', alpha=.7)
-            cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+            cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
+            cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
+                           colors='dimgrey')
             # threshold efficiency for FBM
             sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
             # loop over each data point
@@ -2022,7 +2119,10 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
                     c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
-            ax.set_rmax(-ax_lim)
+            if sig_min > 0:
+                ax.set_rmax(ax_lim)
+            elif sig_min <= 0:
+                ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
             ax.set_xticklabels(['', '', 'Constant positive offset', '', '', r'0$^\circ$/360$^\circ$ ', 'Constant negative offset', ''])
@@ -2033,7 +2133,7 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
                     va='center', ha='center', rotation=90,
                     rotation_mode='anchor', transform=ax.transAxes)
             # add colorbar for temporal correlation
-            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
             cbar.set_label('r [-]', labelpad=4)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -2045,24 +2145,24 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
 
             # 1-D density plot
             g = sns.kdeplot(diag_deg, color='k', ax=ax1)
-            kde_data = g.get_lines()[0].get_data()
-            kde_xx = kde_data[0]
-            kde_yy = kde_data[1]
-            x1 = np.where(kde_xx <= 90)[-1][-1]
-            x2 = np.where(kde_xx <= 180)[-1][-1]
-            x3 = np.where(kde_xx <= 270)[-1][-1]
-            ax1.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple',
-                             alpha=0.3)
-            ax1.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey',
-                             alpha=0.3)
-            ax1.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1],
-                             facecolor='purple', alpha=0.3)
-            ax1.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey',
-                             alpha=0.3)
+            # kde_data = g.get_lines()[0].get_data()
+            # kde_xx = kde_data[0]
+            # kde_yy = kde_data[1]
+            # x1 = np.where(kde_xx <= 90)[-1][-1]
+            # x2 = np.where(kde_xx <= 180)[-1][-1]
+            # x3 = np.where(kde_xx <= 270)[-1][-1]
+            # ax1.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple',
+            #                  alpha=0.2)
+            # ax1.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey',
+            #                  alpha=0.2)
+            # ax1.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1],
+            #                  facecolor='purple', alpha=0.2)
+            # ax1.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey',
+            #                  alpha=0.2)
             ax1.set_xticks([0, 90, 180, 270, 360])
             ax1.set_xlim(0, 360)
             ax1.set_ylim(0, )
-            ax1.set(ylabel=r'[-]',
+            ax1.set(ylabel='Density',
                     xlabel='[$^\circ$]')
 
             # 2-D density plot
@@ -2075,20 +2175,20 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
             g.ax_joint.set_xlim(0, 360)
             g.ax_joint.set_ylim(-ax_lim, 1)
             g.ax_marg_x.set_xticks([0, 90, 180, 270, 360])
-            kde_data = g.ax_marg_x.get_lines()[0].get_data()
-            kde_xx = kde_data[0]
-            kde_yy = kde_data[1]
-            x1 = np.where(kde_xx <= 90)[-1][-1]
-            x2 = np.where(kde_xx <= 180)[-1][-1]
-            x3 = np.where(kde_xx <= 270)[-1][-1]
-            g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1],
-                                     facecolor='purple', alpha=0.3)
-            g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2],
-                                     facecolor='grey', alpha=0.3)
-            g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1],
-                                     facecolor='purple', alpha=0.3)
-            g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey',
-                                     alpha=0.3)
+            # kde_data = g.ax_marg_x.get_lines()[0].get_data()
+            # kde_xx = kde_data[0]
+            # kde_yy = kde_data[1]
+            # x1 = np.where(kde_xx <= 90)[-1][-1]
+            # x2 = np.where(kde_xx <= 180)[-1][-1]
+            # x3 = np.where(kde_xx <= 270)[-1][-1]
+            # g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1],
+            #                          facecolor='purple', alpha=0.2)
+            # g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2],
+            #                          facecolor='grey', alpha=0.2)
+            # g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1],
+            #                          facecolor='purple', alpha=0.2)
+            # g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey',
+            #                          alpha=0.2)
             kde_data = g.ax_marg_y.get_lines()[0].get_data()
             kde_xx = kde_data[0]
             kde_yy = kde_data[1]
@@ -2155,14 +2255,22 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
 
         # determine axis limits
         if sig > 0:
-            yy = np.arange(0, 1, delta)[::-1]
-            ax_lim = 0
-        elif sig <= 0 and sig > -1:
-            yy = np.arange(-1, 1 - delta, delta)[::-1]
-            ax_lim = 1
-        elif sig < -2 and sig <= -1:
-            yy = np.arange(-2, 2 - delta, delta)[::-1]
-            ax_lim = 2
+            ax_lim = sig - .1
+            ax_lim = np.around(ax_lim, decimals=1)
+            yy = np.arange(ax_lim, 1.01, delta)[::-1]
+            c_levels = np.arange(ax_lim+.1, 1.1, .1)
+        elif sig >= 0:
+            ax_lim = 0.2
+            yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+            c_levels = np.arange(0, 1, .2)
+        elif sig < 0 and sig >= -1:
+            ax_lim = 1.2
+            yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+            c_levels = np.arange(-1, 1, .2)
+        elif sig >= -2 and sig < -1:
+            ax_lim = 2.2
+            yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+            c_levels = np.arange(-2, 1, .2)
         elif sig <= -2:
             raise AssertionError("Value of 'KGE'  too low for visualization!", sig)
 
@@ -2172,28 +2280,28 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
         xx = np.radians(np.linspace(0, 360, len_yy))
         theta, r = np.meshgrid(xx, yy)
 
-        # arrays to plot contours of P overestimation
-        xx1 = np.radians(np.linspace(45, 135, len_yy))
-        theta1, r1 = np.meshgrid(xx1, yy)
-
-        # arrays to plot contours of P underestimation
-        xx2 = np.radians(np.linspace(225, 315, len_yy))
-        theta2, r2 = np.meshgrid(xx2, yy)
-
-        # arrays to plot contours of model errors
-        xx3 = np.radians(np.linspace(135, 225, len_yy))
-        theta3, r3 = np.meshgrid(xx3, yy)
-
-        # arrays to plot contours of model errors
-        len_yy2 = int(len_yy/2)
-        if len_yy != len_yy2 + len_yy2:
-            xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
-        else:
-            xx0 = np.radians(np.linspace(0, 45, len_yy2))
-
-        xx360 = np.radians(np.linspace(315, 360, len_yy2))
-        xx4 = np.concatenate((xx360, xx0), axis=None)
-        theta4, r4 = np.meshgrid(xx4, yy)
+        # # arrays to plot contours of positive constant offset
+        # xx1 = np.radians(np.linspace(45, 135, len_yy))
+        # theta1, r1 = np.meshgrid(xx1, yy)
+        #
+        # # arrays to plot contours of negative constant offset
+        # xx2 = np.radians(np.linspace(225, 315, len_yy))
+        # theta2, r2 = np.meshgrid(xx2, yy)
+        #
+        # # arrays to plot contours of dynamic model errors
+        # xx3 = np.radians(np.linspace(135, 225, len_yy))
+        # theta3, r3 = np.meshgrid(xx3, yy)
+        #
+        # # arrays to plot contours of dynamic model errors
+        # len_yy2 = int(len_yy/2)
+        # if len_yy != len_yy2 + len_yy2:
+        #     xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+        # else:
+        #     xx0 = np.radians(np.linspace(0, 45, len_yy2))
+        #
+        # xx360 = np.radians(np.linspace(315, 360, len_yy2))
+        # xx4 = np.concatenate((xx360, xx0), axis=None)
+        # theta4, r4 = np.meshgrid(xx4, yy)
 
         # diagnostic polar plot
         fig, ax = plt.subplots(figsize=(6, 6),
@@ -2204,16 +2312,21 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
         # Clear axis
         ax.cla()
-        # contours P overestimation
-        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-        # contours P underestimation
-        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-        # contours model errors
-        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
-        # contours of DE
-        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
-        cl = ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
+        # # contours positive constant offset
+        # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+        # # contours negative constant offset
+        # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+        # # contours dynamic model errors
+        # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+        # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+        # plot regions
+        ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        # contours of KGE
+        cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
+        cl = ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f', colors='dimgrey')
         # diagnose the error
         if sig < .9:
             ax.annotate("", xytext=(0, 1), xy=(diag, sig),
@@ -2222,14 +2335,17 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
             ax.scatter(diag, sig, color=rgba_color)
         ax.set_rticks([])  # turn defalut ticks off
         ax.set_rmin(1)
-        ax.set_rmax(-ax_lim)
+        if sig > 0:
+            ax.set_rmax(ax_lim)
+        elif sig <= 0:
+            ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
         ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
                 rotation=90, rotation_mode='anchor', transform=ax.transAxes)
         ax.set_xticklabels(['', '', '', '', '', '', r'$\gamma$ - 1 [-]', ''])
         # add colorbar for temporal correlation
-        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
         cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -2259,14 +2375,22 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
 
         # determine axis limits
         if sig > 0:
-            yy = np.arange(0, 1, delta)[::-1]
-            ax_lim = 0
-        elif sig <= 0 and sig > -1:
-            yy = np.arange(-1, 1 - delta, delta)[::-1]
-            ax_lim = 1
-        elif sig <= -1:
-            yy = np.arange(-2, 2 - delta, delta)[::-1]
-            ax_lim = 2
+            ax_lim = sig - .1
+            ax_lim = np.around(ax_lim, decimals=1)
+            yy = np.arange(ax_lim, 1.01, delta)[::-1]
+            c_levels = np.arange(ax_lim+.1, 1.1, .1)
+        elif sig >= 0:
+            ax_lim = 0.2
+            yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+            c_levels = np.arange(0, 1, .2)
+        elif sig < 0 and sig >= -1:
+            ax_lim = 1.2
+            yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+            c_levels = np.arange(-1, 1, .2)
+        elif sig >= -2 and sig < -1:
+            ax_lim = 2.2
+            yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+            c_levels = np.arange(-2, 1, .2)
         elif sig <= -2:
             raise AssertionError("Value of 'KGE' is too low for visualization!", sig)
 
@@ -2276,28 +2400,28 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
         xx = np.radians(np.linspace(0, 360, len_yy))
         theta, r = np.meshgrid(xx, yy)
 
-        # arrays to plot contours of P overestimation
-        xx1 = np.radians(np.linspace(45, 135, len_yy))
-        theta1, r1 = np.meshgrid(xx1, yy)
-
-        # arrays to plot contours of P underestimation
-        xx2 = np.radians(np.linspace(225, 315, len_yy))
-        theta2, r2 = np.meshgrid(xx2, yy)
-
-        # arrays to plot contours of model errors
-        xx3 = np.radians(np.linspace(135, 225, len_yy))
-        theta3, r3 = np.meshgrid(xx3, yy)
-
-        # arrays to plot contours of model errors
-        len_yy2 = int(len_yy/2)
-        if len_yy != len_yy2 + len_yy2:
-            xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
-        else:
-            xx0 = np.radians(np.linspace(0, 45, len_yy2))
-
-        xx360 = np.radians(np.linspace(315, 360, len_yy2))
-        xx4 = np.concatenate((xx360, xx0), axis=None)
-        theta4, r4 = np.meshgrid(xx4, yy)
+        # # arrays to plot contours of positive constant offset
+        # xx1 = np.radians(np.linspace(45, 135, len_yy))
+        # theta1, r1 = np.meshgrid(xx1, yy)
+        #
+        # # arrays to plot contours of negative constant offset
+        # xx2 = np.radians(np.linspace(225, 315, len_yy))
+        # theta2, r2 = np.meshgrid(xx2, yy)
+        #
+        # # arrays to plot contours of dynamic model errors
+        # xx3 = np.radians(np.linspace(135, 225, len_yy))
+        # theta3, r3 = np.meshgrid(xx3, yy)
+        #
+        # # arrays to plot contours of dynamic model errors
+        # len_yy2 = int(len_yy/2)
+        # if len_yy != len_yy2 + len_yy2:
+        #     xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+        # else:
+        #     xx0 = np.radians(np.linspace(0, 45, len_yy2))
+        #
+        # xx360 = np.radians(np.linspace(315, 360, len_yy2))
+        # xx4 = np.concatenate((xx360, xx0), axis=None)
+        # theta4, r4 = np.meshgrid(xx4, yy)
 
         # diagnostic polar plot
         fig, ax = plt.subplots(figsize=(6, 6),
@@ -2308,16 +2432,21 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
         # Clear axis
         ax.cla()
-        # contours P overestimation
-        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-        # contours P underestimation
-        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-        # contours model errors
-        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
-        # contours of DE
-        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
-        cl = ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f')
+        # # contours positive constant offset
+        # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+        # # contours negative constant offset
+        # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+        # # contours dynamic model errors
+        # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+        # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+        # plot regions
+        ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        # contours of KGE
+        cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
+        cl = ax.clabel(cp, inline=1, fontsize=10, fmt='%1.1f', colors='dimgrey')
         # diagnose the error
         if sig < .9:
             ax.annotate("", xytext=(0, 1), xy=(diag, sig),
@@ -2326,14 +2455,17 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
             ax.scatter(diag, sig, color=rgba_color)
         ax.set_rticks([])  # turn defalut ticks off
         ax.set_rmin(1)
-        ax.set_rmax(-ax_lim)
+        if sig > 0:
+            ax.set_rmax(ax_lim)
+        elif sig <= 0:
+            ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
         ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
         rotation=90, rotation_mode='anchor', transform=ax.transAxes)
         ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$ - 1 [-]', ''])
         # add colorbar for temporal correlation
-        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
         cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -2379,14 +2511,22 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
 
     # determine axis limits
     if sig_min > 0:
-        yy = np.arange(0, 1, delta)[::-1]
-        ax_lim = 0
-    elif sig_min <= 0 and sig_min > -1:
-        yy = np.arange(-1, 1, delta)[::-1]
-        ax_lim = 1
-    elif sig_min > -2 and sig_min <= -1:
-        yy = np.arange(-2, 1, delta)[::-1]
-        ax_lim = 2
+        ax_lim = sig_min - .1
+        ax_lim = np.around(ax_lim, decimals=1)
+        yy = np.arange(ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(ax_lim+.1, 1.1, .1)
+    elif sig_min >= 0:
+        ax_lim = 0.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(0, 1, .2)
+    elif sig_min < 0 and sig_min >= -1:
+        ax_lim = 1.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(-1, 1, .2)
+    elif sig_min >= -2 and sig_min < -1:
+        ax_lim = 2.2
+        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
+        c_levels = np.arange(-2, 1, .2)
     elif sig_min <= -2:
         raise ValueError("Some values of 'KGE' are too low for visualization!", sig_min)
 
@@ -2396,28 +2536,28 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
     xx = np.radians(np.linspace(0, 360, len_yy))
     theta, r = np.meshgrid(xx, yy)
 
-    # arrays to plot contours of P overestimation
-    xx1 = np.radians(np.linspace(45, 135, len_yy))
-    theta1, r1 = np.meshgrid(xx1, yy)
-
-    # arrays to plot contours of P underestimation
-    xx2 = np.radians(np.linspace(225, 315, len_yy))
-    theta2, r2 = np.meshgrid(xx2, yy)
-
-    # arrays to plot contours of model errors
-    xx3 = np.radians(np.linspace(135, 225, len_yy))
-    theta3, r3 = np.meshgrid(xx3, yy)
-
-    # arrays to plot contours of model errors
-    len_yy2 = int(len_yy/2)
-    if len_yy != len_yy2 + len_yy2:
-        xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
-    else:
-        xx0 = np.radians(np.linspace(0, 45, len_yy2))
-
-    xx360 = np.radians(np.linspace(315, 360, len_yy2))
-    xx4 = np.concatenate((xx360, xx0), axis=None)
-    theta4, r4 = np.meshgrid(xx4, yy)
+    # # arrays to plot contours of positive constant offset
+    # xx1 = np.radians(np.linspace(45, 135, len_yy))
+    # theta1, r1 = np.meshgrid(xx1, yy)
+    #
+    # # arrays to plot contours of negative constant offset
+    # xx2 = np.radians(np.linspace(225, 315, len_yy))
+    # theta2, r2 = np.meshgrid(xx2, yy)
+    #
+    # # arrays to plot contours of dynamic model errors
+    # xx3 = np.radians(np.linspace(135, 225, len_yy))
+    # theta3, r3 = np.meshgrid(xx3, yy)
+    #
+    # # arrays to plot contours of dynamic model errors
+    # len_yy2 = int(len_yy/2)
+    # if len_yy != len_yy2 + len_yy2:
+    #     xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
+    # else:
+    #     xx0 = np.radians(np.linspace(0, 45, len_yy2))
+    #
+    # xx360 = np.radians(np.linspace(315, 360, len_yy2))
+    # xx4 = np.concatenate((xx360, xx0), axis=None)
+    # theta4, r4 = np.meshgrid(xx4, yy)
 
     # diagnostic polar plot
     if not extended:
@@ -2429,16 +2569,22 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
         # Clear axis
         ax.cla()
-        # contours P overestimation
-        cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-        # contours P underestimation
-        cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-        # contours model errors
-        cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-        cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
-        # contours of DE
-        cp = ax.contour(theta, r, r, colors='black', alpha=.7)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+        # # contours positive constant offset
+        # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+        # # contours negative constant offset
+        # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+        # # contours dynamic model errors
+        # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+        # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+        # plot regions
+        ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+        # contours of KGE
+        cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
+        cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
+                       colors='dimgrey')
         # loop over each data point
         for (a, bg, r, sig) in zip(ll_kge_alpha, ll_bg, ll_kge_r, ll_sig):
             ang = np.arctan2(a - 1, bg - 1)
@@ -2453,9 +2599,12 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
         ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$/$\gamma$ - 1 [-]', ''])
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
-        ax.set_rmax(-ax_lim)
+        if sig_min > 0:
+            ax.set_rmax(ax_lim)
+        elif sig_min <= 0:
+            ax.set_rmax(-ax_lim)
         # add colorbar for temporal correlation
-        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+        cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
         cbar.set_label('r [-]', labelpad=4)
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -2471,16 +2620,22 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
             dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
             # Clear axis
             ax.cla()
-            # contours P overestimation
-            cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.3)
-            # contours P underestimation
-            cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.3)
-            # contours model errors
-            cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.3)
-            cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.3)
-            # contours of DE
-            cp = ax.contour(theta, r, r, colors='black', alpha=.7)
-            cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f', inline_spacing=6)
+            # # contours positive constant offset
+            # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2)
+            # # contours negative constant offset
+            # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2)
+            # # contours dynamic model errors
+            # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2)
+            # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2)
+            # plot regions
+            ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
+            # contours of KGE
+            cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
+            cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
+                           colors='dimgrey')
             # loop over each data point
             for (a, bg, r, sig) in zip(ll_kge_alpha, ll_bg, ll_kge_r, ll_sig):
                 ang = np.arctan2(a - 1, bg - 1)
@@ -2495,9 +2650,12 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
             ax.set_xticklabels(['', '', '', '', '', r'0$^\circ$/360$^\circ$ ', r'$\beta$/$\gamma$ - 1 [-]', ''])
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
-            ax.set_rmax(-ax_lim)
+            if sig_min > 0:
+                ax.set_rmax(ax_lim)
+            elif sig_min <= 0:
+                ax.set_rmax(-ax_lim)
             # add colorbar for temporal correlation
-            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='vertical',
+            cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
             cbar.set_label('r [-]', labelpad=4)
             cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
@@ -2510,20 +2668,20 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
 
             # 1-D density plot
             g = sns.kdeplot(diag_deg, color='k', ax=ax1)
-            kde_data = g.get_lines()[0].get_data()
-            kde_xx = kde_data[0]
-            kde_yy = kde_data[1]
-            x1 = np.where(kde_xx <= 90)[-1][-1]
-            x2 = np.where(kde_xx <= 180)[-1][-1]
-            x3 = np.where(kde_xx <= 270)[-1][-1]
-            ax1.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.3)
-            ax1.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.3)
-            ax1.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.3)
-            ax1.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.3)
+            # kde_data = g.get_lines()[0].get_data()
+            # kde_xx = kde_data[0]
+            # kde_yy = kde_data[1]
+            # x1 = np.where(kde_xx <= 90)[-1][-1]
+            # x2 = np.where(kde_xx <= 180)[-1][-1]
+            # x3 = np.where(kde_xx <= 270)[-1][-1]
+            # ax1.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.2)
+            # ax1.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.2)
+            # ax1.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.2)
+            # ax1.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.2)
             ax1.set_xticks([0, 90, 180, 270, 360])
             ax1.set_xlim(0, 360)
             ax1.set_ylim(0, )
-            ax1.set(ylabel=r'[-]',
+            ax1.set(ylabel='Density',
                     xlabel='[$^\circ$]')
 
             # 2-D density plot
@@ -2536,16 +2694,16 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
             g.ax_joint.set_xlim(0, 360)
             g.ax_joint.set_ylim(-ax_lim, 1)
             g.ax_marg_x.set_xticks([0, 90, 180, 270, 360])
-            kde_data = g.ax_marg_x.get_lines()[0].get_data()
-            kde_xx = kde_data[0]
-            kde_yy = kde_data[1]
-            x1 = np.where(kde_xx <= 90)[-1][-1]
-            x2 = np.where(kde_xx <= 180)[-1][-1]
-            x3 = np.where(kde_xx <= 270)[-1][-1]
-            g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.3)
-            g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.3)
-            g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.3)
-            g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.3)
+            # kde_data = g.ax_marg_x.get_lines()[0].get_data()
+            # kde_xx = kde_data[0]
+            # kde_yy = kde_data[1]
+            # x1 = np.where(kde_xx <= 90)[-1][-1]
+            # x2 = np.where(kde_xx <= 180)[-1][-1]
+            # x3 = np.where(kde_xx <= 270)[-1][-1]
+            # g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.2)
+            # g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.2)
+            # g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.2)
+            # g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.2)
             kde_data = g.ax_marg_y.get_lines()[0].get_data()
             kde_xx = kde_data[0]
             kde_yy = kde_data[1]
@@ -2570,8 +2728,8 @@ def shift_ts(ts, offset=1.5):
         Observed time series
 
     offset : float, optional
-        Offset multiplied to time series. If greater than 1 P overestimation
-        and if less than 1 P underestimation.
+        Offset multiplied to time series. If greater than 1 positive constant offset
+        and if less than 1 negative constant offset.
 
     Returns
     ----------
@@ -2583,11 +2741,11 @@ def shift_ts(ts, offset=1.5):
     return shift_ts
 
 def highunder_lowover(ts, prop=0.5):
-    """Generate model errors.
+    """Generate dynamic model errors.
 
     Underestimate high flows - Overestimate low flows
 
-    Mimicking model errors. High to medium flows are decreased by linear
+    Mimicking dynamic model errors. High to medium flows are decreased by linear
     increasing factors. Medium to low flows are increased by linear
     increasing factors.
 
@@ -2620,13 +2778,13 @@ def highunder_lowover(ts, prop=0.5):
     return ts_smoothed
 
 def highover_lowunder(ts, prop=0.5):
-    """Generate model errors.
+    """Generate dynamic model errors.
 
     Overestimate high flows - Underestimate low flows.
 
     Increase max values and decrease min values.
 
-    Mimicking model errors. High to medium flows are increased by linear
+    Mimicking dynamic model errors. High to medium flows are increased by linear
     decreasing factors. Medium to low flows are decreased by linear
     decreasing factors.
 
