@@ -185,6 +185,7 @@ def calc_brel_mean(obs, sim, sort=True):
     if sort:
         obs = np.sort(obs)[::-1]
         sim = np.sort(sim)[::-1]
+
     sim_obs_diff = np.subtract(sim, obs)
     brel = np.divide(sim_obs_diff, obs)
     brel[sim_obs_diff==0] = 0
@@ -607,8 +608,8 @@ def calc_de(obs, sim, sort=True):
 
     return sig
 
-def calc_kge_alpha(obs, sim):
-    """Calculate the alpha term of Kling-Gupta-Efficiency (KGE).
+def calc_kge_beta(obs, sim):
+    """Calculate the beta term of Kling-Gupta-Efficiency (KGE).
 
     Parameters
     ----------
@@ -620,14 +621,14 @@ def calc_kge_alpha(obs, sim):
 
     Returns
     ----------
-    kge_alpha : float
+    kge_beta : float
         alpha value
 
     Notes
     ----------
     .. math::
 
-        \alpha = \frac{\mu_{sim}}{\mu_{obs}}
+        \beta = \frac{\mu_{sim}}{\mu_{obs}}
 
     Examples
     --------
@@ -637,7 +638,7 @@ def calc_kge_alpha(obs, sim):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.calc_kge_alpha(obs, sim)
+    >>> de.calc_kge_beta(obs, sim)
     1.0980392156862746
 
     References
@@ -661,12 +662,12 @@ def calc_kge_alpha(obs, sim):
     # calculate alpha term
     obs_mean = np.mean(obs)
     sim_mean = np.mean(sim)
-    kge_alpha = sim_mean/obs_mean
+    kge_beta = sim_mean/obs_mean
 
-    return kge_alpha
+    return kge_beta
 
-def calc_kge_beta(obs, sim):
-    """Calculate the beta term of the Kling-Gupta-Efficiency (KGE).
+def calc_kge_alpha(obs, sim):
+    """Calculate the alpha term of the Kling-Gupta-Efficiency (KGE).
 
     Parameters
     ----------
@@ -678,14 +679,14 @@ def calc_kge_beta(obs, sim):
 
     Returns
     ----------
-    kge_beta : float
-        beta value
+    kge_alpha : float
+        alpha value
 
     Notes
     ----------
     .. math::
 
-        \beta = \frac{\sigma_{sim}}{\sigma_{obs}}
+        \alpha = \frac{\sigma_{sim}}{\sigma_{obs}}
 
     Examples
     --------
@@ -695,7 +696,7 @@ def calc_kge_beta(obs, sim):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.calc_kge_beta(obs, sim)
+    >>> de.calc_kge_alpha(obs, sim)
     1.2812057455166919
 
     References
@@ -718,9 +719,9 @@ def calc_kge_beta(obs, sim):
 
     obs_std = np.std(obs)
     sim_std = np.std(sim)
-    kge_beta = sim_std/obs_std
+    kge_alpha = sim_std/obs_std
 
-    return kge_beta
+    return kge_alpha
 
 def calc_kge_gamma(obs, sim):
     """Calculate the gamma term of Kling-Gupta-Efficiency (KGE).
@@ -825,11 +826,11 @@ def calc_kge(obs, sim, r='pearson', var='std'):
     ----------
     .. math::
 
-        KGE = 1 - \sqrt{(\alpha - 1)^2 + (\beta - 1)^2 + (r - 1)^2}
+        KGE = 1 - \sqrt{(\beta - 1)^2 + (\alpha - 1)^2 + (r - 1)^2}
 
         KGE = 1 - \sqrt{(\frac{\mu_{sim}}{\mu_{obs}} - 1)^2 + (\frac{\sigma_{sim}}{\sigma_{obs}} - 1)^2 + (r - 1)^2}
 
-        KGE = 1 - \sqrt{(\alpha - 1)^2 + (\gamma - 1)^2 + (r - 1)^2}
+        KGE = 1 - \sqrt{(\beta - 1)^2 + (\gamma - 1)^2 + (r - 1)^2}
 
         KGE = 1 - \sqrt{(\frac{\mu_{sim}}{\mu_{obs}} - 1)^2 + (\frac{CV_{sim}}{CV_{obs}} - 1)^2 + (r - 1)^2}
 
@@ -853,21 +854,21 @@ def calc_kge(obs, sim, r='pearson', var='std'):
     # calculate alpha term
     obs_mean = np.mean(obs)
     sim_mean = np.mean(sim)
-    kge_alpha = sim_mean/obs_mean
+    kge_beta = sim_mean/obs_mean
 
     # calculate KGE with gamma term
     if var == 'cv':
         kge_gamma = calc_kge_gamma(obs, sim)
         temp_cor = calc_temp_cor(obs, sim, r=r)
 
-        sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma - 1)**2  + (temp_cor - 1)**2)
+        sig = 1 - np.sqrt((kge_beta - 1)**2 + (kge_gamma - 1)**2  + (temp_cor - 1)**2)
 
     # calculate KGE with beta term
     elif var == 'std':
-        kge_beta = calc_kge_beta(obs, sim)
+        kge_alpha = calc_kge_alpha(obs, sim)
         temp_cor = calc_temp_cor(obs, sim, r=r)
 
-        sig = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta - 1)**2  + (temp_cor - 1)**2)
+        sig = 1 - np.sqrt((kge_beta - 1)**2 + (kge_alpha - 1)**2  + (temp_cor - 1)**2)
 
     return sig
 
@@ -921,23 +922,23 @@ def calc_kge_norm(obs, sim, r='pearson', var='std'):
     # calculate alpha term
     obs_mean = np.mean(obs)
     sim_mean = np.mean(sim)
-    kge_alpha = sim_mean/obs_mean
+    kge_beta = sim_mean/obs_mean
 
     # calculate KGE with gamma term
     if var == 'cv':
         kge_gamma = calc_kge_gamma(obs, sim)
         temp_cor = calc_temp_cor(obs, sim, r=r)
 
-        sig_nn = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma - 1)**2  + (temp_cor - 1)**2)
+        sig_nn = 1 - np.sqrt((kge_beta - 1)**2 + (kge_gamma - 1)**2  + (temp_cor - 1)**2)
         # normalizing KGE with mean flow benchmark
         sig = (sig_nn - (-.41))/(1 - (-.41))
 
     # calculate KGE with beta term
     elif var == 'std':
-        kge_beta = calc_kge_beta(obs, sim)
+        kge_alpha = calc_kge_alpha(obs, sim)
         temp_cor = calc_temp_cor(obs, sim, r=r)
 
-        sig_nn = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta - 1)**2  + (temp_cor - 1)**2)
+        sig_nn = 1 - np.sqrt((kge_beta - 1)**2 + (kge_alpha - 1)**2  + (temp_cor - 1)**2)
         # normalizing KGE with mean flow benchmark
         sig = (sig_nn - (-.41))/(1 - (-.41))
 
@@ -1172,12 +1173,34 @@ def vis2d_de_nn(obs, sim, sort=True, lim=0.05, extended=False):
             ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
-        ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
+        ax.set_xticklabels(['', '', '', '', '', '', '', ''])
+        ax.text(-.14, 0.5, 'High flow overestimation -',
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
                 transform=ax.transAxes)
-        ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
+        ax.text(-.09, 0.5, 'Low flow underestimation',
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(-.04, 0.5, r'$B_{slope}$ < 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.14, 0.5, 'High flow underestimation -',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.09, 0.5, 'Low flow overestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.04, 0.5, r'$B_{slope}$ > 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, -.09, 'Constant negative offset', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, -.04, r'$\overline{B_{rel}}$ < 0', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, 1.09, 'Constant positive offset',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, 1.04, r'$\overline{B_{rel}}$ > 0',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
                 transform=ax.transAxes)
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
@@ -1246,13 +1269,35 @@ def vis2d_de_nn(obs, sim, sort=True, lim=0.05, extended=False):
                 ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-            ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
-            ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
-                    va='center', ha='center', rotation=90,
-                    rotation_mode='anchor', transform=ax.transAxes)
-            ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
-                    va='center', ha='center', rotation=90,
-                    rotation_mode='anchor', transform=ax.transAxes)
+            ax.set_xticklabels(['', '', '', '', '', '', '', ''])
+            ax.text(-.14, 0.5, 'High flow overestimation -',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(-.09, 0.5, 'Low flow underestimation',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(-.04, 0.5, r'$B_{slope}$ < 0',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.14, 0.5, 'High flow underestimation -',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.09, 0.5, 'Low flow overestimation',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.04, 0.5, r'$B_{slope}$ > 0',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(.5, -.09, 'Constant negative offset', va='center', ha='center',
+                    rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(.5, -.04, r'$\overline{B_{rel}}$ < 0', va='center', ha='center',
+                    rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(.5, 1.09, 'Constant positive offset',
+                    va='center', ha='center', rotation=0, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(.5, 1.04, r'$\overline{B_{rel}}$ > 0',
+                    va='center', ha='center', rotation=0, rotation_mode='anchor',
+                    transform=ax.transAxes)
             # add colorbar for temporal correlation
             cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
@@ -1436,12 +1481,34 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
             ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
-        ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
+        ax.set_xticklabels(['', '', '', '', '', '', '', ''])
+        ax.text(-.14, 0.5, 'High flow overestimation -',
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
                 transform=ax.transAxes)
-        ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
+        ax.text(-.09, 0.5, 'Low flow underestimation',
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(-.04, 0.5, r'$B_{slope}$ < 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.14, 0.5, 'High flow underestimation -',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.09, 0.5, 'Low flow overestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.04, 0.5, r'$B_{slope}$ > 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, -.09, 'Constant negative offset', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, -.04, r'$\overline{B_{rel}}$ < 0', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, 1.09, 'Constant positive offset',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, 1.04, r'$\overline{B_{rel}}$ > 0',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
                 transform=ax.transAxes)
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
@@ -1513,13 +1580,35 @@ def vis2d_de_nn_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                 ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-            ax.set_xticklabels(['', '', 'Constant positive offset', '', '', r'0$^\circ$/360$^\circ$ ', 'Constant negative offset', ''])
-            ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
-                    va='center', ha='center', rotation=90,
-                    rotation_mode='anchor', transform=ax.transAxes)
-            ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
-                    va='center', ha='center', rotation=90,
-                    rotation_mode='anchor', transform=ax.transAxes)
+            ax.set_xticklabels(['', '', '', '', '', r'0$^{\circ}$ (360$^{\circ}$)', '', ''])
+            ax.text(-.14, 0.5, 'High flow overestimation -',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(-.09, 0.5, 'Low flow underestimation',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(-.04, 0.5, r'$B_{slope}$ < 0',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.14, 0.5, 'High flow underestimation -',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.09, 0.5, 'Low flow overestimation',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.04, 0.5, r'$B_{slope}$ > 0',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(.5, -.09, 'Constant negative offset', va='center', ha='center',
+                    rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(.5, -.04, r'$\overline{B_{rel}}$ < 0', va='center', ha='center',
+                    rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(.5, 1.09, 'Constant positive offset',
+                    va='center', ha='center', rotation=0, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(.5, 1.04, r'$\overline{B_{rel}}$ > 0',
+                    va='center', ha='center', rotation=0, rotation_mode='anchor',
+                    transform=ax.transAxes)
             # add colorbar for temporal correlation
             cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
@@ -1738,7 +1827,7 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
         # threshold efficiency for FBM
         sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
         # mean flow becnhmark
-        mfb = calc_de_mfb(obs, sim)
+        mfb = calc_de_mfb(obs)
         # normalize threshold with mean flow becnhmark
         sig_lim_norm = (sig_lim - mfb)/(1 - mfb)
         # relation of b_dir which explains the error
@@ -1773,12 +1862,34 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
             ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
-        ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
+        ax.set_xticklabels(['', '', '', '', '', '', '', ''])
+        ax.text(-.14, 0.5, 'High flow overestimation -',
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
                 transform=ax.transAxes)
-        ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
+        ax.text(-.09, 0.5, 'Low flow underestimation',
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(-.04, 0.5, r'$B_{slope}$ < 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.14, 0.5, 'High flow underestimation -',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.09, 0.5, 'Low flow overestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.04, 0.5, r'$B_{slope}$ > 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, -.09, 'Constant negative offset', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, -.04, r'$\overline{B_{rel}}$ < 0', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, 1.09, 'Constant positive offset',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, 1.04, r'$\overline{B_{rel}}$ > 0',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
                 transform=ax.transAxes)
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
@@ -1816,7 +1927,7 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
             # threshold efficiency for FBM
             sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
             # mean flow benchmark
-            mfb = calc_de_mfb(obs, sim)
+            mfb = calc_de_mfb(obs)
             # normalize threshold with mean flow becnhmark
             sig_lim_norm = (sig_lim - mfb)/(1 - mfb)
             # relation of b_dir which explains the error
@@ -1851,13 +1962,35 @@ def vis2d_de(obs, sim, sort=True, lim=0.05, extended=False):
                 ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-            ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
-            ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
-                    va='center', ha='center', rotation=90,
-                    rotation_mode='anchor', transform=ax.transAxes)
-            ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
-                    va='center', ha='center', rotation=90,
-                    rotation_mode='anchor', transform=ax.transAxes)
+            ax.set_xticklabels(['', '', '', '', '', '', '', ''])
+            ax.text(-.14, 0.5, 'High flow overestimation -',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(-.09, 0.5, 'Low flow underestimation',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(-.04, 0.5, r'$B_{slope}$ < 0',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.14, 0.5, 'High flow underestimation -',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.09, 0.5, 'Low flow overestimation',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.04, 0.5, r'$B_{slope}$ > 0',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(.5, -.09, 'Constant negative offset', va='center', ha='center',
+                    rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(.5, -.04, r'$\overline{B_{rel}}$ < 0', va='center', ha='center',
+                    rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(.5, 1.09, 'Constant positive offset',
+                    va='center', ha='center', rotation=0, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(.5, 1.04, r'$\overline{B_{rel}}$ > 0',
+                    va='center', ha='center', rotation=0, rotation_mode='anchor',
+                    transform=ax.transAxes)
             # add colorbar for temporal correlation
             cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
@@ -2047,12 +2180,34 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
             ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.set_xticklabels(['', '', 'Constant positive offset', '', '', '', 'Constant negative offset', ''])
-        ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
+        ax.set_xticklabels(['', '', '', '', '', '', '', ''])
+        ax.text(-.14, 0.5, 'High flow overestimation -',
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
                 transform=ax.transAxes)
-        ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
+        ax.text(-.09, 0.5, 'Low flow underestimation',
                 va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(-.04, 0.5, r'$B_{slope}$ < 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.14, 0.5, 'High flow underestimation -',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.09, 0.5, 'Low flow overestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.04, 0.5, r'$B_{slope}$ > 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, -.09, 'Constant negative offset', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, -.04, r'$\overline{B_{rel}}$ < 0', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, 1.09, 'Constant positive offset',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, 1.04, r'$\overline{B_{rel}}$ > 0',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
                 transform=ax.transAxes)
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
@@ -2125,13 +2280,35 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag,
                 ax.set_rmax(-ax_lim)
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-            ax.set_xticklabels(['', '', 'Constant positive offset', '', '', r'0$^\circ$/360$^\circ$ ', 'Constant negative offset', ''])
-            ax.text(-.05, 0.5, 'High flow overestimation - \n Low flow underestimation',
-                    va='center', ha='center', rotation=90,
-                    rotation_mode='anchor', transform=ax.transAxes)
-            ax.text(1.05, 0.5, 'High flow underestimation - \n Low flow overestimation',
-                    va='center', ha='center', rotation=90,
-                    rotation_mode='anchor', transform=ax.transAxes)
+            ax.set_xticklabels(['', '', '', '', '', r'0$^{\circ}$ (360$^{\circ}$)', '', ''])
+            ax.text(-.14, 0.5, 'High flow overestimation -',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(-.09, 0.5, 'Low flow underestimation',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(-.04, 0.5, r'$B_{slope}$ < 0',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.14, 0.5, 'High flow underestimation -',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.09, 0.5, 'Low flow overestimation',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.04, 0.5, r'$B_{slope}$ > 0',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(.5, -.09, 'Constant negative offset', va='center', ha='center',
+                    rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(.5, -.04, r'$\overline{B_{rel}}$ < 0', va='center', ha='center',
+                    rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(.5, 1.09, 'Constant positive offset',
+                    va='center', ha='center', rotation=0, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(.5, 1.04, r'$\overline{B_{rel}}$ > 0',
+                    va='center', ha='center', rotation=0, rotation_mode='anchor',
+                    transform=ax.transAxes)
             # add colorbar for temporal correlation
             cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                                 ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
@@ -2341,9 +2518,27 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
             ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
+        ax.text(-.09, 0.5, 'Variability underestimation', va='center', ha='center',
                 rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-        ax.set_xticklabels(['', '', '', '', '', '', r'$\gamma$ - 1 [-]', ''])
+        ax.text(-.04, 0.5, r'($\alpha$ - 1) < 0', va='center', ha='center',
+                rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(1.09, 0.5, 'Variability overestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.04, 0.5, r'($\alpha$ - 1) > 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, -.09, 'Mean underestimation', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, -.04, r'($\beta$ - 1) < 0', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, 1.09, 'Mean overestimation',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, 1.04, r'($\beta$ - 1) > 0',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.set_xticklabels(['', '', '', '', '', '', '', ''])
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
@@ -2461,9 +2656,27 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
             ax.set_rmax(-ax_lim)
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
-        rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-        ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$ - 1 [-]', ''])
+        ax.text(-.09, 0.5, 'Variability underestimation', va='center', ha='center',
+                rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(-.04, 0.5, r'($\alpha$ - 1) < 0', va='center', ha='center',
+                rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(1.09, 0.5, 'Variability overestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.04, 0.5, r'($\alpha$ - 1) > 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, -.09, 'Mean underestimation', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, -.04, r'($\beta$ - 1) < 0', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, 1.09, 'Mean overestimation',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, 1.04, r'($\beta$ - 1) > 0',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.set_xticklabels(['', '', '', '', '', '', '', ''])
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                             ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
@@ -2471,18 +2684,18 @@ def vis2d_kge_norm(obs, sim, r='pearson', var='std'):
         cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
         cbar.ax.tick_params(direction='in')
 
-def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=False):
+def vis2d_kge_norm_multi(kge_beta, alpha_or_gamma, kge_r, sig_kge, extended=False):
     r"""Multiple polar plot of Kling-Gupta Efficiency ($KGE_{norm}$).
 
     KGE is normalized by its mean flow benchmark.
 
     Parameters
     ----------
-    kge_alpha: (N,)array_like
-        KGE alpha as 1-D array
+    kge_beta: (N,)array_like
+        KGE beta as 1-D array
 
-    beta_or_gamma : (N,)array_like
-        KGE beta or KGE gamma as 1-D array
+    alpha_or_gamma : (N,)array_like
+        KGE alpha or KGE gamma as 1-D array
 
     kge_r : (N,)array_like
         KGE r as 1-D array
@@ -2499,8 +2712,8 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
     sig_norm = (sig_kge - (-.41))/(1 - (-.41))
     sig_min = np.min(sig_norm)
 
-    ll_kge_alpha = kge_alpha.tolist()
-    ll_bg = beta_or_gamma.tolist()
+    ll_kge_beta = kge_beta.tolist()
+    ll_ag = alpha_or_gamma.tolist()
     ll_kge_r = kge_r.tolist()
     ll_sig = sig_norm.tolist()
 
@@ -2586,17 +2799,35 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
                        colors='dimgrey')
         # loop over each data point
-        for (a, bg, r, sig) in zip(ll_kge_alpha, ll_bg, ll_kge_r, ll_sig):
-            ang = np.arctan2(a - 1, bg - 1)
+        for (b, ag, r, sig) in zip(ll_kge_beta, ll_ag, ll_kge_r, ll_sig):
+            ang = np.arctan2(b - 1, ag - 1)
             # convert temporal correlation to color
             rgba_color = cm.YlGnBu(norm(r))
             c = ax.scatter(ang, sig, color=rgba_color)
 
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                       labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-        ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
+        ax.text(-.09, 0.5, 'Variability underestimation', va='center', ha='center',
                 rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-        ax.set_xticklabels(['', '', '', '', '', '', r'$\beta$/$\gamma$ - 1 [-]', ''])
+        ax.text(-.04, 0.5, r'($\alpha$ - 1) < 0', va='center', ha='center',
+                rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(1.09, 0.5, 'Variability overestimation',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(1.04, 0.5, r'($\alpha$ - 1) > 0',
+                va='center', ha='center', rotation=90, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, -.09, 'Mean underestimation', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, -.04, r'($\beta$ - 1) < 0', va='center', ha='center',
+                rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+        ax.text(.5, 1.09, 'Mean overestimation',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.text(.5, 1.04, r'($\beta$ - 1) > 0',
+                va='center', ha='center', rotation=0, rotation_mode='anchor',
+                transform=ax.transAxes)
+        ax.set_xticklabels(['', '', '', '', '', '', '', ''])
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
         if sig_min > 0:
@@ -2637,17 +2868,35 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
             cl = ax.clabel(cp, inline=True, fontsize=10, fmt='%1.1f',
                            colors='dimgrey')
             # loop over each data point
-            for (a, bg, r, sig) in zip(ll_kge_alpha, ll_bg, ll_kge_r, ll_sig):
-                ang = np.arctan2(a - 1, bg - 1)
+            for (b, ag, r, sig) in zip(ll_kge_beta, ll_ag, ll_kge_r, ll_sig):
+                ang = np.arctan2(b - 1, ag - 1)
                 # convert temporal correlation to color
                 rgba_color = cm.YlGnBu(norm(r))
                 c = ax.scatter(ang, sig, color=rgba_color)
 
             ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                           labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-            ax.text(-.05, 0.5, r'$\alpha$ - 1 [-]', va='center', ha='center',
+            ax.text(-.09, 0.5, 'Variability underestimation', va='center', ha='center',
                     rotation=90, rotation_mode='anchor', transform=ax.transAxes)
-            ax.set_xticklabels(['', '', '', '', '', r'0$^\circ$/360$^\circ$ ', r'$\beta$/$\gamma$ - 1 [-]', ''])
+            ax.text(-.04, 0.5, r'($\alpha$ - 1) < 0', va='center', ha='center',
+                    rotation=90, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(1.09, 0.5, 'Variability overestimation',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(1.04, 0.5, r'($\alpha$ - 1) > 0',
+                    va='center', ha='center', rotation=90, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(.5, -.09, 'Mean underestimation', va='center', ha='center',
+                    rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(.5, -.04, r'($\beta$ - 1) < 0', va='center', ha='center',
+                    rotation=0, rotation_mode='anchor', transform=ax.transAxes)
+            ax.text(.5, 1.09, 'Mean overestimation',
+                    va='center', ha='center', rotation=0, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.text(.5, 1.04, r'($\beta$ - 1) > 0',
+                    va='center', ha='center', rotation=0, rotation_mode='anchor',
+                    transform=ax.transAxes)
+            ax.set_xticklabels(['', '', '', '', '', r'0$^{\circ}$ (360$^{\circ}$)', '', ''])
             ax.set_rticks([])  # turn default ticks off
             ax.set_rmin(1)
             if sig_min > 0:
@@ -2662,7 +2911,7 @@ def vis2d_kge_norm_multi(kge_alpha, beta_or_gamma, kge_r, sig_kge, extended=Fals
             cbar.ax.tick_params(direction='in')
 
             # convert to degrees
-            diag = np.arctan2(kge_alpha - 1, beta_or_gamma - 1)
+            diag = np.arctan2(kge_beta - 1, alpha_or_gamma - 1)
             diag_deg = (diag  * (180 / np.pi)) + 135
             diag_deg[diag_deg < 0] = 360 - diag_deg[diag_deg < 0]
 

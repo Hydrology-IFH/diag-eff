@@ -157,7 +157,7 @@ if __name__ == "__main__":
         kge_arr = meta['kge_norm'].values
 
         # multi KGE plot
-        de.vis2d_kge_norm_multi(alpha_arr, beta_arr, temp_cor_arr, kge_arr, extended=True)
+        de.vis2d_kge_norm_multi(beta_arr, alpha_arr, temp_cor_arr, kge_arr, extended=True)
 
         # global map
         x = meta['lon'].values

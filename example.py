@@ -813,7 +813,7 @@ if __name__ == "__main__":
     temp_cor_arr = df_es['temp_cor'].values
     kge_arr = df_es['kge_norm'].values
 
-    fig_kge = util.vis2d_kge_norm_multi_fc(alpha_arr, beta_arr, temp_cor_arr,
+    fig_kge = util.vis2d_kge_norm_multi_fc(beta_arr, alpha_arr, temp_cor_arr,
                                            kge_arr, idx)
     fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/kge_diag.pdf', dpi=250)
 
@@ -838,14 +838,14 @@ if __name__ == "__main__":
     #     ax.annotate(txt, (nse_arr[i], de_arr[i]), color='red', fontsize=15)
 
     # scatterplots components
-    sc = sns.scatterplot(alpha_arr - 1, brel_mean_arr, color='black', ax=ax2)
-    sc1 = sns.scatterplot(beta_arr - 1, b_slope_arr, color='red', ax=ax2)
+    sc = sns.scatterplot(beta_arr - 1, brel_mean_arr, color='black', ax=ax2)
+    sc1 = sns.scatterplot(alpha_arr - 1, b_slope_arr, color='red', ax=ax2)
     ax2.plot([-2.05, 2.05], [-2.05, 2.05], ls="--", c=".3")
     ax2.set_ylim(-2.05, 2.05)
     ax2.set_xlim(-2.05, 2.05)
-    ax2.set(ylabel=r'$\overline{B_{rel}}$ [-]', xlabel=r'$\alpha$ - 1 [-]')
+    ax2.set(ylabel=r'$\overline{B_{rel}}$ [-]', xlabel=r'$\beta$ - 1 [-]')
     ax2.text(-.29, .415, r'$B_{slope}$ [-]', color='red', transform=ax2.transAxes, rotation=90)
-    ax2.text(.42, -.22, r'$\beta$ - 1 [-]', color='red', transform=ax2.transAxes)
+    ax2.text(.42, -.22, r'$\alpha$ - 1 [-]', color='red', transform=ax2.transAxes)
     ax2.text(.03, .93, '(b)', transform=ax2.transAxes)
     ax2.text(.05, .1, '1:1', rotation=45, transform=ax2.transAxes)
     fig.subplots_adjust(wspace=.35, bottom=.2)
@@ -855,10 +855,13 @@ if __name__ == "__main__":
     #     ax.annotate(txt, (beta_arr[i] - 1, b_slope_arr[i]), color='red', fontsize=15)
 
     # export table
-    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/table_eff.csv'
     df_es_t = df_es.T
+    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/table_eff_comp.csv'
+    df_es_t = df_es_t.round(2)
+    df_es_t.to_csv(path_csv, header=True, index=True, sep=';')
     df_es_t = df_es_t.loc[['de', 'kge_norm', 'nse'], :]
     df_es_t = df_es_t.round(2)
+    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/table_eff.csv'
     df_es_t.to_csv(path_csv, header=True, index=True, sep=';')
 
     ### camels
@@ -1065,6 +1068,6 @@ if __name__ == "__main__":
     beta_arr = df_es_cam['beta'].values
     kge_arr = df_es_cam['kge_norm'].values
 
-    fig_kge = util.vis2d_kge_norm_multi_fc(alpha_arr, beta_arr, temp_cor_arr,
-                                      kge_arr, idx)
+    fig_kge = util.vis2d_kge_norm_multi_fc(beta_arr, alpha_arr, temp_cor_arr,
+                                           kge_arr, idx)
     fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/kge_diag_real_case.pdf', dpi=250)
