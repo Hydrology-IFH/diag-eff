@@ -14,6 +14,8 @@ import matplotlib.cm as cm
 from mpl_toolkits.basemap import Basemap
 from matplotlib.patches import Polygon
 from de import de
+from de import kge
+from de import nse
 from de import util
 
 if __name__ == "__main__":
@@ -64,7 +66,7 @@ if __name__ == "__main__":
     meta['beta'] = np.nan
 
     meta['nse'] = np.nan
-    
+
     meta['obs_mean'] = np.nan
     meta['obs_std'] = np.nan
     meta['obs_cv'] = np.nan
@@ -115,15 +117,15 @@ if __name__ == "__main__":
             meta.iloc[i, 11] = np.arctan2(brel_mean, b_slope)
 
             # KGE
-            meta.iloc[i, 12] = de.calc_kge_norm(obs_arr, sim_arr)
+            meta.iloc[i, 12] = kge.calc_kge_norm(obs_arr, sim_arr)
             # KGE alpha
-            meta.iloc[i, 13] = de.calc_kge_alpha(obs_arr, sim_arr)
+            meta.iloc[i, 13] = kge.calc_kge_alpha(obs_arr, sim_arr)
             # KGE beta
-            meta.iloc[i, 14] = de.calc_kge_beta(obs_arr, sim_arr)
+            meta.iloc[i, 14] = kge.calc_kge_beta(obs_arr, sim_arr)
 
             # NSE
-            meta.iloc[i, 15] = de.calc_nse(obs_arr, sim_arr)
-            
+            meta.iloc[i, 15] = nse.calc_nse(obs_arr, sim_arr)
+
             # mean, std, min and max of obs
             meta.iloc[i, 16] = np.mean(obs_arr)
             meta.iloc[i, 17] = np.std(obs_arr)
@@ -157,7 +159,7 @@ if __name__ == "__main__":
         kge_arr = meta['kge_norm'].values
 
         # multi KGE plot
-        de.vis2d_kge_norm_multi(beta_arr, alpha_arr, temp_cor_arr, kge_arr, extended=True)
+        kge.vis2d_kge_norm_multi(beta_arr, alpha_arr, temp_cor_arr, kge_arr, extended=True)
 
         # global map
         x = meta['lon'].values

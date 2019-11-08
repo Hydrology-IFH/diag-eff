@@ -124,6 +124,45 @@ def import_camels_obs_sim(path, sep=r"\s+"):
 
     return obs_sim
 
+def plot_ts(ts):
+    """Plot time series.
+
+    Parameters
+    ----------
+    ts : dataframe
+        Dataframe with time series
+    """
+    fig, ax = plt.subplots()
+    ax.plot(ts.index, ts.iloc[:, 0].values, color='blue')
+    ax.set(ylabel=_q_lab,
+           xlabel='Time [Years]')
+    ax.set_ylim(0, )
+    ax.set_xlim(ts.index[0], ts.index[-1])
+    years_5 = mdates.YearLocator(5)
+    years = mdates.YearLocator()
+    yearsFmt = mdates.DateFormatter('%Y')
+    ax.xaxis.set_major_locator(years_5)
+    ax.xaxis.set_major_formatter(yearsFmt)
+    ax.xaxis.set_minor_locator(years)
+
+def plot_obs_sim(obs, sim):
+    """Plot observed and simulated time series.
+
+    Parameters
+    ----------
+    obs : series
+        observed time series
+
+    sim : series
+        simulated time series
+    """
+    fig, ax = plt.subplots()
+    ax.plot(obs.index, obs, lw=2, color='blue')  # observed time series
+    ax.plot(sim.index, sim, lw=1, ls='-.', color='red', alpha=.8)  # simulated time series
+    ax.set(ylabel=_q_lab, xlabel='Time')
+    ax.set_ylim(0, )
+    ax.set_xlim(obs.index[0], obs.index[-1])
+
 def sort_obs(ts):
     """
     Sort time series by observed values.

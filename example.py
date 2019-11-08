@@ -6,6 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from de import de
+from de import generate_errors
+from de import kge
+from de import nse
 from de import util
 import seaborn as sns
 # controlling figure aesthetics
@@ -34,7 +37,7 @@ if __name__ == "__main__":
 
     # import observed time series
     df_ts = util.import_camels_ts(path, sep=r"\s+")
-    de.plot_ts(df_ts)
+    util.plot_ts(df_ts)
 
     ### perfect simulation ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -71,19 +74,19 @@ if __name__ == "__main__":
     df_es.iloc[0, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[0, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[0, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[0, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[0, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[0, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[0, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[0, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[0, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### increase high flows - decrease low flows ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highover_lowunder(df_ts.copy(), prop=0.5)
+    tsd = generate_errors.highover_lowunder(df_ts.copy(), prop=0.5)
     obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qsim']  # disaggregated time series
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 0], fig_num_fdc[0])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 0], fig_num_ts[0])
@@ -118,19 +121,19 @@ if __name__ == "__main__":
     df_es.iloc[1, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[1, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[1, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[1, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[1, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[1, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[1, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[1, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[1, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### decrease high flows - increase low flows ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)
+    tsd = generate_errors.highunder_lowover(df_ts.copy(), prop=0.5)
     obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qsim']  # smoothed time series
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 1], fig_num_fdc[1])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 1], fig_num_ts[1])
@@ -165,19 +168,19 @@ if __name__ == "__main__":
     df_es.iloc[2, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[2, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[2, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[2, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[2, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[2, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[2, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[2, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[2, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### precipitation surplus ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    obs_sim.loc[:, 'Qsim'] = de.shift_ts(df_ts['Qobs'].values, offset=1.5)  # positive offset
+    obs_sim.loc[:, 'Qsim'] = generate_errors.shift_ts(df_ts['Qobs'].values, offset=1.5)  # positive offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 2], fig_num_fdc[2])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 2], fig_num_ts[2])
 
@@ -211,19 +214,19 @@ if __name__ == "__main__":
     df_es.iloc[3, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[3, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[3, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[3, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[3, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[3, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[3, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[3, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[3, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### precipitation shortage ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    obs_sim.loc[:, 'Qsim'] = de.shift_ts(df_ts['Qobs'].values, offset=.5)  # negative offset
+    obs_sim.loc[:, 'Qsim'] = generate_errors.shift_ts(df_ts['Qobs'].values, offset=.5)  # negative offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 3], fig_num_fdc[3])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 3], fig_num_ts[3])
 
@@ -257,19 +260,19 @@ if __name__ == "__main__":
     df_es.iloc[4, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[4, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[4, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[4, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[4, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[4, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[4, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[4, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[4, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tss = de.time_shift(df_ts.copy(), random=True)  # shuffled time series
+    tss = generate_errors.time_shift(df_ts.copy(), random=True)  # shuffled time series
     obs_sim.loc[:, 'Qsim'] = tss.iloc[:, 0].values
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 4], fig_num_fdc[4])
     axes_fdc[0, 4].legend(loc=2, frameon=False)
@@ -305,20 +308,20 @@ if __name__ == "__main__":
     df_es.iloc[5, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[5, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[5, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[5, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[5, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[5, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[5, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[5, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[5, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### Decrease high flows - Increase low flows and precipitation surplus ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
-    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsd = generate_errors.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
+    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
     obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values + tso  # positive offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 0], fig_num_fdc[5])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 0], fig_num_ts[5])
@@ -353,20 +356,20 @@ if __name__ == "__main__":
     df_es.iloc[6, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[6, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[6, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[6, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[6, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[6, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[6, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[6, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[6, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### Decrease high flows - Increase low flows and precipitation shortage ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
-    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsd = generate_errors.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
+    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
     obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values - tso  # negative offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 1], fig_num_fdc[6])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 1], fig_num_ts[6])
@@ -401,20 +404,20 @@ if __name__ == "__main__":
     df_es.iloc[7, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[7, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[7, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[7, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[7, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[7, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[7, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[7, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[7, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### Increase high flows - Decrease low flows and precipitation surplus ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highover_lowunder(df_ts.copy(), prop=0.5)  # disaggregated time series
-    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsd = generate_errors.highover_lowunder(df_ts.copy(), prop=0.5)  # disaggregated time series
+    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
     obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values + tso  # positive offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 2], fig_num_fdc[7])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 2], fig_num_ts[7])
@@ -449,20 +452,20 @@ if __name__ == "__main__":
     df_es.iloc[8, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[8, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[8, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[8, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[8, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[8, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[8, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[8, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[8, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### Increase high flows - Decrease low flows and precipitation shortage ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
-    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsd = generate_errors.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
+    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
     obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values - tso  # negative offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 3], fig_num_fdc[8])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 3], fig_num_ts[8])
@@ -497,14 +500,14 @@ if __name__ == "__main__":
     df_es.iloc[9, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[9, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[9, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[9, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[9, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[9, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[9, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[9, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[9, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### mean flow benchmark ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
@@ -544,23 +547,23 @@ if __name__ == "__main__":
     df_es.iloc[10, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[10, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[10, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[10, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[10, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[10, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[10, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[10, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[10, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### Decrease high flows - Increase low flows, precipitation surplus and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
+    tsd = generate_errors.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
     tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    tsp.iloc[:, 0]  = tsd.iloc[:, 0].values + tso  # negative offset
-    tst = de.time_shift(tsp, random=True)  # shuffling
+    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsp.iloc[:, 0] = tsd.iloc[:, 0].values + tso  # negative offset
+    tst = generate_errors.time_shift(tsp, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 0], fig_num_ts[9])
 
@@ -594,23 +597,23 @@ if __name__ == "__main__":
     df_es.iloc[11, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[11, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[11, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[11, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[11, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[11, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[11, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[11, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[11, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### Decrease high flows - Increase low flows, precipitation shortage and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
+    tsd = generate_errors.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
     tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    tsn.iloc[:, 0]  = tsd.iloc[:, 0].values - tso  # negative offset
-    tst = de.time_shift(tsn, random=True)  # shuffling
+    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsn.iloc[:, 0] = tsd.iloc[:, 0].values - tso  # negative offset
+    tst = generate_errors.time_shift(tsn, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 1], fig_num_ts[10])
 
@@ -644,23 +647,23 @@ if __name__ == "__main__":
     df_es.iloc[12, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[12, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[12, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[12, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[12, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[12, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[12, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[12, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[12, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### Increase high flows - Decrease low flows, precipitation surplus and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highover_lowunder(df_ts.copy(), prop=0.5)  # disaggregated time series
+    tsd = generate_errors.highover_lowunder(df_ts.copy(), prop=0.5)  # disaggregated time series
     tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    tsp.iloc[:, 0]  = tsd.iloc[:, 0].values + tso  # positve offset
-    tst = de.time_shift(tsp, random=True)  # shuffling
+    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsp.iloc[:, 0] = tsd.iloc[:, 0].values + tso  # positve offset
+    tst = generate_errors.time_shift(tsp, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 2], fig_num_ts[11])
 
@@ -694,23 +697,23 @@ if __name__ == "__main__":
     df_es.iloc[13, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[13, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[13, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[13, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[13, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[13, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[13, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[13, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[13, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     ### Increase high flows - Decrease low flows, precipitation shortage and shuffling ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = de.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
+    tsd = generate_errors.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
     tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tso = de.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
     tsn.iloc[:, 0]  = tsd.iloc[:, 0].values - tso  # negative offset
-    tst = de.time_shift(tsn, random=True)  # shuffling
+    tst = generate_errors.time_shift(tsn, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 3], fig_num_ts[12])
 
@@ -744,14 +747,14 @@ if __name__ == "__main__":
     df_es.iloc[14, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es.iloc[14, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es.iloc[14, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[14, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.iloc[14, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es.iloc[14, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es.iloc[14, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[14, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es.iloc[14, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     axes_ts[2, 3].legend(loc=6, bbox_to_anchor=(1.18, .85))
 
@@ -884,7 +887,7 @@ if __name__ == "__main__":
     fig.text(0.75, 0.05, 'Exceedence probabilty [-]', ha='center', va='center')
 
     util.plot_obs_sim_ax(df_cam1['Qobs'], df_cam1['Qsim'], axes[0,0], '')
-    axes[0,0].text(.95, .95, '(a; {})'.format(idx[0]),
+    axes[0,0].text(.95, .95, '(a; set_id: {})'.format(idx[0]),
                    transform=axes[0,0].transAxes, ha='right', va='top')
     # format the ticks
     years_10 = mdates.YearLocator(10)
@@ -894,13 +897,13 @@ if __name__ == "__main__":
     axes[0,0].xaxis.set_major_formatter(yearsFmt)
     axes[0,0].xaxis.set_minor_locator(years_5)
     util.fdc_obs_sim_ax(df_cam1['Qobs'], df_cam1['Qsim'], axes[0,1], '')
-    axes[0,1].text(.95, .95, '(b; {})'.format(idx[0]),
+    axes[0,1].text(.95, .95, '(b; set_id: {})'.format(idx[0]),
                    transform=axes[0,1].transAxes, ha='right', va='top')
     # legend above plot
     axes[0,1].legend(loc=2, labels=['Observed', 'Simulated'], ncol=2, frameon=False, bbox_to_anchor=(-0.6, 1.2))
 
     util.plot_obs_sim_ax(df_cam2['Qobs'], df_cam2['Qsim'], axes[1,0], '')
-    axes[1,0].text(.95, .95, '(c; {})'.format(idx[1]),
+    axes[1,0].text(.95, .95, '(c; set_id: {})'.format(idx[1]),
                    transform=axes[1,0].transAxes, ha='right', va='top')
     # format the ticks
     years_10 = mdates.YearLocator(10)
@@ -910,11 +913,11 @@ if __name__ == "__main__":
     axes[1,0].xaxis.set_major_formatter(yearsFmt)
     axes[1,0].xaxis.set_minor_locator(years_5)
     util.fdc_obs_sim_ax(df_cam1['Qobs'], df_cam1['Qsim'], axes[1,1], '')
-    axes[1,1].text(.95, .95, '(d; {})'.format(idx[1]),
+    axes[1,1].text(.95, .95, '(d; set_id: {})'.format(idx[1]),
                    transform=axes[1,1].transAxes, ha='right', va='top')
 
     util.plot_obs_sim_ax(df_cam1['Qobs'], df_cam1['Qsim'], axes[2,0], '')
-    axes[2,0].text(.95, .95, '(e; {})'.format(idx[2]),
+    axes[2,0].text(.95, .95, '(e; set_id: {})'.format(idx[2]),
                    transform=axes[2,0].transAxes, ha='right', va='top')
     # format the ticks
     years_10 = mdates.YearLocator(10)
@@ -924,7 +927,7 @@ if __name__ == "__main__":
     axes[2,0].xaxis.set_major_formatter(yearsFmt)
     axes[2,0].xaxis.set_minor_locator(years_5)
     util.fdc_obs_sim_ax(df_cam1['Qobs'], df_cam1['Qsim'], axes[2,1], '')
-    axes[2,1].text(.95, .95, '(f; {})'.format(idx[2]),
+    axes[2,1].text(.95, .95, '(f; set_id: {})'.format(idx[2]),
                    transform=axes[2,1].transAxes, ha='right', va='top')
 
     fig.subplots_adjust(wspace=0.3)
@@ -959,14 +962,14 @@ if __name__ == "__main__":
     df_es_cam.iloc[0, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es_cam.iloc[0, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es_cam.iloc[0, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es_cam.iloc[0, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es_cam.iloc[0, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es_cam.iloc[0, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es_cam.iloc[0, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es_cam.iloc[0, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es_cam.iloc[0, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     obs_arr = df_cam2['Qobs'].values
     sim_arr = df_cam2['Qsim'].values
@@ -997,14 +1000,14 @@ if __name__ == "__main__":
     df_es_cam.iloc[1, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es_cam.iloc[1, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es_cam.iloc[1, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es_cam.iloc[1, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es_cam.iloc[1, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es_cam.iloc[1, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es_cam.iloc[1, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es_cam.iloc[1, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es_cam.iloc[1, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     obs_arr = df_cam3['Qobs'].values
     sim_arr = df_cam3['Qsim'].values
@@ -1035,14 +1038,14 @@ if __name__ == "__main__":
     df_es_cam.iloc[2, 7] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es_cam.iloc[2, 8] = de.calc_kge_norm(obs_arr, sim_arr)
+    df_es_cam.iloc[2, 8] = kge.calc_kge_norm(obs_arr, sim_arr)
     # KGE alpha
-    df_es_cam.iloc[2, 9] = de.calc_kge_alpha(obs_arr, sim_arr)
+    df_es_cam.iloc[2, 9] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
-    df_es_cam.iloc[2, 10] = de.calc_kge_beta(obs_arr, sim_arr)
+    df_es_cam.iloc[2, 10] = kge.calc_kge_beta(obs_arr, sim_arr)
 
     # NSE
-    df_es_cam.iloc[2, 11] = de.calc_nse(obs_arr, sim_arr)
+    df_es_cam.iloc[2, 11] = nse.calc_nse(obs_arr, sim_arr)
 
     path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/table_eff_real_case.csv'
     df_es_cam.to_csv(path_csv, header=True, index=True, sep=';')
