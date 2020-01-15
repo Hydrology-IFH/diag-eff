@@ -160,3 +160,32 @@ def time_shift(ts, tshift=3, random=True):
         ts_shift.iloc[:, 0] = y
 
     return ts_shift
+
+def linear_bm(ts):
+    """Generate a linear flow duration as a benchmark.
+
+    Parameters
+    ----------
+    ts : dataframe
+        Observed time series
+
+    Returns
+    ----------
+    ts_lin: dataframe
+        Smoothed time series
+    """
+    obs_sim = pd.DataFrame(index=ts.index, columns=['Qobs', 'Qsim'])
+    obs_sim.iloc[:, 0] = ts.iloc[:, 0]
+    # sort values by descending order
+    obs_sort = obs_sim.sort_values(by='Qobs', ascending=False)
+    nn = len(obs_sim.index)
+    qmax = np.max(obs_sim.iloc[:, 0].values)
+    qmin = np.min(obs_sim.iloc[:, 0].values)
+    # linearly interpolated array
+    lin_arr = np.linspace(qmin, qmax, nn)
+    obs_sort.iloc[:, 1] = lin_arr
+    # sort by index
+    obs_sim = obs_sort.sort_index()
+    ts_lin = obs_sim.iloc[:, 1].copy().to_frame()
+
+    return ts_lin

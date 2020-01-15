@@ -65,9 +65,9 @@ def import_ts(path, sep=','):
 
     return df_ts
 
-def import_camels_ts(path, sep=r"\s+", catch_area=619.11):
+def import_camels_ts(path, sep=r"\s+", catch_area=None):
     """
-    Import .csv-file with streamflow time series from CAMELS dataset (cubic feet
+    Import .txt-file with streamflow time series from CAMELS dataset (cubic feet
     per second).
 
     Parameters
@@ -76,7 +76,7 @@ def import_camels_ts(path, sep=r"\s+", catch_area=619.11):
         Path to .csv-file which contains time series
 
     sep : str, optional
-        Delimeter to use. The default is ‘;’.
+        Delimeter to use. The default is r"\s+".
 
     catch_area : float, optional
         catchment area in km2 to convert runoff to mm/day
@@ -86,7 +86,10 @@ def import_camels_ts(path, sep=r"\s+", catch_area=619.11):
     df_ts : dataframe
         Imported time series in m3/s
     """
-    df_ts = pd.read_csv(path, sep=sep, na_values=-999, header=None, parse_dates=[[1,2,3]], index_col=0)
+    if catch_area is None:
+        raise ValueError("Value for catchment area is missing")
+    df_ts = pd.read_csv(path, sep=sep, na_values=-999, header=None,
+                        parse_dates=[[1, 2, 3]], index_col=0)
     df_ts.drop(df_ts.columns[[0, 2]], axis=1, inplace=True)
     df_ts.columns = ['Qobs']
     df_ts = df_ts.dropna()
@@ -100,8 +103,8 @@ def import_camels_ts(path, sep=r"\s+", catch_area=619.11):
 
 def import_camels_obs_sim(path, sep=r"\s+"):
     """
-    Import .csv-file with streamflow time series from CAMELS dataset (cubic feet
-    per second).
+    Import .txt-file containing observed and simulated streamflow time series
+    from CAMELS dataset (cubic feet per second).
 
     Parameters
     ----------
@@ -130,7 +133,7 @@ def plot_ts(ts):
     Parameters
     ----------
     ts : dataframe
-        Dataframe with time series
+        Dataframe which contains time series
     """
     fig, ax = plt.subplots()
     ax.plot(ts.index, ts.iloc[:, 0].values, color='blue')
@@ -158,7 +161,8 @@ def plot_obs_sim(obs, sim):
     """
     fig, ax = plt.subplots()
     ax.plot(obs.index, obs, lw=2, color='blue')  # observed time series
-    ax.plot(sim.index, sim, lw=1, ls='-.', color='red', alpha=.8)  # simulated time series
+    # simulated time series
+    ax.plot(sim.index, sim, lw=1, ls='-.', color='red', alpha=.8)
     ax.set(ylabel=_q_lab, xlabel='Time')
     ax.set_ylim(0, )
     ax.set_xlim(obs.index[0], obs.index[-1])
@@ -290,8 +294,10 @@ def plot_obs_sim_ax(obs, sim, ax, fig_num):
     fig_num : string
         string object for figure caption
     """
-    ax.plot(obs.index, obs, lw=2, color='blue', label='Observed')  # observed time series
-    ax.plot(sim.index, sim, lw=1, ls='-.', color='red', alpha=.8, label='Manipulated')  # simulated time series
+    # observed time series
+    ax.plot(obs.index, obs, lw=2, color='blue', label='Observed')
+    ax.plot(sim.index, sim, lw=1, ls='-.', color='red', alpha=.8,
+            label='Manipulated')  # simulated time series
     ax.set_ylim(0, )
     ax.set_xlim(obs.index[0], obs.index[-1])
     ax.text(.96, .95, fig_num, transform=ax.transAxes, ha='right', va='top')
@@ -549,9 +555,9 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
     ax.set(ylabel=r'[$m^{3}$ $s^{-1}$]',
            xlabel='Time [Days]')
 
-def vis2d_de_nn_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
-                         lim=0.05):
-    """Multiple polar plot of non-normalized Diagnostic-Efficiency (DE)
+def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
+                      lim=0.05, ax_lim=-.6):
+    """Multiple polar plot of Diagnostic-Efficiency (DE)
 
     Parameters
     ----------
@@ -566,9 +572,6 @@ def vis2d_de_nn_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
 
     sig_de : (N,)array_like
         diagnostic efficiency as 1-D array
-
-    de_mfb : (N,)array_like
-        mean flow benchmark of diagnostic efficiency as 1-D array
 
     b_dir : (N,)array_like
         direction of bias as 1-D array
@@ -598,30 +601,13 @@ def vis2d_de_nn_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
     ll_temp_cor = temp_cor.tolist()
 
     # convert temporal correlation to color
-    norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
+    norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
 
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if sig_min > 0:
-        ax_lim = sig_min - .1
-        ax_lim = np.around(ax_lim, decimals=1)
-        yy = np.arange(ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(ax_lim+.1, 1.1, .1)
-    elif sig_min >= 0:
-        ax_lim = 0.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(0, 1, .2)
-    elif sig_min < 0 and sig_min >= -1:
-        ax_lim = 1.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-1, 1, .2)
-    elif sig_min >= -2 and sig_min < -1:
-        ax_lim = 2.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(2, 1, .2)
-    elif sig_min < -2:
-        raise AssertionError("Some values of 'DE' are too low for visualization!", sig_min)
+    yy = np.arange(ax_lim, 1.01, delta)[::-1]
+    c_levels = np.arange(ax_lim, 1, .2)
 
     len_yy = 360
     # len_yy1 = 90
@@ -658,8 +644,8 @@ def vis2d_de_nn_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
                            subplot_kw=dict(projection='polar'),
                            constrained_layout=True)
     # dummie plot for colorbar of temporal correlation
-    cs = np.arange(-1, 1.1, 0.1)
-    dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+    cs = np.arange(0, 1.1, 0.1)
+    dummie_cax = ax.scatter(cs, cs, c=cs, cmap='plasma_r')
     # Clear axis
     ax.cla()
     # # contours positive constant offset
@@ -685,7 +671,7 @@ def vis2d_de_nn_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
         # slope of bias
         b_slope = de.calc_bias_slope(ba, bd)
         # convert temporal correlation to color
-        rgba_color = cm.YlGnBu(norm(r))
+        rgba_color = cm.plasma_r(norm(r))
         # relation of b_dir which explains the error
         if abs(ba) > 0:
             exp_err = (abs(bd) * 2)/abs(ba)
@@ -725,10 +711,7 @@ def vis2d_de_nn_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
                         ha='center', va='center')
     ax.set_rticks([])  # turn default ticks off
     ax.set_rmin(1)
-    if sig_min > 0:
-        ax.set_rmax(ax_lim)
-    elif sig_min <= 0:
-        ax.set_rmax(-ax_lim)
+    ax.set_rmax(ax_lim)
     ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                   labelbottom=True, grid_alpha=.01)  # turn labels and grid off
     ax.set_xticklabels(['', '', '', '', '', '', '', ''])
@@ -762,16 +745,16 @@ def vis2d_de_nn_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
             transform=ax.transAxes)
     # add colorbar for temporal correlation
     cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
-                        ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+                        ticks=[1, 0.5, 0], shrink=0.8)
     cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
-    cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
+    cbar.set_ticklabels(['1', '0.5', '<0'])
     cbar.ax.tick_params(direction='in', labelsize=10)
 
     return fig
 
-def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag, fc,
+def vis2d_deb_multi_fc(brel_mean, b_area, temp_cor, sig_de, sig_de_bench, b_dir, diag, fc,
                       lim=0.05):
-    """Multiple polar plot of Diagnostic-Efficiency (DE)
+    """Multiple polar plot of benchmarked Diagnostic-Efficiency (DEB)
 
     Parameters
     ----------
@@ -787,8 +770,8 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag, 
     sig_de : (N,)array_like
         diagnostic efficiency as 1-D array
 
-    de_mfb : (N,)array_like
-        mean flow benchmark of diagnostic efficiency as 1-D array
+    sig_de_bench : (N,)array_like
+        benchmark of diagnostic efficiency as 1-D array
 
     b_dir : (N,)array_like
         direction of bias as 1-D array
@@ -814,12 +797,12 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag, 
     ll_b_dir = b_dir.tolist()
     ll_b_area = b_area.tolist()
     ll_sig = sig_de.tolist()
-    ll_mfb = de_mfb.tolist()
+    ll_bench = sig_de_bench.tolist()
     ll_diag = diag.tolist()
     ll_temp_cor = temp_cor.tolist()
 
     # convert temporal correlation to color
-    norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
+    norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
 
     delta = 0.01  # for spacing
 
@@ -879,8 +862,8 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag, 
                            subplot_kw=dict(projection='polar'),
                            constrained_layout=True)
     # dummie plot for colorbar of temporal correlation
-    cs = np.arange(-1, 1.1, 0.1)
-    dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+    cs = np.arange(0, 1.1, 0.1)
+    dummie_cax = ax.scatter(cs, cs, c=cs, cmap='plasma_r')
     # Clear axis
     ax.cla()
     # # contours positive constant offset
@@ -902,13 +885,13 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag, 
     # threshold efficiency for FBM
     sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
     # loop over each data point
-    for (bm, bd, ba, r, sig, mfb, ang, txt) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_mfb, ll_diag, fc):
+    for (bm, bd, ba, r, sig, sig_bench, ang, txt) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_bench, ll_diag, fc):
         # normalizing the threshold efficiency
-        sig_lim_norm = (sig_lim - mfb)/(1 - mfb)
+        sig_lim_norm = (sig_lim - sig_bench)/(1 - sig_bench)
         # slope of bias
         b_slope = de.calc_bias_slope(ba, bd)
         # convert temporal correlation to color
-        rgba_color = cm.YlGnBu(norm(r))
+        rgba_color = cm.plasma_r(norm(r))
         # relation of b_dir which explains the error
         if abs(ba) > 0:
             exp_err = (abs(bd) * 2)/abs(ba)
@@ -985,15 +968,15 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, de_mfb, b_dir, diag, 
             transform=ax.transAxes)
     # add colorbar for temporal correlation
     cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
-                        ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+                        ticks=[1, 0.5, 0], shrink=0.8)
     cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
-    cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
+    cbar.set_ticklabels(['1', '0.5', '<0'])
     cbar.ax.tick_params(direction='in', labelsize=10)
 
     return fig
 
-def vis2d_kge_norm_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc):
-    """Multiple polar plot of normalized Kling-Gupta Efficiency (KGE_norm)
+def vis2d_kge_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc, ax_lim=-.6):
+    """Multiple polar plot of Kling-Gupta Efficiency (KGE)
 
     Parameters
     ----------
@@ -1012,39 +995,21 @@ def vis2d_kge_norm_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc):
     fc : list
         figure captions
     """
-    sig_norm = (sig_kge - (-.41))/(1 - (-.41))
-    sig_min = np.min(sig_norm)
+    sig_min = np.min(sig_kge)
 
     ll_kge_beta = kge_beta.tolist()
     ll_ag = alpha_or_gamma.tolist()
     ll_kge_r = kge_r.tolist()
-    ll_sig = sig_norm.tolist()
+    ll_sig = sig_kge.tolist()
 
     # convert temporal correlation to color
-    norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
+    norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
 
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if sig_min > 0:
-        ax_lim = sig_min - .1
-        ax_lim = np.around(ax_lim, decimals=1)
-        yy = np.arange(ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(ax_lim+.1, 1.1, .1)
-    elif sig_min >= 0:
-        ax_lim = 0.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(0, 1, .2)
-    elif sig_min < 0 and sig_min >= -1:
-        ax_lim = 1.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-1, 1, .2)
-    elif sig_min >= -2 and sig_min < -1:
-        ax_lim = 2.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-2, 1, .2)
-    elif sig_min < -2:
-        raise AssertionError("Some values of 'KGE' are too low for visualization!", sig_min)
+    yy = np.arange(ax_lim, 1.01, delta)[::-1]
+    c_levels = np.arange(ax_lim, 1, .2)
 
     len_yy = 360
     # len_yy1 = 90
@@ -1081,8 +1046,8 @@ def vis2d_kge_norm_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc):
                            subplot_kw=dict(projection='polar'),
                            constrained_layout=True)
     # dummie plot for colorbar of temporal correlation
-    cs = np.arange(-1, 1.1, 0.1)
-    dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+    cs = np.arange(0, 1.1, 0.1)
+    dummie_cax = ax.scatter(cs, cs, c=cs, cmap='plasma_r')
     # Clear axis
     ax.cla()
     # # contours positive constant offset
@@ -1105,7 +1070,7 @@ def vis2d_kge_norm_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc):
     for (b, ag, r, sig, txt) in zip(ll_kge_beta, ll_ag, ll_kge_r, ll_sig, fc):
         ang = np.arctan2(b - 1, ag - 1)
         # convert temporal correlation to color
-        rgba_color = cm.YlGnBu(norm(r))
+        rgba_color = cm.plasma_r(norm(r))
         c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
         ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                     xytext=(8, 0), textcoords="offset points",
@@ -1135,15 +1100,12 @@ def vis2d_kge_norm_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc):
     ax.set_xticklabels(['', '', '', '', '', '', '', ''])
     ax.set_rticks([])  # turn default ticks off
     ax.set_rmin(1)
-    if sig_min > 0:
-        ax.set_rmax(ax_lim)
-    elif sig_min <= 0:
-        ax.set_rmax(-ax_lim)
+    ax.set_rmax(ax_lim)
     # add colorbar for temporal correlation
     cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
-                        ticks=[1, 0.5, 0, -0.5, -1], shrink=0.8)
+                        ticks=[1, 0.5, 0], shrink=0.8)
     cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
-    cbar.set_ticklabels(['1', '0.5', '0', '-0.5', '-1'])
+    cbar.set_ticklabels(['1', '0.5', '<0'])
     cbar.ax.tick_params(direction='in', labelsize=10)
 
     return fig

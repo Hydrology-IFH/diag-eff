@@ -54,7 +54,7 @@ def calc_temp_cor(obs, sim, r='pearson'):
     Returns
     ----------
     temp_cor : float
-        Rank correlation between observed and simulated time series
+        correlation between observed and simulated time series
 
     Examples
     --------

@@ -31,8 +31,8 @@ PyPI:
 
 ```bash
 pip install de
-```  
-  
+```
+
 
 GIT:
 
@@ -54,7 +54,9 @@ df_ts = util.import_ts(path, sep=';')
 obs_arr = df_ts['Qobs'].values
 sim_arr = df_ts['Qsim'].values
 
+# calculate diagnostic efficiency
 sig_de = de.calc_de(obs_arr, sim_arr)
 
+# diagnostic polar plot
 de.vis2d_de(obs_arr, sim_arr)
 ```
