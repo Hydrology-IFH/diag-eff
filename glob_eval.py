@@ -21,6 +21,8 @@ from de import util
 if __name__ == "__main__":
     # RunTimeWarning will not be displayed (division by zeros or NaN values)
     np.seterr(divide='ignore', invalid='ignore')
+    
+    tier = 'wrr2/'
 
     # define operation system
     # 'win' = windows machine, 'unix_local' = local unix machine, 'unix' = acces data with unix machine from file server
@@ -29,19 +31,19 @@ if __name__ == "__main__":
         # windows directories
         db_Qobs_meta_dir = '//fuhys013/Schwemmle/Data/Runoff/observed/' \
                            'summary_near_nat.csv'
-        Q_dir = '//fuhys013/Schwemmle/Data/Runoff/Q_paired/wrr2/'
+        Q_dir = '//fuhys013/Schwemmle/Data/Runoff/Q_paired/%s' % (tier)
 
     elif OS == 'unix_server':
         # unix directories server
         db_Qobs_meta_dir = '/Volumes/Schwemmle/Data/Runoff/observed/' \
                            'summary_near_nat.csv'
-        Q_dir = '/Volumes/Schwemmle/Data/Runoff/Q_paired/wrr2/'
+        Q_dir = '/Volumes/Schwemmle/Data/Runoff/Q_paired/%s' % (tier)
 
     elif OS == 'unix_local':
         # unix directories local
         db_Qobs_meta_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data'\
                            '/Runoff/observed/summary_near_nat.csv'
-        Q_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data/Runoff/Q_paired/wrr2/'
+        Q_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data/Runoff/Q_paired/%s' % (tier)
 
     df_meta = pd.read_csv(db_Qobs_meta_dir, sep=',', na_values=-9999, index_col=0)
     ll_catchs = os.listdir(Q_dir)
@@ -54,14 +56,12 @@ if __name__ == "__main__":
     meta['brel_mean'] = np.nan
     meta['b_area'] = np.nan
     meta['temp_cor'] = np.nan
-    meta['de_nn'] = np.nan
     meta['de'] = np.nan
-    meta['mfb'] = np.nan
     meta['b_dir'] = np.nan
     meta['b_slope'] = np.nan
     meta['diag'] = np.nan
 
-    meta['kge_norm'] = np.nan
+    meta['kge'] = np.nan
     meta['alpha'] = np.nan
     meta['beta'] = np.nan
 
@@ -100,44 +100,41 @@ if __name__ == "__main__":
             # temporal correlation
             temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
             meta.iloc[i, 5] = temp_cor
-            # non-normalized diagnostic efficiency
-            meta.iloc[i, 6] = 1 - np.sqrt((brel_mean)**2 + (b_area)**2 + (temp_cor - 1)**2)
             # diagnostic efficiency
-            meta.iloc[i, 7] = de.calc_de(obs_arr, sim_arr)
-            # mean flow benchmark of diagnostic efficiency
-            meta.iloc[i, 8] = de.calc_de_mfb(obs_arr)
+            meta.iloc[i, 6] = de.calc_de(obs_arr, sim_arr)
             # direction of bias
             b_dir = de.calc_bias_dir(brel_rest)
-            meta.iloc[i, 9] = b_dir
+            meta.iloc[i, 7] = b_dir
             # slope of bias
             b_slope = de.calc_bias_slope(b_area, b_dir)
-            meta.iloc[i, 10] = b_slope
+            meta.iloc[i, 8] = b_slope
             # convert to radians
             # (y, x) Trigonometric inverse tangent
-            meta.iloc[i, 11] = np.arctan2(brel_mean, b_slope)
+            meta.iloc[i, 9] = np.arctan2(brel_mean, b_slope)
 
             # KGE
-            meta.iloc[i, 12] = kge.calc_kge_norm(obs_arr, sim_arr)
+            meta.iloc[i, 10] = kge.calc_kge(obs_arr, sim_arr)
             # KGE alpha
-            meta.iloc[i, 13] = kge.calc_kge_alpha(obs_arr, sim_arr)
+            meta.iloc[i, 11] = kge.calc_kge_alpha(obs_arr, sim_arr)
             # KGE beta
-            meta.iloc[i, 14] = kge.calc_kge_beta(obs_arr, sim_arr)
+            meta.iloc[i, 12] = kge.calc_kge_beta(obs_arr, sim_arr)
 
             # NSE
-            meta.iloc[i, 15] = nse.calc_nse(obs_arr, sim_arr)
+            meta.iloc[i, 13] = nse.calc_nse(obs_arr, sim_arr)
 
             # mean, std, min and max of obs
-            meta.iloc[i, 16] = np.mean(obs_arr)
-            meta.iloc[i, 17] = np.std(obs_arr)
-            meta.iloc[i, 18] = np.std(obs_arr)/np.mean(obs_arr)
-            meta.iloc[i, 19] = np.min(obs_arr)
-            meta.iloc[i, 20] = np.max(obs_arr)
-            meta.iloc[i, 21] = sp.stats.skew(obs_arr)
-            meta.iloc[i, 22] = sp.stats.kurtosis(obs_arr)
+            meta.iloc[i, 14] = np.mean(obs_arr)
+            meta.iloc[i, 15] = np.std(obs_arr)
+            meta.iloc[i, 16] = np.std(obs_arr)/np.mean(obs_arr)
+            meta.iloc[i, 17] = np.min(obs_arr)
+            meta.iloc[i, 18] = np.max(obs_arr)
+            meta.iloc[i, 19] = sp.stats.skew(obs_arr)
+            meta.iloc[i, 20] = sp.stats.kurtosis(obs_arr)
             pbar.update(1)
 
         # remove outliers
-        meta = meta[(meta['de_nn'] >= -1) & (meta['kge_norm'] >= -1)]
+        meta_all = meta.copy()
+        meta = meta[(meta['de'] >= -1) & (meta['kge'] >= -1)]
 
         # make arrays
         brel_mean_arr = meta['brel_mean'].values
@@ -145,21 +142,20 @@ if __name__ == "__main__":
         temp_cor_arr = meta['temp_cor'].values
         b_dir_arr = meta['b_dir'].values
         sig_de_arr = meta['de'].values
-        mfb_arr = meta['mfb'].values
         diag_arr = meta['diag'].values
         b_slope_arr = meta['b_slope'].values
 
         # multi polar plot
         de.vis2d_de_multi(brel_mean_arr, b_area_arr, temp_cor_arr, sig_de_arr,
-                          mfb_arr, b_dir_arr, diag_arr, extended=True)
+                          b_dir_arr, diag_arr, extended=True)
 
         # make arrays
         alpha_arr = meta['alpha'].values
         beta_arr = meta['beta'].values
-        kge_arr = meta['kge_norm'].values
+        kge_arr = meta['kge'].values
 
         # multi KGE plot
-        kge.vis2d_kge_norm_multi(beta_arr, alpha_arr, temp_cor_arr, kge_arr, extended=True)
+        kge.vis2d_kge_multi(beta_arr, alpha_arr, temp_cor_arr, kge_arr, extended=True)
 
         # global map
         x = meta['lon'].values
@@ -192,7 +188,8 @@ if __name__ == "__main__":
 #        cbar.ax.xaxis.set_label_position('top')
 #        cbar.ax.xaxis.set_ticks_position('top')
 #        fig.tight_layout(rect=[0, .13, 1, 1])
-#        fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/de_glob.png', dpi=250)
+#        fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/%sde_glob.png' % (tier)
+#        fig.savefig(fig_path, dpi=250)
 #
 #        # EU map visualizing the spatial distribution of DE
 #        fig, ax = plt.subplots(figsize=(12, 6))
@@ -208,7 +205,8 @@ if __name__ == "__main__":
 #        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
 #                     scale=2, scale_units='inches', angles='xy', norm=norm)
 #        fig.tight_layout(rect=[0, .13, 1, 1])
-#        fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/de_eu.png', dpi=250)
+#        fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/%sde_eu.png' % (tier)
+#        fig.savefig(fig_path, dpi=250)
 #
 #
 #        # US map visualizing the spatial distribution of DE
@@ -225,7 +223,8 @@ if __name__ == "__main__":
 #        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, z, cmap='Reds_r',
 #                     scale=2, scale_units='inches', angles='xy', norm=norm)
 #        fig.tight_layout(rect=[0, .13, 1, 1])
-#        fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/de_us.png', dpi=250)
+#        fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/%sde_us.png' % (tier)
+#        fig.savefig(fig_path, dpi=250)
 #
         # global map with outsets
         fig = plt.figure(figsize=(10, 10))
@@ -301,4 +300,5 @@ if __name__ == "__main__":
                      norm=norm)
 
         fig.tight_layout(rect=[0, .13, 1, 1])
-        fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/de_glob_us_eu.png', dpi=250)
+        fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/%sde_glob_us_eu.png' % (tier)
+        fig.savefig(fig_path, dpi=250)

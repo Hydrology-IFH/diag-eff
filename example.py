@@ -868,7 +868,7 @@ if __name__ == "__main__":
     df_es_cam.iloc[0, 6] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es_cam.iloc[0, 7] = kge.calc_kge_norm(obs_arr, sim_arr)
+    df_es_cam.iloc[0, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es_cam.iloc[0, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
@@ -904,7 +904,7 @@ if __name__ == "__main__":
     df_es_cam.iloc[1, 6] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es_cam.iloc[1, 7] = kge.calc_kge_norm(obs_arr, sim_arr)
+    df_es_cam.iloc[1, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es_cam.iloc[1, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta
@@ -940,7 +940,7 @@ if __name__ == "__main__":
     df_es_cam.iloc[2, 6] = np.arctan2(brel_mean, b_slope)
 
     # KGE
-    df_es_cam.iloc[2, 7] = kge.calc_kge_norm(obs_arr, sim_arr)
+    df_es_cam.iloc[2, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es_cam.iloc[2, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE beta

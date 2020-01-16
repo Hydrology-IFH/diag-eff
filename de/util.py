@@ -167,6 +167,39 @@ def plot_obs_sim(obs, sim):
     ax.set_ylim(0, )
     ax.set_xlim(obs.index[0], obs.index[-1])
 
+def fdc_obs_sim(obs, sim):
+    """Plotting the flow duration curves of two hydrologic time series (e.g.
+    observed streamflow and simulated streamflow).
+
+    Parameters
+    ----------
+    obs : series
+        observed time series
+    sim : series
+        simulated time series
+    """
+    obs_sim = pd.DataFrame(index=obs.index, columns=['obs', 'sim'])
+    obs_sim.loc[:, 'obs'] = obs.values
+    obs_sim.loc[:, 'sim'] = sim.values
+    obs = obs_sim.sort_values(by=['obs'], ascending=True)
+    sim = obs_sim.sort_values(by=['sim'], ascending=True)
+
+    # calculate exceedence probability
+    ranks_obs = sp.stats.rankdata(obs['obs'], method='ordinal')
+    ranks_obs = ranks_obs[::-1]
+    prob_obs = [(ranks_obs[i]/(len(obs['obs'])+1)) for i in range(len(obs['obs']))]
+
+    ranks_sim = sp.stats.rankdata(sim['sim'], method='ordinal')
+    ranks_sim = ranks_sim[::-1]
+    prob_sim = [(ranks_sim[i]/(len(sim['sim'])+1)) for i in range(len(sim['sim']))]
+
+    fig, ax = plt.subplots()
+    ax.plot(prob_obs, obs['obs'], lw=2, color='blue', alpha=.5, label='Observed')
+    ax.plot(prob_sim, sim['sim'], lw=2, ls='-.', color='red', label='Manipulated')
+    ax.set(yscale='log', ylabel=_q_lab, xlabel='Exceedence probabilty [-]')
+    ax.set_ylim(0, )
+    ax.set_xlim(0, 1)
+
 def sort_obs(ts):
     """
     Sort time series by observed values.
@@ -556,7 +589,7 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
            xlabel='Time [Days]')
 
 def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
-                      lim=0.05, ax_lim=-.6):
+                      l=0.05, ax_lim=-.6):
     """Multiple polar plot of Diagnostic-Efficiency (DE)
 
     Parameters
@@ -582,7 +615,7 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
     fc : list
         figure captions
 
-    lim : float, optional
+    l : float, optional
         Threshold for which diagnosis can be made. The default is 0.05.
 
     Notes
@@ -665,7 +698,7 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
     cl = ax.clabel(cp, inline=False, fontsize=10, fmt='%1.1f',
                    colors='dimgrey')
     # threshold efficiency for FBM
-    sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
+    sig_l = 1 - np.sqrt((l)**2 + (l)**2 + (l)**2)
     # loop over each data point
     for (bm, bd, ba, r, sig, ang, txt) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_diag, fc):
         # slope of bias
@@ -679,33 +712,37 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
             exp_err = 0
 
         # diagnose the error
-        if abs(bm) <= lim and exp_err > lim and sig <= sig_lim:
-            c = ax.scatter(ang, sig, color=rgba_color, zorder=3)
+        if abs(bm) <= l and exp_err > l and sig <= sig_l:
+            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
-        elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim:
-            c = ax.scatter(ang, sig, color=rgba_color, zorder=3)
+        elif abs(bm) > l and exp_err <= l and sig <= sig_l:
+            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
-        elif abs(bm) > lim and exp_err > lim and sig <= sig_lim:
-            c = ax.scatter(ang, sig, color=rgba_color, zorder=3)
+        elif abs(bm) > l and exp_err > l and sig <= sig_l:
+            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
         # FBM
-        elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim:
+        elif abs(bm) <= l and exp_err <= l and sig <= sig_l:
             ax.annotate("", xytext=(0, 1), xy=(0, sig),
-                        arrowprops=dict(facecolor=rgba_color), zorder=2)
+                        arrowprops=dict(edgecolor=rgba_color, facecolor='black', lw=3), zorder=2)
             ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
-                        arrowprops=dict(facecolor=rgba_color), zorder=2)
+                        arrowprops=dict(edgecolor=rgba_color, facecolor='black', lw=3), zorder=2)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
         # FGM
-        elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim:
-            c = ax.scatter(ang, sig, color=rgba_color, zorder=3)
+        elif abs(bm) <= l and exp_err <= l and sig > sig_l:
+            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-6, 0), textcoords="offset points",
                         ha='center', va='center')
@@ -753,7 +790,7 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
     return fig
 
 def vis2d_deb_multi_fc(brel_mean, b_area, temp_cor, sig_de, sig_de_bench, b_dir, diag, fc,
-                      lim=0.05):
+                      l=0.05):
     """Multiple polar plot of benchmarked Diagnostic-Efficiency (DEB)
 
     Parameters
@@ -782,7 +819,7 @@ def vis2d_deb_multi_fc(brel_mean, b_area, temp_cor, sig_de, sig_de_bench, b_dir,
     fc : list
         figure captions
 
-    lim : float, optional
+    l : float, optional
         Threshold for which diagnosis can be made. The default is 0.05.
 
     Notes
@@ -883,11 +920,11 @@ def vis2d_deb_multi_fc(brel_mean, b_area, temp_cor, sig_de, sig_de_bench, b_dir,
     cl = ax.clabel(cp, inline=False, fontsize=10, fmt='%1.1f',
                    colors='dimgrey')
     # threshold efficiency for FBM
-    sig_lim = 1 - np.sqrt((lim)**2 + (lim)**2 + (lim)**2)
+    sig_l = 1 - np.sqrt((l)**2 + (l)**2 + (l)**2)
     # loop over each data point
     for (bm, bd, ba, r, sig, sig_bench, ang, txt) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_bench, ll_diag, fc):
         # normalizing the threshold efficiency
-        sig_lim_norm = (sig_lim - sig_bench)/(1 - sig_bench)
+        sig_lim_norm = (sig_l - sig_bench)/(1 - sig_bench)
         # slope of bias
         b_slope = de.calc_bias_slope(ba, bd)
         # convert temporal correlation to color
@@ -899,33 +936,37 @@ def vis2d_deb_multi_fc(brel_mean, b_area, temp_cor, sig_de, sig_de_bench, b_dir,
             exp_err = 0
 
         # diagnose the error
-        if abs(bm) <= lim and exp_err > lim and sig <= sig_lim_norm:
-            c = ax.scatter(ang, sig, color=rgba_color, zorder=3)
+        if abs(bm) <= l and exp_err > l and sig <= sig_lim_norm:
+            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
-        elif abs(bm) > lim and exp_err <= lim and sig <= sig_lim_norm:
-            c = ax.scatter(ang, sig, color=rgba_color, zorder=3)
+        elif abs(bm) > l and exp_err <= l and sig <= sig_lim_norm:
+            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
-        elif abs(bm) > lim and exp_err > lim and sig <= sig_lim_norm:
-            c = ax.scatter(ang, sig, color=rgba_color, zorder=3)
+        elif abs(bm) > l and exp_err > l and sig <= sig_lim_norm:
+            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
         # FBM
-        elif abs(bm) <= lim and exp_err <= lim and sig <= sig_lim_norm:
+        elif abs(bm) <= l and exp_err <= l and sig <= sig_lim_norm:
             ax.annotate("", xytext=(0, 1), xy=(0, sig),
-                        arrowprops=dict(facecolor=rgba_color), zorder=2)
+                        arrowprops=dict(edgecolor=rgba_color, facecolor='black', lw=3), zorder=2)
             ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
-                        arrowprops=dict(facecolor=rgba_color), zorder=2)
+                        arrowprops=dict(edgecolor=rgba_color, facecolor='black', lw=3), zorder=2)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
         # FGM
-        elif abs(bm) <= lim and exp_err <= lim and sig > sig_lim_norm:
-            c = ax.scatter(ang, sig, color=rgba_color, zorder=3)
+        elif abs(bm) <= l and exp_err <= l and sig > sig_lim_norm:
+            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-6, 0), textcoords="offset points",
                         ha='center', va='center')
@@ -1071,7 +1112,8 @@ def vis2d_kge_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc, ax_lim=-.6)
         ang = np.arctan2(b - 1, ag - 1)
         # convert temporal correlation to color
         rgba_color = cm.plasma_r(norm(r))
-        c = ax.scatter(ang, sig, color=rgba_color, zorder=2)
+        c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=2)
+        d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
         ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                     xytext=(8, 0), textcoords="offset points",
                     ha='center', va='center')
