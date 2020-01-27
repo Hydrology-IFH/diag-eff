@@ -40,7 +40,7 @@ setup(
 
     url='https://github.com/schwemro/de',
 
-    author='Robin Schwemmle, Markus Weiler, Dominic Demand, Andreas Hartmann',
+    author='Robin Schwemmle, Dominic Demand, Markus Weiler',
     author_email='robin.schwemmle@hydrology.uni-freiburg.de',
 
     license='GPLv3',
