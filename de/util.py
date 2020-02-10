@@ -328,8 +328,8 @@ def plot_obs_sim_ax(obs, sim, ax, fig_num):
         string object for figure caption
     """
     # observed time series
-    ax.plot(obs.index, obs, lw=2, color='blue', label='Observed')
-    ax.plot(sim.index, sim, lw=1, ls='-.', color='red', alpha=.8,
+    ax.plot(obs.index, obs, lw=2, color='blue', label='Observed', alpha=.8)
+    ax.plot(sim.index, sim, lw=1.5, ls='-.', color='red', alpha=.9,
             label='Manipulated')  # simulated time series
     ax.set_ylim(0, )
     ax.set_xlim(obs.index[0], obs.index[-1])

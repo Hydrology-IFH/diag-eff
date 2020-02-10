@@ -668,8 +668,8 @@ def vis2d_de(obs, sim, sort=True, l=0.05, extended=False):
                                subplot_kw=dict(projection='polar'),
                                constrained_layout=True)
         # dummie plot for colorbar of temporal correlation
-        cs = np.arange(-1, 1.1, 0.1)
-        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+        cs = np.arange(0, 1.1, 0.1)
+        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='plasma_r')
         # Clear axis
         ax.cla()
         # plot regions
@@ -757,8 +757,8 @@ def vis2d_de(obs, sim, sort=True, l=0.05, extended=False):
         ax = fig.add_subplot(gs[0, 0], projection='polar')
         ax1 = fig.add_axes([.65, .3, .33, .33], frameon=True)
         # dummie plot for colorbar of temporal correlation
-        cs = np.arange(-1, 1.1, 0.1)
-        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+        cs = np.arange(0, 1.1, 0.1)
+        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='plasma_r')
         # Clear axis
         ax.cla()
         # plot regions
@@ -1659,8 +1659,8 @@ def vis2d_deb_multi(brel_mean, b_area, temp_cor, sig_de, sig_de_bench, b_dir, di
             ax = fig.add_subplot(gs[0, 0], projection='polar')
             ax1 = fig.add_axes([.66, .3, .32, .32], frameon=True)
             # dummie plot for colorbar of temporal correlation
-            cs = np.arange(-1, 1.1, 0.1)
-            dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+            cs = np.arange(0, 1.1, 0.1)
+            dummie_cax = ax.scatter(cs, cs, c=cs, cmap='plasma_r')
             # Clear axis
             ax.cla()
             # plot regions
@@ -2043,8 +2043,8 @@ def diag_polar_plot_multi(eff, comp1, comp2, comp3, l=0.05, extended=True):
                                subplot_kw=dict(projection='polar'),
                                constrained_layout=True)
         # dummie plot for colorbar of temporal correlation
-        cs = np.arange(-1, 1.1, 0.1)
-        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+        cs = np.arange(0, 1.1, 0.1)
+        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='plasma_r')
         # Clear axis
         ax.cla()
         # plot regions
@@ -2063,7 +2063,7 @@ def diag_polar_plot_multi(eff, comp1, comp2, comp3, l=0.05, extended=True):
             # normalize threshold with mean flow becnhmark
             ang = np.arctan2(c1, c2)
             # convert temporal correlation to color
-            rgba_color = cm.YlGnBu(norm(c3))
+            rgba_color = cm.plasma_r(norm(c3))
             # relation of b_dir which explains the error
             if abs(c2) > 0:
                 exp_err = c2
@@ -2118,8 +2118,8 @@ def diag_polar_plot_multi(eff, comp1, comp2, comp3, l=0.05, extended=True):
         ax = fig.add_subplot(gs[0, 0], projection='polar')
         ax1 = fig.add_axes([.66, .3, .32, .32], frameon=True)
         # dummie plot for colorbar of temporal correlation
-        cs = np.arange(-1, 1.1, 0.1)
-        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='YlGnBu')
+        cs = np.arange(0, 1.1, 0.1)
+        dummie_cax = ax.scatter(cs, cs, c=cs, cmap='plasma_r')
         # Clear axis
         ax.cla()
         # plot regions

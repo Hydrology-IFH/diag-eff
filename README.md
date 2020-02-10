@@ -1,4 +1,4 @@
-# Diagnostic efficiency
+# Diagnostic efficiency <img src="docs/figures/logo.png" align="right" width="120" />
 
 Info: de needs Python >= 3.6!
 

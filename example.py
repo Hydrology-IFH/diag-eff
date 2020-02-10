@@ -840,6 +840,8 @@ if __name__ == "__main__":
 
     fig.subplots_adjust(wspace=0.3)
     fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/ts_fdc_real_case.png', dpi=250)
+    fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/ts_fdc_real_case.pdf', dpi=250)
+
 
     obs_arr = df_cam1['Qobs'].values
     sim_arr = df_cam1['Qsim'].values
