@@ -42,9 +42,9 @@ if __name__ == "__main__":
 
     elif OS == 'unix_local':
         # unix directories local
-        db_Qobs_meta_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data'\
-                           '/Runoff/observed/summary_near_nat.csv'
-        Q_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/Data/Runoff/Q_paired/%s' % (tier)
+        db_Qobs_meta_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/data'\
+                           '/summary_near_nat.csv'
+        Q_dir = '/Users/robinschwemmle/Desktop/MSc_Thesis/data/Runoff/Q_paired/%s' % (tier)
 
     if calc:
         df_meta = pd.read_csv(db_Qobs_meta_dir, sep=',', na_values=-9999, index_col=0)
@@ -149,8 +149,8 @@ if __name__ == "__main__":
     b_slope_arr = meta['b_slope'].values
 
     # multi polar plot
-    de.vis2d_de_multi(brel_mean_arr, b_area_arr, temp_cor_arr, sig_de_arr,
-                      b_dir_arr, diag_arr, extended=True)
+    de.diag_polar_plot_multi(brel_mean_arr, b_area_arr, temp_cor_arr,
+                             sig_de_arr, b_dir_arr, diag_arr, extended=True)
 
     # make arrays
     alpha_arr = meta['alpha'].values
@@ -158,7 +158,8 @@ if __name__ == "__main__":
     kge_arr = meta['kge'].values
 
     # multi KGE plot
-    kge.vis2d_kge_multi(beta_arr, alpha_arr, temp_cor_arr, kge_arr, extended=True)
+    kge.diag_polar_plot_kge_multi(beta_arr, alpha_arr, temp_cor_arr, kge_arr,
+                                  extended=True)
 
     # global map
     x = meta['lon'].values
@@ -384,3 +385,7 @@ if __name__ == "__main__":
     fig.tight_layout(rect=[0, .13, 1, 1])
     fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%sde_r_glob_us_eu.png' % (tier)
     fig.savefig(fig_path, dpi=250)
+
+    meta_eff = meta_all.loc[:, 'brel_mean':'nse'].join(df_meta)
+    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%smeta_eff.csv' % (tier)
+    meta_eff.to_csv(path_csv, sep=';')

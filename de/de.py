@@ -565,8 +565,8 @@ def calc_deb(obs, sim, bench, sort=True):
 
     return sig
 
-def vis2d_de(obs, sim, sort=True, l=0.05, extended=False):
-    """Polar plot of Diagnostic-Efficiency (DE)
+def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
+    """Diagnostic polar plot of Diagnostic efficiency (DE) for a single value
 
     Parameters
     ----------
@@ -602,7 +602,7 @@ def vis2d_de(obs, sim, sort=True, l=0.05, extended=False):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.vis2d_de(obs, sim)
+    >>> de.diag_polar_plot(obs, sim)
     """
     if len(obs) != len(sim):
         raise AssertionError("Arrays are not of equal length!")
@@ -851,9 +851,9 @@ def vis2d_de(obs, sim, sort=True, l=0.05, extended=False):
         ax1.set(ylabel=r'$B_{rest}$ [-]',
                 xlabel='Exceedence probabilty [-]')
 
-def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
+def diag_polar_plot_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                    l=0.05, extended=False):
-    """Multiple polar plot of Diagnostic-Efficiency (DE)
+    """Diagnostic polar plot of Diagnostic efficiency (DE) with multiple values.
 
     Parameters
     ----------
@@ -1176,8 +1176,9 @@ def vis2d_de_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                                       color=colors[i])
         g.fig.tight_layout()
 
-def vis2d_deb(obs, sim, bench, sort=True, l=0.05, extended=False):
-    """Polar plot of benchmarked diagnostic-Efficiency (DEB)
+def bdiag_polar_plot(obs, sim, bench, sort=True, l=0.05, extended=False):
+    """Diagnostic polar plot of benchmarked Diagnostic efficiency (DEB)
+    with a single value
 
     Parameters
     ----------
@@ -1216,7 +1217,7 @@ def vis2d_deb(obs, sim, bench, sort=True, l=0.05, extended=False):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.vis2d_de(obs, sim)
+    >>> de.diag_polar_plot(obs, sim)
     """
     if len(obs) != len(sim):
         raise AssertionError("Arrays are not of equal length!")
@@ -1476,9 +1477,10 @@ def vis2d_deb(obs, sim, bench, sort=True, l=0.05, extended=False):
         ax1.set(ylabel=r'$B_{rest}$ [-]',
                 xlabel='Exceedence probabilty [-]')
 
-def vis2d_deb_multi(brel_mean, b_area, temp_cor, sig_de, sig_de_bench, b_dir, diag,
+def bdiag_polar_plot_multi(brel_mean, b_area, temp_cor, sig_de, sig_de_bench, b_dir, diag,
                    l=0.05, extended=False):
-    """Multiple polar plot of benchmarked Diagnostic Efficiency (DEB)
+    """Diagnostic polar plot of benchmarked Diagnostic efficiency (DEB) with
+    multiple values
 
     Parameters
     ----------
@@ -1808,8 +1810,8 @@ def vis2d_deb_multi(brel_mean, b_area, temp_cor, sig_de, sig_de_bench, b_dir, di
                                           color=colors[i])
             g.fig.tight_layout()
 
-def diag_polar_plot(eff, comp1, comp2, comp3, l=0.05):
-    """Generic diagnostic polar plot
+def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):
+    """Generic diagnostic polar plot with a single value
 
     Parameters
     ----------
@@ -1959,8 +1961,8 @@ def diag_polar_plot(eff, comp1, comp2, comp3, l=0.05):
     cbar.set_ticklabels(['1', '0.5', '<0'])
     cbar.ax.tick_params(direction='in')
 
-def diag_polar_plot_multi(eff, comp1, comp2, comp3, l=0.05, extended=True):
-    """Generic diagnostic polar plot
+def gdiag_polar_plot_multi(eff, comp1, comp2, comp3, l=0.05, extended=True):
+    """Generic diagnostic polar plot with multiple values
 
     Parameters
     ----------

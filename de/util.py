@@ -4,10 +4,7 @@
 """
 de.util
 ~~~~~~~~~~~
-Diagnosing model performance using an efficiency measure based on flow
-duration curve and temoral correlation. The efficiency measure can be
-visualized in 2D-Plot which facilitates decomposing potential error origins
-(model errors vs. input data erros)
+
 :2019 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
@@ -588,7 +585,7 @@ def plot_peaks(ts, max_peak_ts, min_peak_ts):
     ax.set(ylabel=r'[$m^{3}$ $s^{-1}$]',
            xlabel='Time [Days]')
 
-def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
+def diag_polar_plot_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
                       l=0.05, ax_lim=-.6):
     """Multiple polar plot of Diagnostic-Efficiency (DE)
 
@@ -714,19 +711,19 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
         # diagnose the error
         if abs(bm) <= l and exp_err > l and sig <= sig_l:
             c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
+            d = ax.scatter(ang, sig, color='grey', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
         elif abs(bm) > l and exp_err <= l and sig <= sig_l:
             c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
+            d = ax.scatter(ang, sig, color='grey', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
         elif abs(bm) > l and exp_err > l and sig <= sig_l:
             c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
+            d = ax.scatter(ang, sig, color='grey', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-8, 0), textcoords="offset points",
                         ha='center', va='center')
@@ -742,7 +739,7 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
         # FGM
         elif abs(bm) <= l and exp_err <= l and sig > sig_l:
             c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
+            d = ax.scatter(ang, sig, color='grey', marker='.', zorder=4)
             ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                         xytext=(-6, 0), textcoords="offset points",
                         ha='center', va='center')
@@ -789,235 +786,9 @@ def vis2d_de_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc,
 
     return fig
 
-def vis2d_deb_multi_fc(brel_mean, b_area, temp_cor, sig_de, sig_de_bench, b_dir, diag, fc,
-                      l=0.05):
-    """Multiple polar plot of benchmarked Diagnostic-Efficiency (DEB)
-
-    Parameters
-    ----------
-    brel_mean : (N,)array_like
-        relative mean bias as 1-D array
-
-    b_area : (N,)array_like
-        bias area as 1-D array
-
-    temp_cor : (N,)array_like
-        temporal correlation as 1-D array
-
-    sig_de : (N,)array_like
-        diagnostic efficiency as 1-D array
-
-    sig_de_bench : (N,)array_like
-        benchmark of diagnostic efficiency as 1-D array
-
-    b_dir : (N,)array_like
-        direction of bias as 1-D array
-
-    diag : (N,)array_like
-        angle as 1-D array
-
-    fc : list
-        figure captions
-
-    l : float, optional
-        Threshold for which diagnosis can be made. The default is 0.05.
-
-    Notes
-    ----------
-    .. math::
-
-        \varphi = arctan2(\overline{B_{rel}}, B_{slope})
-    """
-    sig_min = np.min(sig_de)
-
-    ll_brel_mean = brel_mean.tolist()
-    ll_b_dir = b_dir.tolist()
-    ll_b_area = b_area.tolist()
-    ll_sig = sig_de.tolist()
-    ll_bench = sig_de_bench.tolist()
-    ll_diag = diag.tolist()
-    ll_temp_cor = temp_cor.tolist()
-
-    # convert temporal correlation to color
-    norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
-
-    delta = 0.01  # for spacing
-
-    # determine axis limits
-    if sig_min > 0:
-        ax_lim = sig_min - .1
-        ax_lim = np.around(ax_lim, decimals=1)
-        yy = np.arange(ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(ax_lim+.1, 1.1, .1)
-    elif sig_min >= 0:
-        ax_lim = 0.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(0, 1, .2)
-    elif sig_min < 0 and sig_min >= -1:
-        ax_lim = 1.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-1, 1, .2)
-    elif sig_min >= -2 and sig_min < -1:
-        ax_lim = 2.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-2, 1, .2)
-    elif sig_min < -2:
-        raise AssertionError("Some values of 'DE' are too low for visualization!", sig_min)
-
-    len_yy = 360
-    # len_yy1 = 90
-
-    # arrays to plot contour lines of DE
-    xx = np.radians(np.linspace(0, 360, len_yy))
-    theta, r = np.meshgrid(xx, yy)
-    #
-    # # arrays to plot contours of positive constant offset
-    # xx1 = np.radians(np.linspace(45, 135, len_yy1))
-    # theta1, r1 = np.meshgrid(xx1, yy)
-    #
-    # # arrays to plot contours of negative constant offset
-    # xx2 = np.radians(np.linspace(225, 315, len_yy1))
-    # theta2, r2 = np.meshgrid(xx2, yy)
-    #
-    # # arrays to plot contours of model errors
-    # xx3 = np.radians(np.linspace(135, 225, len_yy1))
-    # theta3, r3 = np.meshgrid(xx3, yy)
-    #
-    # # arrays to plot contours of model errors
-    # len_yy2 = int(len_yy1/2)
-    # if len_yy != len_yy2 + len_yy2:
-    #     xx0 = np.radians(np.linspace(0, 45, len_yy2+1))
-    # else:
-    #     xx0 = np.radians(np.linspace(0, 45, len_yy2))
-    #
-    # xx360 = np.radians(np.linspace(315, 360, len_yy2))
-    # xx4 = np.concatenate((xx360, xx0), axis=None)
-    # theta4, r4 = np.meshgrid(xx4, yy)
-
-    # diagnostic polar plot
-    fig, ax = plt.subplots(figsize=(6, 6),
-                           subplot_kw=dict(projection='polar'),
-                           constrained_layout=True)
-    # dummie plot for colorbar of temporal correlation
-    cs = np.arange(0, 1.1, 0.1)
-    dummie_cax = ax.scatter(cs, cs, c=cs, cmap='plasma_r')
-    # Clear axis
-    ax.cla()
-    # # contours positive constant offset
-    # cpio = ax.contourf(theta1, r1, r1, cmap='Purples_r', alpha=.2, edgecolors=None, levels=c_levels, zorder=0)
-    # # contours negative constant offset
-    # cpiu = ax.contourf(theta2, r2, r2, cmap='Purples_r', alpha=.2, edgecolors=None, levels=c_levels, zorder=0)
-    # # contours model errors
-    # cpmou = ax.contourf(theta3, r3, r3, cmap='Greys_r', alpha=.2, edgecolors=None, levels=c_levels, zorder=0)
-    # cpmuo = ax.contourf(theta4, r4, r4, cmap='Greys_r', alpha=.2, edgecolors=None, levels=c_levels, zorder=0)
-    # plot regions
-    ax.plot((1, np.deg2rad(45)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
-    ax.plot((1, np.deg2rad(135)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
-    ax.plot((1, np.deg2rad(225)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
-    ax.plot((1, np.deg2rad(315)), (1, np.min(yy)), color='lightgray', linewidth=1.5, ls='--', zorder=0)
-    # contours of DE
-    cp = ax.contour(theta, r, r, colors='darkgray', levels=c_levels, zorder=1)
-    cl = ax.clabel(cp, inline=False, fontsize=10, fmt='%1.1f',
-                   colors='dimgrey')
-    # threshold efficiency for FBM
-    sig_l = 1 - np.sqrt((l)**2 + (l)**2 + (l)**2)
-    # loop over each data point
-    for (bm, bd, ba, r, sig, sig_bench, ang, txt) in zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_bench, ll_diag, fc):
-        # normalizing the threshold efficiency
-        sig_lim_norm = (sig_l - sig_bench)/(1 - sig_bench)
-        # slope of bias
-        b_slope = de.calc_bias_slope(ba, bd)
-        # convert temporal correlation to color
-        rgba_color = cm.plasma_r(norm(r))
-        # relation of b_dir which explains the error
-        if abs(ba) > 0:
-            exp_err = (abs(bd) * 2)/abs(ba)
-        elif abs(ba) == 0:
-            exp_err = 0
-
-        # diagnose the error
-        if abs(bm) <= l and exp_err > l and sig <= sig_lim_norm:
-            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
-            ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
-                        xytext=(-8, 0), textcoords="offset points",
-                        ha='center', va='center')
-        elif abs(bm) > l and exp_err <= l and sig <= sig_lim_norm:
-            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
-            ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
-                        xytext=(-8, 0), textcoords="offset points",
-                        ha='center', va='center')
-        elif abs(bm) > l and exp_err > l and sig <= sig_lim_norm:
-            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
-            ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
-                        xytext=(-8, 0), textcoords="offset points",
-                        ha='center', va='center')
-        # FBM
-        elif abs(bm) <= l and exp_err <= l and sig <= sig_lim_norm:
-            ax.annotate("", xytext=(0, 1), xy=(0, sig),
-                        arrowprops=dict(edgecolor=rgba_color, facecolor='black', lw=3), zorder=2)
-            ax.annotate("", xytext=(0, 1), xy=(np.pi, sig),
-                        arrowprops=dict(edgecolor=rgba_color, facecolor='black', lw=3), zorder=2)
-            ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
-                        xytext=(-8, 0), textcoords="offset points",
-                        ha='center', va='center')
-        # FGM
-        elif abs(bm) <= l and exp_err <= l and sig > sig_lim_norm:
-            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
-            ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
-                        xytext=(-6, 0), textcoords="offset points",
-                        ha='center', va='center')
-    ax.set_rticks([])  # turn default ticks off
-    ax.set_rmin(1)
-    if sig_min > 0:
-        ax.set_rmax(ax_lim)
-    elif sig_min <= 0:
-        ax.set_rmax(-ax_lim)
-    ax.tick_params(labelleft=False, labelright=False, labeltop=False,
-                  labelbottom=True, grid_alpha=.01)  # turn labels and grid off
-    ax.set_xticklabels(['', '', '', '', '', '', '', ''])
-    ax.text(-.14, 0.5, 'High flow overestimation -',
-            va='center', ha='center', rotation=90, rotation_mode='anchor',
-            transform=ax.transAxes)
-    ax.text(-.09, 0.5, 'Low flow underestimation',
-            va='center', ha='center', rotation=90, rotation_mode='anchor',
-            transform=ax.transAxes)
-    ax.text(-.04, 0.5, r'$B_{slope}$ < 0',
-            va='center', ha='center', rotation=90, rotation_mode='anchor',
-            transform=ax.transAxes)
-    ax.text(1.14, 0.5, 'High flow underestimation -',
-            va='center', ha='center', rotation=90, rotation_mode='anchor',
-            transform=ax.transAxes)
-    ax.text(1.09, 0.5, 'Low flow overestimation',
-            va='center', ha='center', rotation=90, rotation_mode='anchor',
-            transform=ax.transAxes)
-    ax.text(1.04, 0.5, r'$B_{slope}$ > 0',
-            va='center', ha='center', rotation=90, rotation_mode='anchor',
-            transform=ax.transAxes)
-    ax.text(.5, -.09, 'Constant negative offset', va='center', ha='center',
-            rotation=0, rotation_mode='anchor', transform=ax.transAxes)
-    ax.text(.5, -.04, r'$\overline{B_{rel}}$ < 0', va='center', ha='center',
-            rotation=0, rotation_mode='anchor', transform=ax.transAxes)
-    ax.text(.5, 1.09, 'Constant positive offset',
-            va='center', ha='center', rotation=0, rotation_mode='anchor',
-            transform=ax.transAxes)
-    ax.text(.5, 1.04, r'$\overline{B_{rel}}$ > 0',
-            va='center', ha='center', rotation=0, rotation_mode='anchor',
-            transform=ax.transAxes)
-    # add colorbar for temporal correlation
-    cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
-                        ticks=[1, 0.5, 0], shrink=0.8)
-    cbar.set_label(r'r [-]', fontsize=12, labelpad=8)
-    cbar.set_ticklabels(['1', '0.5', '<0'])
-    cbar.ax.tick_params(direction='in', labelsize=10)
-
-    return fig
-
-def vis2d_kge_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc, ax_lim=-.6):
-    """Multiple polar plot of Kling-Gupta Efficiency (KGE)
+def diag_polar_plot_kge_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc, ax_lim=-.6):
+    """Diagnostic polar plot of Kling-Gupta efficiency (KGE) with multiple
+    values.
 
     Parameters
     ----------
@@ -1113,7 +884,7 @@ def vis2d_kge_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc, ax_lim=-.6)
         # convert temporal correlation to color
         rgba_color = cm.plasma_r(norm(r))
         c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=2)
-        d = ax.scatter(ang, sig, color='black', marker='.', zorder=4)
+        d = ax.scatter(ang, sig, color='grey', marker='.', zorder=4)
         ax.annotate(txt, xy=(ang, sig), color='black', fontsize=13,
                     xytext=(8, 0), textcoords="offset points",
                     ha='center', va='center')

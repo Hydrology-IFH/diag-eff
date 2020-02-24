@@ -417,8 +417,8 @@ def calc_kge_skill(obs, sim, bench, r='pearson', var='std'):
 
     return sig
 
-def vis2d_kge(obs, sim, r='pearson', var='std'):
-    r"""Polar plot of normalized Kling-Gupta-Efficiency (KGE).
+def diag_polar_plot_kge(obs, sim, r='pearson', var='std'):
+    r"""Diagnostic polar plot for Kling-Gupta efficiency (KGE).
 
     Parameters
     ----------
@@ -436,7 +436,7 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.vis2d_kge(obs, sim)
+    >>> kge.diag_polar_plot_kge(obs, sim)
     """
     # calculate alpha term
     obs_mean = np.mean(obs)
@@ -717,8 +717,9 @@ def vis2d_kge(obs, sim, r='pearson', var='std'):
         cbar.set_ticklabels(['1', '0.5', '<0'])
         cbar.ax.tick_params(direction='in')
 
-def vis2d_kge_multi(kge_beta, alpha_or_gamma, kge_r, sig_kge, extended=False):
-    r"""Multiple polar plot of Kling-Gupta Efficiency (KGE).
+def diag_polar_plot_kge_multi(kge_beta, alpha_or_gamma, kge_r, sig_kge, extended=False):
+    r"""Diagnostic polar plot for Kling-Gupta efficiency (KGE) with multiple
+    values.
 
     Parameters
     ----------

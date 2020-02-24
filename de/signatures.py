@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-de.de
+de.signatures
 ~~~~~~~~~~~
 Alternative signatures which can be used for a tailored diagnosis (e.g. low flow
 behaviour)

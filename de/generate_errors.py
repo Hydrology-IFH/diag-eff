@@ -24,12 +24,11 @@ __author__ = 'Robin Schwemmle'
 __license__ = 'GNU GPLv3'
 #__docformat__ = 'markdown'
 
-def highunder_lowover(ts, prop=0.5):
-    """Generate dynamic errors.
+def negative_dynamic(ts, prop=0.5):
+    """Generate negative dynamic error (i.e Underestimate high flows -
+    Overestimate low flows)
 
-    Underestimate high flows - Overestimate low flows
-
-    Mimicking dynamic errors. High to medium flows are decreased by linear
+    High to medium flows are decreased by linear
     increasing factors. Medium to low flows are increased by linear
     increasing factors.
 
@@ -61,14 +60,11 @@ def highunder_lowover(ts, prop=0.5):
 
     return ts_smoothed
 
-def highover_lowunder(ts, prop=0.5):
-    """Generate dynamic errors.
+def positive_dynamic(ts, prop=0.5):
+    """Generate positive dynamic errors (i.e. Overestimate high flows -
+    Underestimate low flows)
 
-    Overestimate high flows - Underestimate low flows.
-
-    Increase max values and decrease min values.
-
-    Mimicking dynamic errors. High to medium flows are increased by linear
+    High to medium flows are increased by linear
     decreasing factors. Medium to low flows are decreased by linear
     decreasing factors.
 
@@ -100,7 +96,7 @@ def highover_lowunder(ts, prop=0.5):
 
     return ts_disagg
 
-def shift_ts(ts, offset=1.5):
+def constant(ts, offset=1.5):
     """Generate constant errors.
 
     Constant overestimation/underestimation.
@@ -125,7 +121,7 @@ def shift_ts(ts, offset=1.5):
 
     return shift_ts
 
-def time_shift(ts, tshift=3, random=True):
+def timing(ts, tshift=3, random=True):
     """Mimicking timing errors.
 
     Parameters

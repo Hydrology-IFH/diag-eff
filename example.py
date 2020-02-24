@@ -20,16 +20,16 @@ sns.set_context("paper", font_scale=1.5)
 if __name__ == "__main__":
     # 619.11 km2; AI: 0.82
     area = 619.11
-    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/13331500_streamflow_qc.txt'
+    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/examples/camels_example_data/13331500_streamflow_qc.txt'
     # 191.55 km2; AI: 2.04
     #area = 191.55
-    #path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/06332515_streamflow_qc.txt'
+    #path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/examples/camels_example_data/06332515_streamflow_qc.txt'
     # 190.65 km2; AI: 2.98
     #area = 190.65
-    #path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/09512280_streamflow_qc.txt'
+    #path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/examples/camels_example_data/09512280_streamflow_qc.txt'
     # 66.57 km2; AI: 0.27
     #area = 66.57
-    #path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/12114500_streamflow_qc.txt'
+    #path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/examples/camels_example_data/12114500_streamflow_qc.txt'
 
     fig_num_fdc = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)']
     fig_fdc, axes_fdc = plt.subplots(2, 5, sharey=True, sharex=True, figsize=(14,6))
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     # dataframe efficiency measures
     idx = ['1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm']
     cols = ['brel_mean', 'b_area', 'temp_cor', 'de', 'b_dir', 'b_slope', 'diag', 'kge', 'alpha', 'beta', 'nse']
-    df_es = pd.DataFrame(index=idx, columns=cols, dtype=np.float64)
+    df_es = pd.DataFrame(index=idx, columns=cols, dtype=np.float32)
 
     # import observed time series
     df_ts = util.import_camels_ts(path, sep=r"\s+", catch_area=area)
@@ -95,11 +95,10 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[0, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### increase high flows - decrease low flows ###
+    ### positive constant error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = generate_errors.highover_lowunder(df_ts.copy(), prop=0.5)
-    obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qsim']  # disaggregated time series
+    obs_sim.loc[:, 'Qsim'] = generate_errors.constant(df_ts['Qobs'].values, offset=1.25)  # positive offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 0], fig_num_fdc[0])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 0], fig_num_ts[0])
 
@@ -140,11 +139,10 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[1, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### decrease high flows - increase low flows ###
+    ### negative constant error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = generate_errors.highunder_lowover(df_ts.copy(), prop=0.5)
-    obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qsim']  # smoothed time series
+    obs_sim.loc[:, 'Qsim'] = generate_errors.constant(df_ts['Qobs'].values, offset=.75)  # negative offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 1], fig_num_fdc[1])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 1], fig_num_ts[1])
 
@@ -185,10 +183,11 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[2, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### precipitation surplus ###
+    ### positive dynamic error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    obs_sim.loc[:, 'Qsim'] = generate_errors.shift_ts(df_ts['Qobs'].values, offset=1.5)  # positive offset
+    tsd = generate_errors.positive_dynamic(df_ts.copy(), prop=0.5)
+    obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qsim']  # disaggregated time series
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 2], fig_num_fdc[2])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 2], fig_num_ts[2])
 
@@ -229,10 +228,11 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[3, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### precipitation shortage ###
+    ### negative dynamic error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    obs_sim.loc[:, 'Qsim'] = generate_errors.shift_ts(df_ts['Qobs'].values, offset=.5)  # negative offset
+    tsd = generate_errors.negative_dynamic(df_ts.copy(), prop=0.5)
+    obs_sim.loc[:, 'Qsim'] = tsd.loc[:, 'Qsim']  # smoothed time series
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 3], fig_num_fdc[3])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 3], fig_num_ts[3])
 
@@ -273,10 +273,10 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[4, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### shuffling ###
+   ### timing error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tss = generate_errors.time_shift(df_ts.copy(), random=True)  # shuffled time series
+    tss = generate_errors.timing(df_ts.copy(), random=True)  # shuffled time series
     obs_sim.loc[:, 'Qsim'] = tss.iloc[:, 0].values
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 4], fig_num_fdc[4])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[0, 4], fig_num_ts[4])
@@ -318,12 +318,12 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[5, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### Decrease high flows - Increase low flows and precipitation surplus ###
+    ### negative dynamic error and negative constant error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = generate_errors.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
-    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values + tso  # positive offset
+    tsd = generate_errors.negative_dynamic(df_ts.copy(), prop=0.5)  # smoothed time series
+    tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values - tso  # negative offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 0], fig_num_fdc[5])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 0], fig_num_ts[5])
 
@@ -364,12 +364,12 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[6, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### Decrease high flows - Increase low flows and precipitation shortage ###
+    ### negative dynamic error and positive constant error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = generate_errors.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
-    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values - tso  # negative offset
+    tsd = generate_errors.negative_dynamic(df_ts.copy(), prop=0.5)  # smoothed time series
+    tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values + tso  # positive offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 1], fig_num_fdc[6])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 1], fig_num_ts[6])
 
@@ -410,12 +410,12 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[7, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### Increase high flows - Decrease low flows and precipitation surplus ###
+    ### postive dynamic error and negative constant error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = generate_errors.highover_lowunder(df_ts.copy(), prop=0.5)  # disaggregated time series
-    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values + tso  # positive offset
+    tsd = generate_errors.positive_dynamic(df_ts.copy(), prop=0.5) # disaggregated time series
+    tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values - tso  # negative offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 2], fig_num_fdc[7])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 2], fig_num_ts[7])
 
@@ -456,12 +456,12 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[8, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### Increase high flows - Decrease low flows and precipitation shortage ###
+    ### positive dynamic error and positive constant error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = generate_errors.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
-    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values - tso  # negative offset
+    tsd = generate_errors.positive_dynamic(df_ts.copy(), prop=0.5)  # disaggregated time series
+    tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    obs_sim.loc[:, 'Qsim'] = tsd.iloc[:, 0].values + tso  # positive offset
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[1, 3], fig_num_fdc[8])
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 3], fig_num_ts[8])
 
@@ -502,14 +502,14 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[9, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### Decrease high flows - Increase low flows, precipitation surplus and shuffling ###
+    ### negative dynamic error, negative constant error and timing error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = generate_errors.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
-    tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    tsp.iloc[:, 0] = tsd.iloc[:, 0].values + tso  # negative offset
-    tst = generate_errors.time_shift(tsp, random=True)  # shuffling
+    tsd = generate_errors.negative_dynamic(df_ts.copy(), prop=0.5)  # smoothed time series
+    tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
+    tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsn.iloc[:, 0] = tsd.iloc[:, 0].values - tso  # negative offset
+    tst = generate_errors.timing(tsn, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 4], fig_num_ts[9])
 
@@ -550,14 +550,14 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[10, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### Decrease high flows - Increase low flows, precipitation shortage and shuffling ###
+    ### negative dynamic error, positive constant error and timing error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = generate_errors.highunder_lowover(df_ts.copy(), prop=0.5)  # smoothed time series
-    tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    tsn.iloc[:, 0] = tsd.iloc[:, 0].values - tso  # negative offset
-    tst = generate_errors.time_shift(tsn, random=True)  # shuffling
+    tsd = generate_errors.negative_dynamic(df_ts.copy(), prop=0.5)  # smoothed time series
+    tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
+    tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsp.iloc[:, 0] = tsd.iloc[:, 0].values + tso  # negative offset
+    tst = generate_errors.timing(tsp, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 0], fig_num_ts[10])
 
@@ -598,14 +598,14 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[11, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### Increase high flows - Decrease low flows, precipitation surplus and shuffling ###
+    ### positive dynamic error, negative constant error and timing error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = generate_errors.highover_lowunder(df_ts.copy(), prop=0.5)  # disaggregated time series
-    tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    tsp.iloc[:, 0] = tsd.iloc[:, 0].values + tso  # positve offset
-    tst = generate_errors.time_shift(tsp, random=True)  # shuffling
+    tsd = generate_errors.positive_dynamic(df_ts.copy(), prop=0.5) # disaggregated time series
+    tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
+    tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsn.iloc[:, 0]  = tsd.iloc[:, 0].values - tso  # negative offset
+    tst = generate_errors.timing(tsn, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 1], fig_num_ts[11])
 
@@ -646,14 +646,14 @@ if __name__ == "__main__":
     # NSE
     df_es.iloc[12, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    ### Increase high flows - Decrease low flows, precipitation shortage and shuffling ###
+    ### positive dynamic error, positive constant error and timing error ###
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
-    tsd = generate_errors.highover_lowunder(df_ts.copy(), prop=0.5) # disaggregated time series
-    tsn = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
-    tso = generate_errors.shift_ts(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
-    tsn.iloc[:, 0]  = tsd.iloc[:, 0].values - tso  # negative offset
-    tst = generate_errors.time_shift(tsn, random=True)  # shuffling
+    tsd = generate_errors.positive_dynamic(df_ts.copy(), prop=0.5)  # disaggregated time series
+    tsp = pd.DataFrame(index=df_ts.index, columns=['Qsim'])
+    tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)  # P offset
+    tsp.iloc[:, 0] = tsd.iloc[:, 0].values + tso  # positve offset
+    tst = generate_errors.timing(tsp, random=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 2], fig_num_ts[12])
 
@@ -697,10 +697,10 @@ if __name__ == "__main__":
     axes_fdc[1, 3].legend(loc=6, bbox_to_anchor=(1.18, .85))
     axes_ts[2, 2].legend(loc=6, bbox_to_anchor=(1.18, .85))
 
-    fig_fdc.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/fdc_errors.png', dpi=250)
-    fig_ts.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/ts_errors.png', dpi=250)
+    fig_fdc.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/fdc_errors.png', dpi=250)
+    fig_ts.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/ts_errors.png', dpi=250)
 
-    ### multi diagnostic plot ###
+    ### diagnostic plolar plot ###
     # make arrays
     idx = ['1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm']
     ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
@@ -712,9 +712,9 @@ if __name__ == "__main__":
     diag_arr = df_es['diag'].values[ids]
     b_slope_arr = df_es['b_slope'].values[ids]
 
-    fig_de = util.vis2d_de_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
-                                    de_arr, b_dir_arr, diag_arr, idx)
-    fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/de_diag.pdf', dpi=250)
+    fig_de = util.diag_polar_plot_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
+                                           de_arr, b_dir_arr, diag_arr, idx)
+    fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/de_diag.pdf', dpi=250)
 
     ### multi KGE plot ###
     # make arrays
@@ -724,9 +724,9 @@ if __name__ == "__main__":
     temp_cor_arr = df_es['temp_cor'].values
     kge_arr = df_es['kge'].values
 
-    fig_kge = util.vis2d_kge_multi_fc(beta_arr, alpha_arr, temp_cor_arr,
+    fig_kge = util.diag_polar_plot_kge_multi_fc(beta_arr, alpha_arr, temp_cor_arr,
                                       kge_arr, idx)
-    fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/kge_diag.pdf', dpi=250)
+    fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/kge_diag.pdf', dpi=250)
 
 
     nse_arr = df_es['nse'].values
@@ -760,19 +760,19 @@ if __name__ == "__main__":
     ax2.text(.03, .93, '(b)', transform=ax2.transAxes)
     ax2.text(.05, .1, '1:1', rotation=45, transform=ax2.transAxes)
     fig.subplots_adjust(wspace=.35, bottom=.2)
-    fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/scatter_eff_comp.png', dpi=250)
+    fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/scatter_eff_comp.png', dpi=250)
     # for i, txt in enumerate(df_es.index):
     #     ax.annotate(txt, (alpha_arr[i] - 1, brel_mean_arr[i]), color='black', fontsize=15)
     #     ax.annotate(txt, (beta_arr[i] - 1, b_slope_arr[i]), color='red', fontsize=15)
 
     # export table
     df_es_t = df_es.T
-    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/table_eff_comp.csv'
+    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/table_eff_comp.csv'
     df_es_t = df_es_t.round(2)
     df_es_t.to_csv(path_csv, header=True, index=True, sep=';')
     df_es_t = df_es_t.loc[['de', 'kge', 'nse'], :]
     df_es_t = df_es_t.round(2)
-    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/table_eff.csv'
+    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/table_eff.csv'
     df_es_t.to_csv(path_csv, header=True, index=True, sep=';')
 
     ### camels
@@ -781,9 +781,9 @@ if __name__ == "__main__":
     cols = ['brel_mean', 'b_area', 'temp_cor', 'de', 'b_dir', 'b_slope', 'diag', 'kge', 'alpha', 'beta', 'nse']
     df_es_cam = pd.DataFrame(index=idx, columns=cols, dtype=np.float64)
 
-    path_cam1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/13331500_05_model_output.txt'
-    path_cam2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/13331500_48_model_output.txt'
-    path_cam3 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/examples/camels_example_data/13331500_94_model_output.txt'
+    path_cam1 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/examples/camels_example_data/13331500_05_model_output.txt'
+    path_cam2 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/examples/camels_example_data/13331500_48_model_output.txt'
+    path_cam3 = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/examples/camels_example_data/13331500_94_model_output.txt'
     df_cam1 = util.import_camels_obs_sim(path_cam1)
     df_cam2 = util.import_camels_obs_sim(path_cam2)
     df_cam3 = util.import_camels_obs_sim(path_cam3)
@@ -839,8 +839,8 @@ if __name__ == "__main__":
                    transform=axes[2,1].transAxes, ha='right', va='top')
 
     fig.subplots_adjust(wspace=0.3)
-    fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/ts_fdc_real_case.png', dpi=250)
-    fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/ts_fdc_real_case.pdf', dpi=250)
+    fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/ts_fdc_real_case.png', dpi=250)
+    fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/ts_fdc_real_case.pdf', dpi=250)
 
 
     obs_arr = df_cam1['Qobs'].values
@@ -951,7 +951,7 @@ if __name__ == "__main__":
     # NSE
     df_es_cam.iloc[2, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/table_eff_real_case.csv'
+    path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/table_eff_real_case.csv'
     df_es_cam.to_csv(path_csv, header=True, index=True, sep=';')
 
     ### multi diagnostic plot ###
@@ -964,9 +964,9 @@ if __name__ == "__main__":
     diag_arr = df_es_cam['diag'].values
     b_slope_arr = df_es_cam['b_slope'].values
 
-    fig_de = util.vis2d_de_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
+    fig_de = util.diag_polar_plot_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
                                     de_arr, b_dir_arr, diag_arr, idx, ax_lim=0)
-    fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/de_diag_real_case.pdf', dpi=250)
+    fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/de_diag_real_case.pdf', dpi=250)
 
     ### multi KGE plot ###
     # make arrays
@@ -974,6 +974,6 @@ if __name__ == "__main__":
     beta_arr = df_es_cam['beta'].values
     kge_arr = df_es_cam['kge'].values
 
-    fig_kge = util.vis2d_kge_multi_fc(beta_arr, alpha_arr, temp_cor_arr,
+    fig_kge = util.diag_polar_plot_kge_multi_fc(beta_arr, alpha_arr, temp_cor_arr,
                                       kge_arr, idx, ax_lim=0)
-    fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/technical_note/kge_diag_real_case.pdf', dpi=250)
+    fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/kge_diag_real_case.pdf', dpi=250)
