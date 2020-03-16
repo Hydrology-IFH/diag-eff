@@ -17,18 +17,15 @@ from mpl_toolkits.basemap import Basemap
 from matplotlib.patches import Polygon
 import seaborn as sns
 sns.set_style('ticks')
-from bokeh.plotting import figure, output_file, show
-from bokeh.models import ColumnDataSource
-from bokeh.layouts import gridplot
+# from bokeh.plotting import figure, output_file, show
+# from bokeh.models import ColumnDataSource
+# from bokeh.layouts import gridplot
 from de import de
 from de import kge
 from de import nse
 from de import util
 
 if __name__ == "__main__":
-    # RunTimeWarning will not be displayed (division by zeros or NaN values)
-    np.seterr(divide='ignore', invalid='ignore')
-
     calc = True
     tier = 'wrr2/'
 
@@ -256,18 +253,26 @@ if __name__ == "__main__":
     # ax.set(ylabel=r'[mm $d^{-1}$]', xlabel='Exceedence probabilty [-]')
     # sns.reset_defaults()
 
-    # # make arrays
-    # brel_mean_arr = meta['brel_mean'].values
-    # b_area_arr = meta['b_area'].values
-    # temp_cor_arr = meta['temp_cor'].values
-    # b_dir_arr = meta['b_dir'].values
-    # sig_de_arr = meta['de'].values
-    # diag_arr = meta['diag'].values
-    # b_slope_arr = meta['b_slope'].values
+    # make arrays
+    brel_mean_arr = meta['brel_mean'].values
+    b_area_arr = meta['b_area'].values
+    temp_cor_arr = meta['temp_cor'].values
+    b_dir_arr = meta['b_dir'].values
+    eff_de_arr = meta['de'].values
+    phi_arr = meta['diag'].values
+    b_slope_arr = meta['b_slope'].values
 
-    # # multi polar plot
-    # de.diag_polar_plot_multi(brel_mean_arr, b_area_arr, temp_cor_arr,
-    #                           sig_de_arr, b_dir_arr, diag_arr, extended=True)
+    # multi polar plot
+    fig1, fig2 = de.diag_polar_plot_multi(brel_mean_arr, b_area_arr, temp_cor_arr,
+                                          eff_de_arr, b_dir_arr, phi_arr, extended=True)
+    fig1_png = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%polar_de.png' % (tier)
+    fig1.savefig(fig1_png, dpi=250)
+    fig1_pdf = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%spolar_de.pdf' % (tier)
+    fig1.savefig(fig1_pdf, dpi=250)
+    fig2_png = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%sde_kde_bi.png' % (tier)
+    fig2.savefig(fig2_png, dpi=250)
+    fig2_pdf = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%sde_kde_bi.pdf' % (tier)
+    fig2.savefig(fig2_pdf, dpi=250)
 
     # # make arrays
     # alpha_arr = meta['alpha'].values
@@ -275,8 +280,8 @@ if __name__ == "__main__":
     # kge_arr = meta['kge'].values
 
     # # multi KGE plot
-    # kge.diag_polar_plot_kge_multi(beta_arr, alpha_arr, temp_cor_arr, kge_arr,
-    #                               extended=True)
+    # fig1, fig2 = kge.diag_polar_plot_kge_multi(beta_arr, alpha_arr, temp_cor_arr, kge_arr,
+    #                                            extended=True)
 
     # # global map
     # x = meta['lon'].values

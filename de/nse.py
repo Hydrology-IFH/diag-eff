@@ -8,10 +8,10 @@ Nash-Sutcliffe efficiency measure.
 :license: GNU GPLv3, see LICENSE for more details.
 """
 
+from scipy import stats
 import numpy as np
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
 np.seterr(divide='ignore', invalid='ignore')
-import scipy as sp
 
 __title__ = 'de'
 __version__ = '0.1'
@@ -20,10 +20,10 @@ __author__ = 'Robin Schwemmle'
 __license__ = 'GNU GPLv3'
 #__docformat__ = 'markdown'
 
-#TODO: visualization of decomposed NSE
 
 def calc_nse(obs, sim):
-    """Calculate Nash-Sutcliffe-Efficiency (NSE).
+    r"""
+    Calculate Nash-Sutcliffe-Efficiency (NSE).
 
     Parameters
     ----------
@@ -46,7 +46,7 @@ def calc_nse(obs, sim):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.calc_nse(obs, sim)
+    >>> nse.calc_nse(obs, sim)
     0.5648252536640361
 
     Notes
@@ -58,9 +58,9 @@ def calc_nse(obs, sim):
 
     References
     ----------
-    Nash, J. E., and Sutcliffe, J. V.: River flow forecasting through conceptual
-    models part I - A discussion of principles, Journal of Hydrology, 10,
-    282-290, 10.1016/0022-1694(70)90255-6, 1970.
+    Nash, J. E., and Sutcliffe, J. V.: River flow forecasting through
+    conceptual models part I - A discussion of principles, Journal of
+    Hydrology, 10, 282-290, 10.1016/0022-1694(70)90255-6, 1970.
     """
     if len(obs) != len(sim):
         raise AssertionError("Arrays are not of equal length!")
@@ -72,7 +72,8 @@ def calc_nse(obs, sim):
     return sig
 
 def calc_nse_dec(obs, sim):
-    """Calculate the decomposed Nash-Sutcliffe-Efficiency (NSE).
+    """
+    Calculate the decomposed Nash-Sutcliffe-Efficiency (NSE).
 
     Parameters
     ----------
@@ -95,7 +96,8 @@ def calc_nse_dec(obs, sim):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.calc_nse_dec(obs, sim)
+    >>> nse.calc_nse_dec(obs, sim)
+    0.9251076704923259
 
     Notes
     ----------
@@ -121,7 +123,8 @@ def calc_nse_dec(obs, sim):
     return sig
 
 def calc_nse_beta(obs, sim):
-    """Calculate the beta term of decomposed Nash-Sutcliffe-Efficiency (NSE).
+    r"""
+    Calculate the beta term of decomposed Nash-Sutcliffe-Efficiency (NSE).
 
     Parameters
     ----------
@@ -144,7 +147,8 @@ def calc_nse_beta(obs, sim):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.calc_nse_beta(obs, sim)
+    >>> nse.calc_nse_beta(obs, sim)
+    0.2907828720750609
 
     Notes
     ----------
@@ -170,7 +174,8 @@ def calc_nse_beta(obs, sim):
     return nse_beta
 
 def calc_nse_alpha(obs, sim):
-    """Calculate the alpha term of decomposed Nash-Sutcliffe-Efficiency (NSE).
+    r"""
+    Calculate the alpha term of decomposed Nash-Sutcliffe-Efficiency (NSE).
 
     Parameters
     ----------
@@ -193,7 +198,8 @@ def calc_nse_alpha(obs, sim):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.calc_nse_alpha(obs, sim)
+    >>> nse.calc_nse_alpha(obs, sim)
+    1.2812057455166919
 
     Notes
     ----------
@@ -219,8 +225,8 @@ def calc_nse_alpha(obs, sim):
     return nse_alpha
 
 def calc_nse_r(obs, sim):
-    """Calculate linear correlation between observed and simulated
-    time series.
+    """
+    Calculate linear correlation between observed and simulated time series.
 
     Parameters
     ----------
@@ -243,7 +249,7 @@ def calc_nse_r(obs, sim):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.calc_nse_r(obs, sim)
+    >>> nse.calc_nse_r(obs, sim)
     0.8940281850583509
 
     References
@@ -256,10 +262,9 @@ def calc_nse_r(obs, sim):
     if len(obs) != len(sim):
         raise AssertionError("Arrays are not of equal length!")
 
-    r = sp.stats.pearsonr(obs, sim)
-    temp_cor = r[0]
+    lin_cor = stats.pearsonr(obs, sim)[0]
 
-    if np.isnan(temp_cor):
+    if np.isnan(lin_cor):
         lin_cor = 0
 
     return lin_cor

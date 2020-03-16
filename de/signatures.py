@@ -3,8 +3,8 @@
 """
 de.signatures
 ~~~~~~~~~~~
-Alternative signatures which can be used for a tailored diagnosis (e.g. low flow
-behaviour)
+Alternative signatures which can be used for a more specific diagnosis
+(e.g. low flow behaviour)
 :2019 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
@@ -21,7 +21,8 @@ __license__ = 'GNU GPLv3'
 #__docformat__ = 'markdown'
 
 def bias_rr(qobs, qsim):
-    """Bias in runoff ratio.
+    """
+    Bias in runoff ratio.
 
     Parameters
     ----------
@@ -53,7 +54,8 @@ def bias_rr(qobs, qsim):
     return sig
 
 def bias_hf(qobs, qsim):
-    """Bias in high-flow segment of flow duration curve.
+    """
+    Bias in high-flow segment of flow duration curve.
 
     Parameters
     ----------
@@ -92,7 +94,8 @@ def bias_hf(qobs, qsim):
     return sig
 
 def bias_mf(qobs, qsim):
-    """Bias in mid-flow segment of flow duration curve.
+    """
+    Bias in mid-flow segment of flow duration curve.
 
     Parameters
     ----------
@@ -126,7 +129,8 @@ def bias_mf(qobs, qsim):
     return sig
 
 def bias_lf(qobs, qsim):
-    """Bias in low-flow segment of flow duration curve.
+    """
+    Bias in low-flow segment of flow duration curve.
 
     Parameters
     ----------
@@ -168,7 +172,8 @@ def bias_lf(qobs, qsim):
     return sig
 
 def bias_t(qobs, qsim, prec):
-    """Bias in lag time.
+    """
+    Bias in lag time.
 
     Parameters
     ----------
