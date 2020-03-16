@@ -89,6 +89,8 @@ if __name__ == "__main__":
     df_es.iloc[0, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[0, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[0, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -133,6 +135,8 @@ if __name__ == "__main__":
     df_es.iloc[1, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[1, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[1, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[1, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -177,6 +181,8 @@ if __name__ == "__main__":
     df_es.iloc[2, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[2, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[2, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[2, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -222,6 +228,8 @@ if __name__ == "__main__":
     df_es.iloc[3, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[3, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[3, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[3, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -267,6 +275,8 @@ if __name__ == "__main__":
     df_es.iloc[4, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[4, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[4, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[4, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -312,6 +322,8 @@ if __name__ == "__main__":
     df_es.iloc[5, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[5, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[5, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[5, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -358,6 +370,8 @@ if __name__ == "__main__":
     df_es.iloc[6, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[6, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[6, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[6, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -404,6 +418,8 @@ if __name__ == "__main__":
     df_es.iloc[7, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[7, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[7, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[7, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -450,6 +466,8 @@ if __name__ == "__main__":
     df_es.iloc[8, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[8, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[8, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[8, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -496,6 +514,8 @@ if __name__ == "__main__":
     df_es.iloc[9, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[9, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[9, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[9, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -544,6 +564,8 @@ if __name__ == "__main__":
     df_es.iloc[10, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[10, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[10, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[10, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -592,6 +614,8 @@ if __name__ == "__main__":
     df_es.iloc[11, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[11, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[11, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[11, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -640,6 +664,8 @@ if __name__ == "__main__":
     df_es.iloc[12, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[12, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[12, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[12, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -688,6 +714,8 @@ if __name__ == "__main__":
     df_es.iloc[13, 7] = kge.calc_kge(obs_arr, sim_arr)
     # KGE alpha
     df_es.iloc[13, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    # # KGE gamma
+    # df_es.iloc[13, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE beta
     df_es.iloc[13, 9] = kge.calc_kge_beta(obs_arr, sim_arr)
 
@@ -712,20 +740,22 @@ if __name__ == "__main__":
     diag_arr = df_es['diag'].values[ids]
     b_slope_arr = df_es['b_slope'].values[ids]
 
-    fig_de = util.diag_polar_plot_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
-                                           de_arr, b_dir_arr, diag_arr, idx)
+    fig_de = util.diag_polar_plot_multi_fc(brel_mean_arr, b_area_arr,
+                                           temp_cor_arr, de_arr, b_dir_arr,
+                                           diag_arr, idx)
     fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/de_diag.pdf', dpi=250)
 
     ### multi KGE plot ###
     # make arrays
     idx = ['1', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm']
-    alpha_arr = df_es['alpha'].values
     beta_arr = df_es['beta'].values
+    alpha_arr = df_es['alpha'].values
+    # gamma_arr = df_es['gamma'].values
     temp_cor_arr = df_es['temp_cor'].values
     kge_arr = df_es['kge'].values
 
-    fig_kge = util.diag_polar_plot_kge_multi_fc(beta_arr, alpha_arr, temp_cor_arr,
-                                      kge_arr, idx)
+    fig_kge = util.diag_polar_plot_kge_multi_fc(beta_arr, alpha_arr,
+                                                temp_cor_arr, kge_arr, idx)
     fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/kge_diag.pdf', dpi=250)
 
 
@@ -733,33 +763,47 @@ if __name__ == "__main__":
     brel_mean_arr = df_es['brel_mean'].values
     b_slope_arr = df_es['b_slope'].values
     de_arr = df_es['de'].values
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,5))
+
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(16,5))
     # scatterplots efficiencies
-    sc = sns.scatterplot(kge_arr, de_arr, color='black', ax=ax1)
-    sc1 = sns.scatterplot(nse_arr, de_arr, color='red', ax=ax1)
+    sc = sns.scatterplot(kge_arr, de_arr, color='black', s=60, ax=ax1)
+    sc1 = sns.scatterplot(nse_arr, de_arr, color='red', s=30, marker="X", ax=ax1)
     ax1.plot([-2.05, 1.05], [-2.05, 1.05], ls="--", c=".3")
     ax1.set_ylim(-2.05, 1.05)
     ax1.set_xlim(-2.05, 1.05)
     ax1.set(ylabel='DE [-]', xlabel='KGE [-]')
-    ax1.text(.42, -.22, 'NSE [-]', color='red', transform=ax1.transAxes)
+    ax1.text(.40, -.22, 'NSE [-]', color='red', transform=ax1.transAxes)
     ax1.text(.025, .93, '(a)', transform=ax1.transAxes)
     ax1.text(.05, .1, '1:1', rotation=45, transform=ax1.transAxes)
     # for i, txt in enumerate(df_es.index):
     #     ax.annotate(txt, (kge_arr[i], de_arr[i]), color='black', fontsize=15)
     #     ax.annotate(txt, (nse_arr[i], de_arr[i]), color='red', fontsize=15)
 
-    # scatterplots components
-    sc = sns.scatterplot(beta_arr - 1, brel_mean_arr, color='black', ax=ax2)
-    sc1 = sns.scatterplot(alpha_arr - 1, b_slope_arr, color='red', ax=ax2)
+    # scatterplots components inter-comparison
+    sc = sns.scatterplot(beta_arr - 1, brel_mean_arr, color='black', s=60, ax=ax2)
+    sc1 = sns.scatterplot(alpha_arr - 1, b_slope_arr, color='red', s=30, marker="X", ax=ax2)
     ax2.plot([-2.05, 2.05], [-2.05, 2.05], ls="--", c=".3")
     ax2.set_ylim(-2.05, 2.05)
     ax2.set_xlim(-2.05, 2.05)
     ax2.set(ylabel=r'$\overline{B_{rel}}$ [-]', xlabel=r'$\beta$ - 1 [-]')
-    ax2.text(-.29, .415, r'$B_{slope}$ [-]', color='red', transform=ax2.transAxes, rotation=90)
-    ax2.text(.42, -.22, r'$\alpha$ - 1 [-]', color='red', transform=ax2.transAxes)
+    ax2.text(-.33, .415, r'$B_{slope}$ [-]', color='red', transform=ax2.transAxes, rotation=90)
+    ax2.text(.4, -.22, r'$\alpha$ - 1 [-]', color='red', transform=ax2.transAxes)
     ax2.text(.03, .93, '(b)', transform=ax2.transAxes)
     ax2.text(.05, .1, '1:1', rotation=45, transform=ax2.transAxes)
-    fig.subplots_adjust(wspace=.35, bottom=.2)
+
+    # scatterplots components intra-comparison
+    sc = sns.scatterplot(b_slope_arr, brel_mean_arr, color='black', s=60, ax=ax3)
+    sc1 = sns.scatterplot(alpha_arr - 1, beta_arr - 1, color='red', s=30, marker="X", ax=ax3)
+    ax3.plot([-2.05, 2.05], [-2.05, 2.05], ls="--", c=".3")
+    ax3.set_ylim(-2.05, 2.05)
+    ax3.set_xlim(-2.05, 2.05)
+    ax3.set(ylabel=r'$B_{slope}$ [-]', xlabel=r'$\overline{B_{rel}}$ [-]')
+    ax3.text(-.33, .425, r'$\beta$ - 1 [-]', color='red', transform=ax3.transAxes, rotation=90)
+    ax3.text(.4, -.23, r'$\alpha$ - 1 [-]', color='red', transform=ax3.transAxes)
+    ax3.text(.03, .93, '(c)', transform=ax3.transAxes)
+    ax3.text(.05, .1, '1:1', rotation=45, transform=ax3.transAxes)
+
+    fig.subplots_adjust(wspace=.45, bottom=.2)
     fig.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/scatter_eff_comp.png', dpi=250)
     # for i, txt in enumerate(df_es.index):
     #     ax.annotate(txt, (alpha_arr[i] - 1, brel_mean_arr[i]), color='black', fontsize=15)
@@ -964,8 +1008,9 @@ if __name__ == "__main__":
     diag_arr = df_es_cam['diag'].values
     b_slope_arr = df_es_cam['b_slope'].values
 
-    fig_de = util.diag_polar_plot_multi_fc(brel_mean_arr, b_area_arr, temp_cor_arr,
-                                    de_arr, b_dir_arr, diag_arr, idx, ax_lim=0)
+    fig_de = util.diag_polar_plot_multi_fc(brel_mean_arr, b_area_arr,
+                                           temp_cor_arr, de_arr, b_dir_arr,
+                                           diag_arr, idx, ax_lim=0)
     fig_de.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/de_diag_real_case.pdf', dpi=250)
 
     ### multi KGE plot ###
@@ -974,6 +1019,7 @@ if __name__ == "__main__":
     beta_arr = df_es_cam['beta'].values
     kge_arr = df_es_cam['kge'].values
 
-    fig_kge = util.diag_polar_plot_kge_multi_fc(beta_arr, alpha_arr, temp_cor_arr,
-                                      kge_arr, idx, ax_lim=0)
+    fig_kge = util.diag_polar_plot_kge_multi_fc(beta_arr, alpha_arr,
+                                                temp_cor_arr, kge_arr, idx,
+                                                ax_lim=0)
     fig_kge.savefig('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/kge_diag_real_case.pdf', dpi=250)

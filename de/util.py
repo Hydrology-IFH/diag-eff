@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -163,6 +162,28 @@ def plot_obs_sim(obs, sim):
     ax.set(ylabel=_q_lab, xlabel='Time')
     ax.set_ylim(0, )
     ax.set_xlim(obs.index[0], obs.index[-1])
+
+def fdc(ts):
+    """
+    Calculate values for flow duration curves of hydrologic time series.
+
+    Parameters
+    ----------
+    ts : (N,)array_like
+        time series
+
+    Returns
+    ----------
+    prob : (N,)array_like
+        exceedance probability
+
+    ts_sort : (N,)array_like
+        sorted time series by descending order
+    """
+    prob = np.arange(0, 101, 1)[::-1]
+    curve = [np.percentile(ts, p) for p in prob]
+
+    return prob, curve
 
 def fdc_obs_sim(obs, sim):
     """Plotting the flow duration curves of two hydrologic time series (e.g.

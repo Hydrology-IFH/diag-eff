@@ -1,4 +1,5 @@
 .DS_Store
+make_index.py
 .ipynb_checkpoints/
 de/__pycache__/
 tests/__pycache__/

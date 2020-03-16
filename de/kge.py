@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -966,25 +965,17 @@ def diag_polar_plot_kge_multi(kge_beta, alpha_or_gamma, kge_r, sig_kge, extended
                     xlabel='[$^\circ$]')
 
             # 2-D density plot
-            # g = (sns.jointplot(diag_deg, sig_de, color='k', marginal_kws={'color':'k'}).plot_joint(sns.kdeplot, zorder=0, n_levels=10))
+            r_colors = cm.plasma_r(norm(temp_cor))
             g = (sns.jointplot(diag_deg, sig_kge, kind='kde', zorder=1,
-                               n_levels=20, cmap='Greens', shade_lowest=False,
-                               marginal_kws={'color':'k', 'shade':False}).plot_joint(sns.scatterplot, color='k', alpha=.5, zorder=2))
+                               n_levels=20, cmap='Greys', shade_lowest=False,
+                               marginal_kws={'color':'k', 'shade':False})
+                               .plot_joint(plt.scatter, c=r_colors, alpha=.4,
+                                           zorder=2))
             g.set_axis_labels(r'[$^\circ$]', r'KGE [-]')
             g.ax_joint.set_xticks([0, 90, 180, 270, 360])
             g.ax_joint.set_xlim(0, 360)
             g.ax_joint.set_ylim(-ax_lim, 1)
             g.ax_marg_x.set_xticks([0, 90, 180, 270, 360])
-            # kde_data = g.ax_marg_x.get_lines()[0].get_data()
-            # kde_xx = kde_data[0]
-            # kde_yy = kde_data[1]
-            # x1 = np.where(kde_xx <= 90)[-1][-1]
-            # x2 = np.where(kde_xx <= 180)[-1][-1]
-            # x3 = np.where(kde_xx <= 270)[-1][-1]
-            # g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1], facecolor='purple', alpha=0.2)
-            # g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2], facecolor='grey', alpha=0.2)
-            # g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1], facecolor='purple', alpha=0.2)
-            # g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey', alpha=0.2)
             kde_data = g.ax_marg_y.get_lines()[0].get_data()
             kde_xx = kde_data[0]
             kde_yy = kde_data[1]

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -852,7 +851,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
                 xlabel='Exceedence probabilty [-]')
 
 def diag_polar_plot_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
-                   l=0.05, extended=False):
+                          l=0.05, extended=False):
     """Diagnostic polar plot of Diagnostic efficiency (DE) with multiple values.
 
     Parameters
@@ -1115,7 +1114,7 @@ def diag_polar_plot_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
         cbar.ax.tick_params(direction='in')
 
         # convert to degrees
-        diag_deg = (diag  * (180 / np.pi)) + 135
+        diag_deg = (diag * (180 / np.pi)) + 135
         diag_deg[diag_deg < 0] = 360 - diag_deg[diag_deg < 0]
 
         # 1-D density plot
@@ -1141,10 +1140,12 @@ def diag_polar_plot_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                 xlabel='[$^\circ$]')
 
         # 2-D density plot
-        # g = (sns.jointplot(diag_deg, sig_de, color='k', marginal_kws={'color':'k'}).plot_joint(sns.kdeplot, zorder=0, n_levels=10))
+        r_colors = cm.plasma_r(norm(temp_cor))
         g = (sns.jointplot(diag_deg, sig_de, kind='kde', zorder=1,
-                           n_levels=20, cmap='Greens', shade_lowest=False,
-                           marginal_kws={'color':'k', 'shade':False}).plot_joint(sns.scatterplot, color='k', alpha=.5, zorder=2))
+                           n_levels=20, cmap='Greys', shade_lowest=False,
+                           marginal_kws={'color':'k', 'shade':False})
+                           .plot_joint(plt.scatter, c=r_colors, alpha=.4,
+                                       zorder=2))
         g.set_axis_labels(r'[$^\circ$]', 'DE [-]')
         g.ax_joint.set_xticks([0, 90, 180, 270, 360])
         g.ax_joint.set_xlim(0, 360)
@@ -1156,14 +1157,6 @@ def diag_polar_plot_multi(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
         x1 = np.where(kde_xx <= 90)[-1][-1]
         x2 = np.where(kde_xx <= 180)[-1][-1]
         x3 = np.where(kde_xx <= 270)[-1][-1]
-        # g.ax_marg_x.fill_between(kde_xx[:x1+1], kde_yy[:x1+1],
-        #                          facecolor='purple', alpha=0.2)
-        # g.ax_marg_x.fill_between(kde_xx[x1:x2+2], kde_yy[x1:x2+2],
-        #                          facecolor='grey', alpha=0.2)
-        # g.ax_marg_x.fill_between(kde_xx[x2+1:x3+1], kde_yy[x2+1:x3+1],
-        #                          facecolor='purple', alpha=0.2)
-        # g.ax_marg_x.fill_between(kde_xx[x3:], kde_yy[x3:], facecolor='grey',
-        #                          alpha=0.2)
         kde_data = g.ax_marg_y.get_lines()[0].get_data()
         kde_xx = kde_data[0]
         kde_yy = kde_data[1]
