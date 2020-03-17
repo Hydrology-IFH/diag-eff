@@ -7,13 +7,18 @@
     <title>de &#8212; de 0.1 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="generate_errors" href="generate_errors.html" />
+    <link rel="prev" title="Code Reference" href="reference.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -34,15 +39,87 @@
 <h1>de<a class="headerlink" href="#de" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="diagnostic-efficiency">
 <h2>Diagnostic Efficiency<a class="headerlink" href="#diagnostic-efficiency" title="Permalink to this headline">¶</a></h2>
-<p>.. autofunction:: de.de.calc_de</p>
+<dl class="function">
+<dt id="de.de.calc_de">
+<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">calc_de</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">sort=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#calc_de"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.calc_de" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Calculate Diagnostic-Efficiency (DE).</p>
+<dl class="simple">
+<dt>obs<span class="classifier">(N,)array_like</span></dt><dd><p>Observed time series as 1-D array</p>
+</dd>
+<dt>sim<span class="classifier">(N,)array_like</span></dt><dd><p>Simulated time series</p>
+</dd>
+<dt>sort<span class="classifier">boolean, optional</span></dt><dd><p>If True, time series are sorted by ascending order. If False, time
+series are not sorted. The default is to sort.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>eff<span class="classifier">float</span></dt><dd><p>non-normalized Diagnostic efficiency</p>
+</dd>
+</dl>
+<div class="math notranslate nohighlight">
+\[DE = 1 - \sqrt{\overline{B_{rel}}^2 +\]</div>
+</div></blockquote>
+<p>ert B_{area}
+ert^2 + (r - 1)^2}</p>
+<blockquote>
+<div><p>Provide arrays with equal length</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">de</span><span class="o">.</span><span class="n">calc_de</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
+<span class="go">0.8177285723180813</span>
+</pre></div>
 </div>
-<div class="section" id="kling-gupta-efficiency">
-<h2>Kling-Gupta Efficiency<a class="headerlink" href="#kling-gupta-efficiency" title="Permalink to this headline">¶</a></h2>
-<p>.. autofunction:: de.de.calc_kge</p>
+</div></blockquote>
+</dd></dl>
+
 </div>
-<div class="section" id="nash-sutcliffe-efficiency">
-<h2>Nash-Sutcliffe Efficiency<a class="headerlink" href="#nash-sutcliffe-efficiency" title="Permalink to this headline">¶</a></h2>
-<p>.. autofunction:: de.de.calc_nse</p>
+<div class="section" id="diagnostic-polar-plot">
+<h2>Diagnostic Polar Plot<a class="headerlink" href="#diagnostic-polar-plot" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="de.de.diag_polar_plot">
+<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">diag_polar_plot</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">sort=True</em>, <em class="sig-param">l=0.05</em>, <em class="sig-param">extended=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#diag_polar_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.diag_polar_plot" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Diagnostic polar plot of Diagnostic efficiency (DE) for a single
+evaluation.</p>
+<dl class="simple">
+<dt>obs<span class="classifier">(N,)array_like</span></dt><dd><p>Observed time series as 1-D array</p>
+</dd>
+<dt>sim<span class="classifier">(N,)array_like</span></dt><dd><p>Simulated time series as 1-D array</p>
+</dd>
+<dt>sort<span class="classifier">boolean, optional</span></dt><dd><p>If True, time series are sorted by ascending order. If False, time
+series are not sorted. The default is to sort.</p>
+</dd>
+<dt>l<span class="classifier">float, optional</span></dt><dd><p>Threshold for which diagnosis can be made. The default is 0.05.</p>
+</dd>
+<dt>extended<span class="classifier">boolean, optional</span></dt><dd><p>If True, extended diagnostic plot is displayed. In addtion, the
+duration curve of B_rest is plotted besides the polar plot. The default
+is, that only the diagnostic polar plot is displayed.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>fig<span class="classifier">Figure</span></dt><dd><p>Returns a single figure if extended=False and two figures if
+extended=True.</p>
+</dd>
+</dl>
+<div class="math notranslate nohighlight">
+\[\]</div>
+</div></blockquote>
+<p>arphi = arctan2(overline{B_{rel}}, B_{slope})</p>
+<blockquote>
+<div><p>Provide arrays with equal length</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">de</span><span class="o">.</span><span class="n">diag_polar_plot</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
 </div>
 </div>
 
@@ -70,6 +147,24 @@
 
 
 <h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Code Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">de</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#diagnostic-efficiency">Diagnostic Efficiency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diagnostic-polar-plot">Diagnostic Polar Plot</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="generate_errors.html">generate_errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kge.html">kge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nse.html">nse</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
 
 
 <hr />
@@ -82,6 +177,10 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="reference.html">Code Reference</a><ul>
+      <li>Previous: <a href="reference.html" title="previous chapter">Code Reference</a></li>
+      <li>Next: <a href="generate_errors.html" title="next chapter">generate_errors</a></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>
@@ -94,7 +193,7 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -111,11 +210,11 @@
       &copy;2019, Robin Schwemmle.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="../_sources/reference/de.md.txt"
+      <a href="../_sources/reference/de.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

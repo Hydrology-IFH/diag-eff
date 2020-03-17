@@ -4,15 +4,10 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 
-long_description = """DE is an open-source toolbox written in Python to diagnose
-model performance. The toolbox provides functions to calculate the Diagnostic
-Efficiency measure and visualize the three components on which the measure
-is based in 2D-space. First, we introduce a novel model performance metric.
-Secondly, visualising the three metric components in a 2D-space origin of
-errors either input data or model structure/parameterization can be easily
-distinguished. Moreover, we provide functions to manipulate the observed
-hydrologic time series. These manipulations either mimick model errors or input
-data errors. Hence, deliver a proof of concept. Note that the data
+long_description = """de is an open-source toolbox written in Python for
+specific evaluation of model performance. The toolbox provides functions to
+calculate the Diagnostic Efficiency metric and and fucntions to visualize
+contribution of metric terms by diagnostic polar plots. Note that the data
 management of time series is handled using pandas data frame objects.
 """
 
@@ -35,7 +30,7 @@ setup(
 
     version='0.1',
 
-    description='DE: Diagnosing model Efficiency',
+    description='DE: Diagnostic Efficiency',
     long_description=long_description,
 
     url='https://github.com/schwemro/de',

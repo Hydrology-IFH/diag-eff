@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>de.nse &#8212; de 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for de.nse</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">de.nse</span>
+<span class="sd">~~~~~~~~~~~</span>
+<span class="sd">Nash-Sutcliffe efficiency measure.</span>
+<span class="sd">:2019 by Robin Schwemmle.</span>
+<span class="sd">:license: GNU GPLv3, see LICENSE for more details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># RunTimeWarning will not be displayed (division by zeros or NaN values)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="n">__title__</span> <span class="o">=</span> <span class="s1">&#39;de&#39;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.1&#39;</span>
+<span class="c1">#__build__ = 0x001201</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Robin Schwemmle&#39;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s1">&#39;GNU GPLv3&#39;</span>
+<span class="c1">#__docformat__ = &#39;markdown&#39;</span>
+
+
+<div class="viewcode-block" id="calc_nse"><a class="viewcode-back" href="../../reference/nse.html#de.nse.calc_nse">[docs]</a><span class="k">def</span> <span class="nf">calc_nse</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate Nash-Sutcliffe-Efficiency (NSE).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obs : (N,)array_like</span>
+<span class="sd">        Observed time series as 1-D array</span>
+
+<span class="sd">    sim : (N,)array_like</span>
+<span class="sd">        Simulated time series as 1-D array</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sig : float</span>
+<span class="sd">        Nash-Sutcliffe-Efficiency measure</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Provide arrays with equal length</span>
+
+<span class="sd">    &gt;&gt;&gt; from de import de</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])</span>
+<span class="sd">    &gt;&gt;&gt; sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])</span>
+<span class="sd">    &gt;&gt;&gt; nse.calc_nse(obs, sim)</span>
+<span class="sd">    0.5648252536640361</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        NSE = 1 - \frac{\sum_{t=1}^{t=T} (Q_{sim}(t) - Q_{obs}(t))^2}{\sum_{t=1}^{t=T} (Q_{obs}(t) - \overline{Q_{obs}})^2}</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Nash, J. E., and Sutcliffe, J. V.: River flow forecasting through</span>
+<span class="sd">    conceptual models part I - A discussion of principles, Journal of</span>
+<span class="sd">    Hydrology, 10, 282-290, 10.1016/0022-1694(70)90255-6, 1970.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Arrays are not of equal length!&quot;</span><span class="p">)</span>
+    <span class="n">sim_obs_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">sim</span> <span class="o">-</span> <span class="n">obs</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">obs_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+    <span class="n">obs_diff_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">obs</span> <span class="o">-</span> <span class="n">obs_mean</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">sim_obs_diff</span><span class="o">/</span><span class="n">obs_diff_mean</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sig</span></div>
+
+<span class="k">def</span> <span class="nf">calc_nse_dec</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the decomposed Nash-Sutcliffe-Efficiency (NSE).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obs : (N,)array_like</span>
+<span class="sd">        Observed time series as 1-D array</span>
+
+<span class="sd">    sim : (N,)array_like</span>
+<span class="sd">        Simulated time series as 1-D array</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sig : float</span>
+<span class="sd">        decomposed Nash-Sutcliffe-Efficiency measure</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Provide arrays with equal length</span>
+
+<span class="sd">    &gt;&gt;&gt; from de import de</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])</span>
+<span class="sd">    &gt;&gt;&gt; sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])</span>
+<span class="sd">    &gt;&gt;&gt; nse.calc_nse_dec(obs, sim)</span>
+<span class="sd">    0.9251076704923259</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        NSE = 2 \times \alpha \times r - \alpha^2 - \beta_n^2</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Gupta, H. V., Kling, H., Yilmaz, K. K., and Martinez, G. F.: Decomposition</span>
+<span class="sd">    of the mean squared error and NSE performance criteria: Implications for</span>
+<span class="sd">    improving hydrological modelling, Journal of Hydrology, 377, 80-91,</span>
+<span class="sd">    10.1016/j.jhydrol.2009.08.003, 2009.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Arrays are not of equal length!&quot;</span><span class="p">)</span>
+    <span class="n">nse_alpha</span> <span class="o">=</span> <span class="n">calc_nse_alpha</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
+    <span class="n">nse_beta</span> <span class="o">=</span> <span class="n">calc_nse_beta</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
+    <span class="n">nse_r</span> <span class="o">=</span> <span class="n">calc_nse_r</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nse_alpha</span> <span class="o">*</span> <span class="n">nse_r</span> <span class="o">-</span> <span class="n">nse_alpha</span><span class="o">**</span><span class="mi">1</span> <span class="o">-</span> <span class="n">nse_beta</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="k">return</span> <span class="n">sig</span>
+
+<span class="k">def</span> <span class="nf">calc_nse_beta</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the beta term of decomposed Nash-Sutcliffe-Efficiency (NSE).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obs : (N,)array_like</span>
+<span class="sd">        Observed time series as 1-D array</span>
+
+<span class="sd">    sim : (N,)array_like</span>
+<span class="sd">        Simulated time series as 1-D array</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nse_beta : float</span>
+<span class="sd">        beta term of decomposed Nash-Sutcliffe-Efficiency (NSE)</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Provide arrays with equal length</span>
+
+<span class="sd">    &gt;&gt;&gt; from de import de</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])</span>
+<span class="sd">    &gt;&gt;&gt; sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])</span>
+<span class="sd">    &gt;&gt;&gt; nse.calc_nse_beta(obs, sim)</span>
+<span class="sd">    0.2907828720750609</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \beta_{n} = \frac{\mu_{sim} - \mu_{obs}}{\sigma_{obs}}</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Gupta, H. V., Kling, H., Yilmaz, K. K., and Martinez, G. F.: Decomposition</span>
+<span class="sd">    of the mean squared error and NSE performance criteria: Implications for</span>
+<span class="sd">    improving hydrological modelling, Journal of Hydrology, 377, 80-91,</span>
+<span class="sd">    10.1016/j.jhydrol.2009.08.003, 2009.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Arrays are not of equal length!&quot;</span><span class="p">)</span>
+    <span class="n">sim_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sim</span><span class="p">)</span>
+    <span class="n">obs_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+    <span class="n">obs_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+    <span class="n">nse_beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">sim_mean</span> <span class="o">-</span> <span class="n">obs_mean</span><span class="p">)</span><span class="o">/</span><span class="n">obs_std</span>
+
+    <span class="k">return</span> <span class="n">nse_beta</span>
+
+<span class="k">def</span> <span class="nf">calc_nse_alpha</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the alpha term of decomposed Nash-Sutcliffe-Efficiency (NSE).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obs : (N,)array_like</span>
+<span class="sd">        Observed time series as 1-D array</span>
+
+<span class="sd">    sim : (N,)array_like</span>
+<span class="sd">        Simulated time series as 1-D array</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nse_alpha : float</span>
+<span class="sd">        alpha term of decomposed Nash-Sutcliffe-Efficiency</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Provide arrays with equal length</span>
+
+<span class="sd">    &gt;&gt;&gt; from de import de</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])</span>
+<span class="sd">    &gt;&gt;&gt; sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])</span>
+<span class="sd">    &gt;&gt;&gt; nse.calc_nse_alpha(obs, sim)</span>
+<span class="sd">    1.2812057455166919</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \alpha = \frac{\sigma_{sim}}{\sigma_{obs}}</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Gupta, H. V., Kling, H., Yilmaz, K. K., and Martinez, G. F.: Decomposition</span>
+<span class="sd">    of the mean squared error and NSE performance criteria: Implications for</span>
+<span class="sd">    improving hydrological modelling, Journal of Hydrology, 377, 80-91,</span>
+<span class="sd">    10.1016/j.jhydrol.2009.08.003, 2009.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Arrays are not of equal length!&quot;</span><span class="p">)</span>
+
+    <span class="c1"># calculate alpha term</span>
+    <span class="n">obs_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+    <span class="n">sim_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">sim</span><span class="p">)</span>
+    <span class="n">nse_alpha</span> <span class="o">=</span> <span class="n">sim_std</span><span class="o">/</span><span class="n">obs_std</span>
+
+    <span class="k">return</span> <span class="n">nse_alpha</span>
+
+<span class="k">def</span> <span class="nf">calc_nse_r</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate linear correlation between observed and simulated time series.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obs : (N,)array_like</span>
+<span class="sd">        Observed time series as 1-D array</span>
+
+<span class="sd">    sim : (N,)array_like</span>
+<span class="sd">        Simulated time series</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lin_cor : float</span>
+<span class="sd">        Linear correlation between observed and simulated time series</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Provide arrays with equal length</span>
+
+<span class="sd">    &gt;&gt;&gt; from de import de</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])</span>
+<span class="sd">    &gt;&gt;&gt; sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])</span>
+<span class="sd">    &gt;&gt;&gt; nse.calc_nse_r(obs, sim)</span>
+<span class="sd">    0.8940281850583509</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Gupta, H. V., Kling, H., Yilmaz, K. K., and Martinez, G. F.: Decomposition</span>
+<span class="sd">    of the mean squared error and NSE performance criteria: Implications for</span>
+<span class="sd">    improving hydrological modelling, Journal of Hydrology, 377, 80-91,</span>
+<span class="sd">    10.1016/j.jhydrol.2009.08.003, 2009.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Arrays are not of equal length!&quot;</span><span class="p">)</span>
+
+    <span class="n">lin_cor</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lin_cor</span><span class="p">):</span>
+        <span class="n">lin_cor</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">lin_cor</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">de</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=schwemro&repo=de&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/reference.html">Code Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+
+<hr />
+<ul>
+    
+    <li class="toctree-l1"><a href="de.pdf">Download PDF</a></li>
+    
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Robin Schwemmle.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

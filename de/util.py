@@ -17,10 +17,11 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import scipy as sp
 import seaborn as sns
-# controlling figure aesthetics
-sns.set_style('ticks', {'xtick.major.size': 8, 'ytick.major.size': 8})
 import datetime as dt
 from de import de
+
+# controlling figure aesthetics
+sns.set_style('ticks', {'xtick.major.size': 8, 'ytick.major.size': 8})
 
 __title__ = 'de'
 __version__ = '0.1'
@@ -97,7 +98,7 @@ def import_camels_ts(path, sep=r"\s+", catch_area=None):
 def import_camels_obs_sim(path, sep=r"\s+"):
     """
     Import .txt-file containing observed and simulated streamflow time series
-    from CAMELS dataset (cubic feet per second).
+    from CAMELS dataset (mm per day).
 
     Parameters
     ----------
@@ -110,7 +111,7 @@ def import_camels_obs_sim(path, sep=r"\s+"):
     Returns
     ----------
     obs_sim : dataframe
-        observed and simulated time series in m3/s
+        observed and simulated time series in mm/day
     """
     obs_sim = pd.read_csv(path, sep=sep, na_values=-999, header=0,
                           parse_dates=[[0, 1, 2]], index_col=0)

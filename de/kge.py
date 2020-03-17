@@ -477,7 +477,6 @@ def diag_polar_plot(obs, sim, r='pearson', var='std'):
 
         eff = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_gamma - 1)**2 +
                           (kge_r - 1)**2)
-        eff = np.round(eff, decimals=2)
 
         # convert to radians
         # (y, x) Trigonometric inverse tangent
@@ -490,12 +489,7 @@ def diag_polar_plot(obs, sim, r='pearson', var='std'):
         delta = 0.01  # for spacing
 
         # determine axis limits
-        if eff > 0:
-            ax_lim = eff - .1
-            ax_lim = np.around(ax_lim, decimals=1)
-            yy = np.arange(ax_lim, 1.01, delta)[::-1]
-            c_levels = np.arange(ax_lim+.1, 1.1, .1)
-        elif eff >= 0:
+        if eff >= 0:
             ax_lim = 0.2
             yy = np.arange(-ax_lim, 1.01, delta)[::-1]
             c_levels = np.arange(0, 1, .2)
@@ -548,10 +542,10 @@ def diag_polar_plot(obs, sim, r='pearson', var='std'):
             ax.scatter(phi, eff, color=rgba_color)
         ax.set_rticks([])  # turn defalut ticks off
         ax.set_rmin(1)
-        if eff > 0:
-            ax.set_rmax(ax_lim)
+        if eff >= 0:
+            ax.set_rmax(0)
         elif eff <= 0:
-            ax.set_rmax(-ax_lim)
+            ax.set_rmax(-ax_lim + .2)
         # turn labels and grid off
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                        labelbottom=True, grid_alpha=.01)
@@ -593,7 +587,6 @@ def diag_polar_plot(obs, sim, r='pearson', var='std'):
 
         eff = 1 - np.sqrt((kge_alpha - 1)**2 + (kge_beta - 1)**2 +
                           (kge_r - 1)**2)
-        eff = np.round(eff, decimals=2)
 
         # convert to radians
         # (y, x) Trigonometric inverse tangent
@@ -606,12 +599,7 @@ def diag_polar_plot(obs, sim, r='pearson', var='std'):
         delta = 0.01  # for spacing
 
         # determine axis limits
-        if eff > 0:
-            ax_lim = eff - .1
-            ax_lim = np.around(ax_lim, decimals=1)
-            yy = np.arange(ax_lim, 1.01, delta)[::-1]
-            c_levels = np.arange(ax_lim+.1, 1.1, .1)
-        elif eff >= 0:
+        if eff >= 0:
             ax_lim = 0.2
             yy = np.arange(-ax_lim, 1.01, delta)[::-1]
             c_levels = np.arange(0, 1, .2)
@@ -664,10 +652,10 @@ def diag_polar_plot(obs, sim, r='pearson', var='std'):
             ax.scatter(phi, eff, color=rgba_color)
         ax.set_rticks([])  # turn defalut ticks off
         ax.set_rmin(1)
-        if eff > 0:
-            ax.set_rmax(ax_lim)
-        elif eff <= 0:
-            ax.set_rmax(-ax_lim)
+        if eff >= 0:
+            ax.set_rmax(0)
+        elif eff < 0:
+            ax.set_rmax(-ax_lim + .2)
         # turn labels and grid off
         ax.tick_params(labelleft=False, labelright=False, labeltop=False,
                        labelbottom=True, grid_alpha=.01)
@@ -763,12 +751,7 @@ def diag_polar_plot_multi(kge_beta, alpha_or_gamma, kge_r, eff_kge,
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if eff_min > 0:
-        ax_lim = eff_min - .1
-        ax_lim = np.around(ax_lim, decimals=1)
-        yy = np.arange(ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(ax_lim+.1, 1.1, .1)
-    elif eff_min >= 0:
+    if eff_min >= 0:
         ax_lim = 0.2
         yy = np.arange(-ax_lim, 1.01, delta)[::-1]
         c_levels = np.arange(0, 1, .2)
@@ -855,10 +838,10 @@ def diag_polar_plot_multi(kge_beta, alpha_or_gamma, kge_r, eff_kge,
         ax.set_xticklabels(['', '', '', '', '', '', '', ''])
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
-        if eff_min > 0:
-            ax.set_rmax(ax_lim)
-        elif eff_min <= 0:
-            ax.set_rmax(-ax_lim)
+        if eff_min >= 0:
+            ax.set_rmax(0)
+        elif eff_min < 0:
+            ax.set_rmax(-ax_lim + .2)
         # add colorbar for temporal correlation
         cbar = fig.colorbar(dummie_cax, ax=ax, orientation='horizontal',
                             ticks=[1, 0.5, 0], shrink=0.8)
