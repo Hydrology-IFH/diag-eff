@@ -1,0 +1,41 @@
+\babel@toc {english}{}
+\contentsline {chapter}{\numberline {1}Welcome to de\IeC {\textquoteright }s documentation!}{1}{chapter.1}
+\contentsline {chapter}{\numberline {2}How to cite}{3}{chapter.2}
+\contentsline {section}{\numberline {2.1}Installation}{3}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}PyPI}{3}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}GitHub}{3}{subsection.2.1.2}
+\contentsline {subsection}{\numberline {2.1.3}Note}{3}{subsection.2.1.3}
+\contentsline {section}{\numberline {2.2}Getting started}{4}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Diagnostic Efficiency}{4}{subsection.2.2.1}
+\contentsline {subsection}{\numberline {2.2.2}Diagnostic polar plot}{4}{subsection.2.2.2}
+\contentsline {section}{\numberline {2.3}Tutorials}{5}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Proof of concept}{6}{subsection.2.3.1}
+\contentsline {subsubsection}{Observed streamflow time series from CAMELS dataset}{6}{subsubsection*.3}
+\contentsline {subsubsection}{Mimicking errors}{7}{subsubsection*.4}
+\contentsline {paragraph}{Positive constant error}{7}{paragraph*.5}
+\contentsline {paragraph}{Positive dynamic error}{9}{paragraph*.6}
+\contentsline {paragraph}{Timing error}{10}{paragraph*.7}
+\contentsline {subsubsection}{References}{12}{subsubsection*.8}
+\contentsline {subsection}{\numberline {2.3.2}Real case example}{12}{subsection.2.3.2}
+\contentsline {subsubsection}{Observed streamflow time series and simulated streamflow time series from CAMELS dataset}{13}{subsubsection*.9}
+\contentsline {subsubsection}{Plotting simulated streamflow time series and corresponding flow duration curves}{13}{subsubsection*.10}
+\contentsline {subsubsection}{Evaluation of model performance}{15}{subsubsection*.11}
+\contentsline {paragraph}{Calculation of DE, KGE and NSE}{16}{paragraph*.12}
+\contentsline {subsubsection}{Diagnostic polar plot}{18}{subsubsection*.13}
+\contentsline {subsubsection}{References}{19}{subsubsection*.14}
+\contentsline {section}{\numberline {2.4}Code Reference}{19}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}de}{19}{subsection.2.4.1}
+\contentsline {subsubsection}{Diagnostic Efficiency}{19}{subsubsection*.15}
+\contentsline {subsubsection}{Diagnostic Polar Plot}{20}{subsubsection*.17}
+\contentsline {subsection}{\numberline {2.4.2}generate\_errors}{20}{subsection.2.4.2}
+\contentsline {subsubsection}{Constant error}{20}{subsubsection*.19}
+\contentsline {subsubsection}{Dynamic error}{21}{subsubsection*.21}
+\contentsline {subsubsection}{Timing error}{21}{subsubsection*.24}
+\contentsline {subsection}{\numberline {2.4.3}kge}{22}{subsection.2.4.3}
+\contentsline {subsubsection}{Kling\sphinxhyphen {}Gupta Efficiency}{22}{subsubsection*.26}
+\contentsline {subsubsection}{Diagnostic Polar Plot}{23}{subsubsection*.28}
+\contentsline {subsection}{\numberline {2.4.4}nse}{23}{subsection.2.4.4}
+\contentsline {subsubsection}{Nash\sphinxhyphen {}Sutcliffe Efficiency}{23}{subsubsection*.30}
+\contentsline {section}{\numberline {2.5}Changelog}{24}{section.2.5}
+\contentsline {subsection}{\numberline {2.5.1}Version 0.1}{24}{subsection.2.5.1}
+\contentsline {chapter}{Index}{25}{section*.32}

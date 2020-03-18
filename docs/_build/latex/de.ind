@@ -1,0 +1,30 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter C
+  \item \spxentry{calc\_de()}\spxextra{in module de.de}, \hyperpage{19}
+  \item \spxentry{calc\_kge()}\spxextra{in module de.kge}, \hyperpage{22}
+  \item \spxentry{calc\_nse()}\spxextra{in module de.nse}, \hyperpage{23}
+  \item \spxentry{constant()}\spxextra{in module de.generate\_errors}, \hyperpage{20}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{diag\_polar\_plot()}\spxextra{in module de.de}, \hyperpage{20}
+  \item \spxentry{diag\_polar\_plot()}\spxextra{in module de.kge}, \hyperpage{23}
+
+  \indexspace
+  \bigletter N
+  \item \spxentry{negative\_dynamic()}\spxextra{in module de.generate\_errors}, \hyperpage{21}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{positive\_dynamic()}\spxextra{in module de.generate\_errors}, \hyperpage{21}
+
+  \indexspace
+  \bigletter T
+  \item \spxentry{timing()}\spxextra{in module de.generate\_errors}, \hyperpage{21}
+
+\end{sphinxtheindex}
