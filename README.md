@@ -4,7 +4,7 @@ Info: `de` needs Python >= 3.6!
 
 ##### Development branch
 [![Build Status](https://travis-ci.com/schwemro/de.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master)](https://travis-ci.com/schwemro/de)
-[![Documentation Status](https://readthedocs.org/projects/de/badge/?version=latest)](http://ansicolortags.readthedocs.io/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/de/badge/?version=latest)](https://de.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/schwemro/de/branch/master/graph/badge.svg)](https://codecov.io/gh/schwemro/de)
 [![PyPI version shields.io](https://img.shields.io/pypi/v/de.svg)](https://pypi.python.org/pypi/de/)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
@@ -23,7 +23,7 @@ as:
 
 ## Full Documentation
 
-The full documentation can be found at: https://schwemro.github.io/de
+The full documentation can be found at: https://de.readthedocs.io
 
 ## License
 This software can be distributed freely under the GPL v3 license. Please read the LICENSE for further information.

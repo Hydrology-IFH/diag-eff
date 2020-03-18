@@ -3,6 +3,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
+import versioneer
 
 long_description = """de is an open-source toolbox written in Python for
 specific evaluation of model performance. The toolbox provides functions to
@@ -28,7 +29,8 @@ TEST_REQUIRES = [
 setup(
     name='de',
 
-    version='0.1',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
 
     description='DE: Diagnostic Efficiency',
     long_description=long_description,
