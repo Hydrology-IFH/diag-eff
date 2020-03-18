@@ -1,6 +1,6 @@
 # Diagnostic efficiency <img src="logo.png" align="right" width="120" />
 
-Info: de needs Python >= 3.6!
+Info: `de` needs Python >= 3.6!
 
 ##### Development branch
 [![Build Status](https://travis-ci.com/schwemro/de.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master)](https://travis-ci.com/schwemro/de)
@@ -17,7 +17,9 @@ Info: de needs Python >= 3.6!
 In case you use de in other software or scientific publications,
 please reference this module. It is published and has a DOI. It can be cited
 as:
-    ...
+    Schwemmle, R., Demand, D., and Weiler, M.: Diagnostic efficiency – specific
+    evaluation of model performance, Hydrol. Earth Syst. Sci., X, xxxx-xxxx,
+    DOI: [xxx](https://doi.org/xxxx), 2020.
 
 ## Full Documentation
 
@@ -30,7 +32,11 @@ This software can be distributed freely under the GPL v3 license. Please read th
 
 ## Description
 
-...
+`de` is an open-source toolbox written in Python for specific evaluation of
+model performance. The toolbox provides functions to calculate the Diagnostic
+Efficiency metric and and fucntions to visualize contribution of metric terms
+by diagnostic polar plots. Additionally, functions to calculate KGE and NSE
+are available.
 
 ## Installation
 PyPI:
@@ -51,18 +57,23 @@ pip install -e .
 ## Usage
 
 ```python
+from pathlib import Path  # OS-independent path handling
 from de import de
 from de import util
 
-path = '.../obs_sim.csv'
-df_ts = util.import_ts(path, sep=';')
+# set path to example data
+path_cam = Path('/examples/camels_example_data/13331500_94_model_output.txt')
 
-obs_arr = df_ts['Qobs'].values
-sim_arr = df_ts['Qsim'].values
+# import example data as dataframe
+df_cam = util.import_camels_obs_sim(path_cam)
+
+# make arrays
+obs_arr = df_cam['Qobs'].values
+sim_arr = df_cam['Qsim'].values
 
 # calculate diagnostic efficiency
 sig_de = de.calc_de(obs_arr, sim_arr)
 
 # diagnostic polar plot
-de.vis2d_de(obs_arr, sim_arr)
+de.diag_polar_plot(obs_arr, sim_arr)
 ```

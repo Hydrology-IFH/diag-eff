@@ -23,12 +23,12 @@ DEFAULT_TOLERANCE = 10 if WIN else 2
 def test_de_for_arrays():
     eff = de.calc_de(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
                      sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]))
-    assert eff == pytest.approx(0.8177285723180813)
+    assert eff == pytest.approx(0.8177285723180813, rel=1e-4)
 
 def test_temp_cor_for_arrays():
     eff = de.calc_temp_cor(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
                            sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]))
-    assert eff == pytest.approx(0.8940281850583509)
+    assert eff == pytest.approx(0.8940281850583509, rel=1e-4)
 
 def test_brel_mean_simulation_equals_obs_mean():
     brel_mean = de.calc_brel_mean(obs=np.array([1, 2, 3, 4, 5]),
