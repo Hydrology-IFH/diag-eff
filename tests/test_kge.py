@@ -22,33 +22,33 @@ DEFAULT_TOLERANCE = 10 if WIN else 2
 def test_kge_for_arrays():
     eff = kge.calc_kge(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
                        sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]))
-    assert eff == 0.683901305466148
+    assert eff == 0.6839013054661
 
 def test_kge_skill_for_arrays():
     eff = kge.calc_kge_skill(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
                              sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
                              bench=np.array([1, 1.1, 1.15, 1.15, 1.1, 1]))
-    assert eff == 0.8467044616487865
+    assert eff == 0.84670446164878
 
 def test_beta_for_arrays():
     beta = kge.calc_kge_beta(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
                              sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]))
-    assert beta == 1.0980392156862746
+    assert beta == 1.09803921568627
 
 def test_alpha_for_arrays():
     alpha = kge.calc_kge_alpha(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
                                sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]))
-    assert alpha == 1.2812057455166919
+    assert alpha == 1.28120574551669
 
 def test_gamma_for_arrays():
     gamma = kge.calc_kge_gamma(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
                                sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]))
-    assert gamma == 1.166812375381273
+    assert gamma == 1.1668123753812
 
 def test_temp_cor_for_arrays():
     temp_cor = kge.calc_temp_cor(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
                                  sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]))
-    assert temp_cor == 0.8940281850583509
+    assert temp_cor == 0.89402818505835
 
 @pytest.mark.mpl_image_compare(baseline_dir=baseline_dir_single,
                                tolerance=DEFAULT_TOLERANCE)
