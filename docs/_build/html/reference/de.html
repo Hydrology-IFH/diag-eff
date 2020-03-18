@@ -42,28 +42,28 @@
 <dl class="function">
 <dt id="de.de.calc_de">
 <code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">calc_de</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">sort=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#calc_de"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.calc_de" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Calculate Diagnostic-Efficiency (DE).</p>
-<dl class="simple">
-<dt>obs<span class="classifier">(N,)array_like</span></dt><dd><p>Observed time series as 1-D array</p>
+<dd><p>Calculate Diagnostic-Efficiency (DE).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Observed time series as 1-D array</p></li>
+<li><p><strong>sim</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Simulated time series</p></li>
+<li><p><strong>sort</strong> (<em>boolean</em><em>, </em><em>optional</em>) – If True, time series are sorted by ascending order. If False, time
+series are not sorted. The default is to sort.</p></li>
+</ul>
 </dd>
-<dt>sim<span class="classifier">(N,)array_like</span></dt><dd><p>Simulated time series</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>eff</strong> – non-normalized Diagnostic efficiency</p>
 </dd>
-<dt>sort<span class="classifier">boolean, optional</span></dt><dd><p>If True, time series are sorted by ascending order. If False, time
-series are not sorted. The default is to sort.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)">float</a></p>
 </dd>
 </dl>
-<dl class="simple">
-<dt>eff<span class="classifier">float</span></dt><dd><p>non-normalized Diagnostic efficiency</p>
-</dd>
-</dl>
+<p class="rubric">Notes</p>
 <div class="math notranslate nohighlight">
-\[DE = 1 - \sqrt{\overline{B_{rel}}^2 +\]</div>
-</div></blockquote>
-<p>ert B_{area}
-ert^2 + (r - 1)^2}</p>
-<blockquote>
-<div><p>Provide arrays with equal length</p>
+\[DE = 1 - \sqrt{\overline{B_{rel}}^2 + \vert B_{area}\vert^2 + (r - 1)^2}\]</div>
+<p class="rubric">Examples</p>
+<p>Provide arrays with equal length</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
@@ -72,7 +72,6 @@ ert^2 + (r - 1)^2}</p>
 <span class="go">0.8177285723180813</span>
 </pre></div>
 </div>
-</div></blockquote>
 </dd></dl>
 
 </div>
@@ -81,35 +80,34 @@ ert^2 + (r - 1)^2}</p>
 <dl class="function">
 <dt id="de.de.diag_polar_plot">
 <code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">diag_polar_plot</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">sort=True</em>, <em class="sig-param">l=0.05</em>, <em class="sig-param">extended=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#diag_polar_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.diag_polar_plot" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Diagnostic polar plot of Diagnostic efficiency (DE) for a single
+<dd><p>Diagnostic polar plot of Diagnostic efficiency (DE) for a single
 evaluation.</p>
-<dl class="simple">
-<dt>obs<span class="classifier">(N,)array_like</span></dt><dd><p>Observed time series as 1-D array</p>
-</dd>
-<dt>sim<span class="classifier">(N,)array_like</span></dt><dd><p>Simulated time series as 1-D array</p>
-</dd>
-<dt>sort<span class="classifier">boolean, optional</span></dt><dd><p>If True, time series are sorted by ascending order. If False, time
-series are not sorted. The default is to sort.</p>
-</dd>
-<dt>l<span class="classifier">float, optional</span></dt><dd><p>Threshold for which diagnosis can be made. The default is 0.05.</p>
-</dd>
-<dt>extended<span class="classifier">boolean, optional</span></dt><dd><p>If True, extended diagnostic plot is displayed. In addtion, the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Observed time series as 1-D array</p></li>
+<li><p><strong>sim</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Simulated time series as 1-D array</p></li>
+<li><p><strong>sort</strong> (<em>boolean</em><em>, </em><em>optional</em>) – If True, time series are sorted by ascending order. If False, time
+series are not sorted. The default is to sort.</p></li>
+<li><p><strong>l</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Threshold for which diagnosis can be made. The default is 0.05.</p></li>
+<li><p><strong>extended</strong> (<em>boolean</em><em>, </em><em>optional</em>) – If True, extended diagnostic plot is displayed. In addtion, the
 duration curve of B_rest is plotted besides the polar plot. The default
-is, that only the diagnostic polar plot is displayed.</p>
+is, that only the diagnostic polar plot is displayed.</p></li>
+</ul>
 </dd>
-</dl>
-<dl class="simple">
-<dt>fig<span class="classifier">Figure</span></dt><dd><p>Returns a single figure if extended=False and two figures if
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>fig</strong> – Returns a single figure if extended=False and two figures if
 extended=True.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Figure</p>
+</dd>
 </dl>
+<p class="rubric">Notes</p>
 <div class="math notranslate nohighlight">
-\[\]</div>
-</div></blockquote>
-<p>arphi = arctan2(overline{B_{rel}}, B_{slope})</p>
-<blockquote>
-<div><p>Provide arrays with equal length</p>
+\[\varphi = arctan2(\overline{B_{rel}}, B_{slope})\]</div>
+<p class="rubric">Examples</p>
+<p>Provide arrays with equal length</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
@@ -117,7 +115,6 @@ extended=True.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">de</span><span class="o">.</span><span class="n">diag_polar_plot</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
 </pre></div>
 </div>
-</div></blockquote>
 </dd></dl>
 
 </div>

@@ -48,6 +48,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">random</span>
 <span class="c1"># RunTimeWarning will not be displayed (division by zeros or NaN values)</span>
 <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -156,7 +157,7 @@
 
     <span class="k">return</span> <span class="n">ts_dyn</span></div>
 
-<div class="viewcode-block" id="timing"><a class="viewcode-back" href="../../reference/generate_errors.html#de.generate_errors.timing">[docs]</a><span class="k">def</span> <span class="nf">timing</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">tshift</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="timing"><a class="viewcode-back" href="../../reference/generate_errors.html#de.generate_errors.timing">[docs]</a><span class="k">def</span> <span class="nf">timing</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">tshift</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mimicking timing errors.</span>
 
@@ -171,7 +172,7 @@
 <span class="sd">        days by which time series is shifted. Both positive and negative</span>
 <span class="sd">        time shift are possible. The default is 3 days.</span>
 
-<span class="sd">    random : boolean, optional</span>
+<span class="sd">    shuffle : boolean, optional</span>
 <span class="sd">        If True, time series is shuffled. The default is shuffling.</span>
 
 <span class="sd">    Returns</span>
@@ -179,7 +180,7 @@
 <span class="sd">    ts_tim : dataframe</span>
 <span class="sd">        Time series with timing error</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">random</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">shuffle</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
         <span class="n">ts_tim</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">tshift</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tshift</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">ts_tim</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">tshift</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="n">tshift</span><span class="p">:]</span>
@@ -187,10 +188,11 @@
         <span class="k">elif</span> <span class="n">tshift</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">ts_tim</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">tshift</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="o">-</span><span class="n">tshift</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">random</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">shuffle</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">ts_tim</span> <span class="o">=</span> <span class="n">ts</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">ts_tim</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">ts_tim</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
 
     <span class="k">return</span> <span class="n">ts_tim</span></div>

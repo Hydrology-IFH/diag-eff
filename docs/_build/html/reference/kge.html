@@ -42,27 +42,29 @@
 <dl class="function">
 <dt id="de.kge.calc_kge">
 <code class="sig-prename descclassname">de.kge.</code><code class="sig-name descname">calc_kge</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">r='pearson'</em>, <em class="sig-param">var='std'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/kge.html#calc_kge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.kge.calc_kge" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Calculate Kling-Gupta-Efficiency (KGE).</p>
-<dl class="simple">
-<dt>obs<span class="classifier">(N,)array_like</span></dt><dd><p>Observed time series as 1-D array</p>
-</dd>
-<dt>sim<span class="classifier">(N,)array_like</span></dt><dd><p>Simulated time series as 1-D array</p>
-</dd>
-<dt>r<span class="classifier">str, optional</span></dt><dd><p>Either Spearman correlation coefficient (‘spearman’; Pool et al. 2018)
+<dd><p>Calculate Kling-Gupta-Efficiency (KGE).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Observed time series as 1-D array</p></li>
+<li><p><strong>sim</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Simulated time series as 1-D array</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Either Spearman correlation coefficient (‘spearman’; Pool et al. 2018)
 or Pearson correlation coefficient (‘pearson’; Gupta et al. 2009) can
 be used to describe the temporal correlation. The default is to
-calculate the Pearson correlation.</p>
-</dd>
-<dt>var<span class="classifier">str, optional</span></dt><dd><p>Either coefficient of variation (‘cv’; Kling et al. 2012) or standard
+calculate the Pearson correlation.</p></li>
+<li><p><strong>var</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Either coefficient of variation (‘cv’; Kling et al. 2012) or standard
 deviation (‘std’; Gupta et al. 2009, Pool et al. 2018) to describe the
-gamma term. The default is to calculate the standard deviation.</p>
+gamma term. The default is to calculate the standard deviation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>eff</strong> – Kling-Gupta-Efficiency measure</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)">float</a></p>
 </dd>
 </dl>
-<dl class="simple">
-<dt>eff<span class="classifier">float</span></dt><dd><p>Kling-Gupta-Efficiency measure</p>
-</dd>
-</dl>
+<p class="rubric">Examples</p>
 <p>Provide arrays with equal length</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -72,19 +74,11 @@ gamma term. The default is to calculate the standard deviation.</p>
 <span class="go">0.683901305466148</span>
 </pre></div>
 </div>
+<p class="rubric">Notes</p>
 <div class="math notranslate nohighlight">
-\[ \begin{align}\begin{aligned}KGE = 1 - \sqrt{(eta - 1)^2 + (lpha - 1)^2 + (r - 1)^2}\\KGE = 1 - \sqrt{(\end{aligned}\end{align} \]</div>
-</div></blockquote>
-<p>rac{mu_{sim}}{mu_{obs}} - 1)^2 + (
-rac{sigma_{sim}}{sigma_{obs}} - 1)^2 + (r - 1)^2}</p>
-<blockquote>
-<div><p>KGE = 1 - sqrt{(eta - 1)^2 + (gamma - 1)^2 + (r - 1)^2}</p>
-<p>KGE = 1 - sqrt{(</p>
-</div></blockquote>
-<p>rac{mu_{sim}}{mu_{obs}} - 1)^2 + (
-rac{CV_{sim}}{CV_{obs}} - 1)^2 + (r - 1)^2}</p>
-<blockquote>
-<div><p>Gupta, H. V., Kling, H., Yilmaz, K. K., and Martinez, G. F.: Decomposition
+\[ \begin{align}\begin{aligned}KGE = 1 - \sqrt{(\beta - 1)^2 + (\alpha - 1)^2 + (r - 1)^2}\\KGE = 1 - \sqrt{(\frac{\mu_{sim}}{\mu_{obs}} - 1)^2 + (\frac{\sigma_{sim}}{\sigma_{obs}} - 1)^2 + (r - 1)^2}\\KGE = 1 - \sqrt{(\beta - 1)^2 + (\gamma - 1)^2 + (r - 1)^2}\\KGE = 1 - \sqrt{(\frac{\mu_{sim}}{\mu_{obs}} - 1)^2 + (\frac{CV_{sim}}{CV_{obs}} - 1)^2 + (r - 1)^2}\end{aligned}\end{align} \]</div>
+<p class="rubric">References</p>
+<p>Gupta, H. V., Kling, H., Yilmaz, K. K., and Martinez, G. F.: Decomposition
 of the mean squared error and NSE performance criteria: Implications for
 improving hydrological modelling, Journal of Hydrology, 377, 80-91,
 10.1016/j.jhydrol.2009.08.003, 2009.</p>
@@ -94,7 +88,6 @@ Hydrology, 424-425, 264-277, 10.1016/j.jhydrol.2012.01.011, 2012.</p>
 <p>Pool, S., Vis, M., and Seibert, J.: Evaluating model performance: towards a
 non-parametric variant of the Kling-Gupta efficiency, Hydrological Sciences
 Journal, 63, 1941-1953, 10.1080/02626667.2018.1552002, 2018.</p>
-</div></blockquote>
 </dd></dl>
 
 </div>
