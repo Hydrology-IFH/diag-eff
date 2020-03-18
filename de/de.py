@@ -35,7 +35,7 @@ __license__ = 'GNU GPLv3'
 
 
 def calc_brel_mean(obs, sim, sort=True):
-    """
+    r"""
     Calculate arithmetic mean of relative bias.
 
     Parameters
@@ -89,7 +89,7 @@ def calc_brel_mean(obs, sim, sort=True):
     return brel_mean
 
 def calc_brel_rest(obs, sim, sort=True):
-    """
+    r"""
     Subtract arithmetic mean of relative bias from relative bias.
 
     Parameters
@@ -164,7 +164,7 @@ def integrand(y, x):
     return y[i]
 
 def calc_bias_area(brel_rest):
-    """
+    r"""
     Calculate absolute bias area for entire flow duration curve.
 
     Parameters
@@ -203,7 +203,7 @@ def calc_bias_area(brel_rest):
     return b_area[0]
 
 def calc_bias_dir(brel_rest):
-    """
+    r"""
     Calculate absolute bias area for high flow and low flow.
 
     Parameters
@@ -244,7 +244,7 @@ def calc_bias_dir(brel_rest):
     return b_dir
 
 def calc_bias_slope(b_area, b_dir):
-    """
+    r"""
     Calculate slope of bias balance.
 
     Parameters
@@ -350,7 +350,7 @@ def calc_temp_cor(obs, sim, r='pearson'):
     return temp_cor
 
 def calc_de(obs, sim, sort=True):
-    """
+    r"""
     Calculate Diagnostic-Efficiency (DE).
 
     Parameters
@@ -402,7 +402,7 @@ def calc_de(obs, sim, sort=True):
     return eff
 
 def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
-    """
+    r"""
     Diagnostic polar plot of Diagnostic efficiency (DE) for a single
     evaluation.
 
@@ -711,7 +711,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
 
 def diag_polar_plot_multi(brel_mean, b_area, temp_cor, eff_de, b_dir, phi,
                           l=0.05, extended=False):
-    """
+    r"""
     Diagnostic polar plot of Diagnostic efficiency (DE) for multiple
     evaluations.
 
@@ -1052,7 +1052,7 @@ def diag_polar_plot_multi(brel_mean, b_area, temp_cor, eff_de, b_dir, phi,
         return fig, g.fig
 
 def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):
-    """
+    r"""
     Generic diagnostic polar plot for  single evaluation.
 
     Parameters
@@ -1196,7 +1196,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):
     return fig
 
 def gdiag_polar_plot_multi(eff, comp1, comp2, comp3, l=0.05, extended=True):
-    """
+    r"""
     Generic diagnostic polar plot for multiple evaluations.
 
     Parameters

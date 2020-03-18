@@ -85,7 +85,7 @@ def calc_temp_cor(obs, sim, r='pearson'):
     return temp_cor
 
 def calc_kge_beta(obs, sim):
-    """
+    r"""
     Calculate the beta term of Kling-Gupta-Efficiency (KGE).
 
     Parameters
@@ -144,7 +144,7 @@ def calc_kge_beta(obs, sim):
     return kge_beta
 
 def calc_kge_alpha(obs, sim):
-    """
+    r"""
     Calculate the alpha term of the Kling-Gupta-Efficiency (KGE).
 
     Parameters
@@ -202,7 +202,7 @@ def calc_kge_alpha(obs, sim):
     return kge_alpha
 
 def calc_kge_gamma(obs, sim):
-    """
+    r"""
     Calculate the gamma term of Kling-Gupta-Efficiency (KGE).
 
     Parameters
@@ -264,7 +264,7 @@ def calc_kge_gamma(obs, sim):
     return kge_gamma
 
 def calc_kge(obs, sim, r='pearson', var='std'):
-    """
+    r"""
     Calculate Kling-Gupta-Efficiency (KGE).
 
     Parameters

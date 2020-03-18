@@ -72,7 +72,7 @@ def calc_nse(obs, sim):
     return sig
 
 def calc_nse_dec(obs, sim):
-    """
+    r"""
     Calculate the decomposed Nash-Sutcliffe-Efficiency (NSE).
 
     Parameters
