@@ -29,7 +29,7 @@ __license__ = 'GNU GPLv3'
 _mmd = r'[mm $d^{-1}$]'
 _m3s = r'[$m^{3}$ $s^{-1}$]'
 _q_lab = _mmd
-_sim_lab = 'Manipulated'
+_sim_lab = 'Simulated'
 
 def fdc(ts):
     """
@@ -39,6 +39,22 @@ def fdc(ts):
     ----------
     ts : series
         Containing a hydrologic time series
+
+    Returns
+    ----------
+    fig : Figure
+        Returns a single figure containing flow duration curve.
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import fdc
+    >>> import pandas as pd
+    >>> date_rng = pd.date_range(start='1/1/2018', periods=11)
+    >>> arr = np.array([1.5, 1, 0.8, 0.85, 1.5, 2, 2.5, 3.5, 1.8, 1.5, 1.2])
+    >>> ts = pd.Series(data=arr, index=date_rng)
+    >>> fdc.fdc(ts)
     """
     data = ts.dropna()
     data = np.sort(data.values)  # sort values by ascending order
@@ -51,6 +67,7 @@ def fdc(ts):
     ax.plot(prob, data, color='blue')
     ax.set(ylabel=_q_lab,
            xlabel='Exceedence probabilty [-]', yscale='log')
+    fig.subplots_adjust(left=.2)
 
     return fig
 
@@ -65,6 +82,24 @@ def fdc_obs_sim(obs, sim):
         observed time series
     sim : series
         simulated time series
+
+    Returns
+    ----------
+    fig : Figure
+        Returns a single figure containing two flow duration curves.
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import fdc
+    >>> import pandas as pd
+    >>> date_rng = pd.date_range(start='1/1/2018', periods=11)
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2, 2.5, 3.5, 1.8, 1.5, 1.2])
+    >>> ts_obs = pd.Series(data=obs, index=date_rng)
+    >>> sim = np.array([1.4, .9, 1, 0.95, 1.4, 2.1, 2.6, 3.6, 1.9, 1.4, 1.1])
+    >>> ts_sim = pd.Series(data=sim, index=date_rng)
+    >>> fdc.fdc_obs_sim(ts_obs, ts_sim)
     """
     obs_sim = pd.DataFrame(index=obs.index, columns=['obs', 'sim'])
     obs_sim.loc[:, 'obs'] = obs.values
@@ -88,7 +123,8 @@ def fdc_obs_sim(obs, sim):
     ax.set(ylabel=_q_lab,
            xlabel='Exceedence probabilty [-]', yscale='log')
     ax.legend(loc=1)
-    ax.set_ylim(0, )
     ax.set_xlim(0, 1)
+
+    fig.subplots_adjust(left=.2)
 
     return fig

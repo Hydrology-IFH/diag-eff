@@ -33,8 +33,19 @@ def test_negative_constant():
     assert arr_pos[0] < 1
     assert arr_pos[-1] < 5
 
-def test_timing():
+def test_timing_shift():
     arr = np.array([1, 2, 3, 4, 5])
-    arr_tim = generate_errors.timing(arr)
-    assert arr_tim[0] != 1
-    assert arr_tim[-1] != 5
+    date_rng = pd.date_range(start='1/1/2018', periods=5)
+    ts = pd.DataFrame(index=date_rng, columns=['Q'], data=arr)
+    ts_tim = generate_errors.timing(ts, shuffle=False)
+    assert ts_tim['Q'].values[0] == 3
+    assert ts_tim['Q'].values[-1] == 2
+
+def test_timing_shuffling():
+    arr = np.array([1, 2, 3, 4, 5])
+    date_rng = pd.date_range(start='1/1/2018', periods=5)
+    ts = pd.DataFrame(index=date_rng, columns=['Q'], data=arr)
+    ts_tim = generate_errors.timing(ts)
+    arr = np.array([1, 2, 3, 4, 5])
+    diff = np.all(arr == ts_tim['Q'].values)
+    assert diff == False

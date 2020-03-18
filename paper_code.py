@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os  # load modules first before importing .spydata
+PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/'
+os.chdir(PATH)
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,9 +14,6 @@ from de import kge
 from de import nse
 from de import util
 import seaborn as sns
-
-PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/'
-os.chdir(PATH)
 
 # controlling figure aesthetics
 sns.set_style('ticks', {'xtick.major.size': 8, 'ytick.major.size': 8})

@@ -8,7 +8,6 @@ de.util
 :license: GNU GPLv3, see LICENSE for more details.
 """
 
-import datetime as dt
 import pandas as pd
 import numpy as np
 import matplotlib
@@ -17,7 +16,6 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import scipy as sp
 import seaborn as sns
-import datetime as dt
 from de import de
 
 # controlling figure aesthetics
@@ -33,7 +31,7 @@ __license__ = 'GNU GPLv3'
 _mmd = r'[mm $d^{-1}$]'
 _m3s = r'[$m^{3}$ $s^{-1}$]'
 _q_lab = _mmd
-_sim_lab = 'Manipulated'
+_sim_lab = 'Simulated'
 
 def import_ts(path, sep=','):
     """
@@ -60,7 +58,7 @@ def import_ts(path, sep=','):
     return df_ts
 
 def import_camels_ts(path, sep=r"\s+", catch_area=None):
-    """
+    r"""
     Import .txt-file with streamflow time series from CAMELS dataset (cubic
     feet per second).
 
@@ -96,7 +94,7 @@ def import_camels_ts(path, sep=r"\s+", catch_area=None):
     return df_ts
 
 def import_camels_obs_sim(path, sep=r"\s+"):
-    """
+    r"""
     Import .txt-file containing observed and simulated streamflow time series
     from CAMELS dataset (mm per day).
 
@@ -106,7 +104,7 @@ def import_camels_obs_sim(path, sep=r"\s+"):
         Path to .csv-file which contains time series
 
     sep : str, optional
-        Delimeter to use. The default is ‘,’.
+        Delimeter to use. The default is r"\s+".
 
     Returns
     ----------
@@ -135,9 +133,16 @@ def plot_ts(ts):
     ----------
     fig : Figure
         time series plot
+
+    >>> from de import util
+    >>> import pandas as pd
+    >>> date_rng = pd.date_range(start='1/1/2018', periods=11)
+    >>> arr = np.array([1.5, 1, 0.8, 0.85, 1.5, 2, 2.5, 3.5, 1.8, 1.5, 1.2])
+    >>> ts = pd.Series(data=arr, index=date_rng)
+    >>> util.plot_ts(ts)
     """
     fig, ax = plt.subplots()
-    ax.plot(ts.index, ts.iloc[:, 0].values, color='blue')
+    ax.plot(ts.index, ts.values, color='blue')
     ax.set(ylabel=_q_lab,
            xlabel='Time [Years]')
     ax.set_ylim(0, )
@@ -166,14 +171,37 @@ def plot_obs_sim(obs, sim):
     ----------
     fig : Figure
         time series plot
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import util
+    >>> import pandas as pd
+    >>> date_rng = pd.date_range(start='1/1/2018', periods=11)
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2, 2.5, 3.5, 1.8, 1.5, 1.2])
+    >>> ts_obs = pd.Series(data=obs, index=date_rng)
+    >>> sim = np.array([1.4, .9, 1, 0.95, 1.4, 2.1, 2.6, 3.6, 1.9, 1.4, 1.1])
+    >>> ts_sim = pd.Series(data=sim, index=date_rng)
+    >>> util.plot_obs_sim(ts_obs, ts_sim)
     """
     fig, ax = plt.subplots()
-    ax.plot(obs.index, obs, lw=2, color='blue')  # observed time series
+    # observed time series
+    ax.plot(obs.index, obs, lw=2, color='blue', label='Observed', alpha=.8)
     # simulated time series
-    ax.plot(sim.index, sim, lw=1, ls='-.', color='red', alpha=.8)
+    ax.plot(sim.index, sim, lw=1, ls='-.', color='red', label=_sim_lab,
+            alpha=.9)
     ax.set(ylabel=_q_lab, xlabel='Time')
     ax.set_ylim(0, )
     ax.set_xlim(obs.index[0], obs.index[-1])
+
+    # format the ticks
+    years_20 = mdates.YearLocator(20)
+    years_5 = mdates.YearLocator(5)
+    yearsFmt = mdates.DateFormatter('%Y')
+    ax.xaxis.set_major_locator(years_20)
+    ax.xaxis.set_major_formatter(yearsFmt)
+    ax.xaxis.set_minor_locator(years_5)
 
     return fig
 
@@ -215,7 +243,6 @@ def fdc_obs_sim_ax(obs, sim, ax, fig_num):
             label='Manipulated')
     ax.text(.96, .95, fig_num, transform=ax.transAxes, ha='right', va='top')
     ax.set(yscale='log')
-    ax.set_ylim(0, )
     ax.set_xlim(0, 1)
 
 def plot_obs_sim_ax(obs, sim, ax, fig_num):
@@ -235,7 +262,7 @@ def plot_obs_sim_ax(obs, sim, ax, fig_num):
     # observed time series
     ax.plot(obs.index, obs, lw=2, color='blue', label='Observed', alpha=.8)
     ax.plot(sim.index, sim, lw=1.5, ls='-.', color='red', alpha=.9,
-            label='Manipulated')  # simulated time series
+            label=_sim_lab)  # simulated time series
     ax.set_ylim(0, )
     ax.set_xlim(obs.index[0], obs.index[-1])
     ax.text(.96, .95, fig_num, transform=ax.transAxes, ha='right', va='top')
@@ -249,7 +276,7 @@ def plot_obs_sim_ax(obs, sim, ax, fig_num):
 
 def diag_polar_plot_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
                              fc, l=0.05, ax_lim=-.6):
-    """Multiple polar plot of Diagnostic-Efficiency (DE)
+    r"""Multiple polar plot of Diagnostic-Efficiency (DE)
 
     Parameters
     ----------

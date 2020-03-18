@@ -12,6 +12,7 @@ Mimicking three different error types:
 """
 
 import numpy as np
+import random
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
 np.seterr(divide='ignore', invalid='ignore')
 import pandas as pd
@@ -120,7 +121,7 @@ def positive_dynamic(ts, prop=0.5):
 
     return ts_dyn
 
-def timing(ts, tshift=3, random=True):
+def timing(ts, tshift=3, shuffle=True):
     """
     Mimicking timing errors.
 
@@ -135,7 +136,7 @@ def timing(ts, tshift=3, random=True):
         days by which time series is shifted. Both positive and negative
         time shift are possible. The default is 3 days.
 
-    random : boolean, optional
+    shuffle : boolean, optional
         If True, time series is shuffled. The default is shuffling.
 
     Returns
@@ -143,7 +144,7 @@ def timing(ts, tshift=3, random=True):
     ts_tim : dataframe
         Time series with timing error
     """
-    if not random:
+    if shuffle is False:
         ts_tim = ts.shift(periods=tshift, fill_value=0)
         if tshift > 0:
             ts_tim.iloc[:tshift, 0] = ts.iloc[:, 0].values[-tshift:]
@@ -151,10 +152,11 @@ def timing(ts, tshift=3, random=True):
         elif tshift < 0:
             ts_tim.iloc[tshift:, 0] = ts.iloc[:, 0].values[:-tshift]
 
-    if random:
+    elif shuffle is True:
         ts_tim = ts
         y = ts_tim.iloc[:, 0].values
-        np.random.shuffle(y)
+        random.seed(42)
+        random.shuffle(y)
         ts_tim.iloc[:, 0] = y
 
     return ts_tim
