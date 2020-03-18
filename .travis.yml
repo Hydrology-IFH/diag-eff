@@ -8,7 +8,7 @@ python:
 matrix:
   fast_finish: true
   include:
-    ======= OSX ========
+      #  ======= OSX ========
     - name: "Python 3.7.4 on macOS 10.14"
       os: osx
       osx_image: xcode10.3  # Python 3.7.4 running on macOS 10.14.6
