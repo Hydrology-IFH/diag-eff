@@ -1051,7 +1051,7 @@ def diag_polar_plot_multi(brel_mean, b_area, temp_cor, eff_de, b_dir, phi,
 
         return fig, g.fig
 
-def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):
+def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05): # pragma: no cover
     r"""
     Generic diagnostic polar plot for  single evaluation.
 
@@ -1195,7 +1195,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):
 
     return fig
 
-def gdiag_polar_plot_multi(eff, comp1, comp2, comp3, l=0.05, extended=True):
+def gdiag_polar_plot_multi(eff, comp1, comp2, comp3, l=0.05, extended=True): # pragma: no cover
     r"""
     Generic diagnostic polar plot for multiple evaluations.
 

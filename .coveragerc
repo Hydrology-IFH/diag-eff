@@ -4,6 +4,12 @@ include = de/*
 omit =
   tests/*
   */__init__.py
+  # omit single files
+  setup.py
+  glob_eval.py
+  paper_code.py
+  versioneer.py
+  de/signatures.py
 
 [report]
 show_missing = True

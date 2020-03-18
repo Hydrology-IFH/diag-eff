@@ -205,7 +205,7 @@ def plot_obs_sim(obs, sim):
 
     return fig
 
-def fdc_obs_sim_ax(obs, sim, ax, fig_num):
+def fdc_obs_sim_ax(obs, sim, ax, fig_num): # pragma: no cover
     """Plotting the flow duration curves of two hydrologic time series (e.g.
     observed streamflow and simulated streamflow).
 
@@ -245,7 +245,7 @@ def fdc_obs_sim_ax(obs, sim, ax, fig_num):
     ax.set(yscale='log')
     ax.set_xlim(0, 1)
 
-def plot_obs_sim_ax(obs, sim, ax, fig_num):
+def plot_obs_sim_ax(obs, sim, ax, fig_num): # pragma: no cover
     """Plot observed and simulated time series.
 
     Parameters
@@ -275,7 +275,7 @@ def plot_obs_sim_ax(obs, sim, ax, fig_num):
     ax.xaxis.set_minor_locator(years_5)
 
 def diag_polar_plot_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
-                             fc, l=0.05, ax_lim=-.6):
+                             fc, l=0.05, ax_lim=-.6): # pragma: no cover
     r"""Multiple polar plot of Diagnostic-Efficiency (DE)
 
     Parameters
@@ -451,7 +451,7 @@ def diag_polar_plot_multi_fc(brel_mean, b_area, temp_cor, sig_de, b_dir, diag,
     return fig
 
 def diag_polar_plot_kge_multi_fc(kge_beta, alpha_or_gamma, kge_r, sig_kge, fc,
-                                 ax_lim=-.6):
+                                 ax_lim=-.6): # pragma: no cover
     """Diagnostic polar plot of Kling-Gupta efficiency (KGE) with multiple
     values.
 

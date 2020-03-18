@@ -25,10 +25,25 @@ def test_de_for_arrays():
                      sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]))
     assert eff == pytest.approx(0.8177285723180813, rel=1e-4)
 
-def test_temp_cor_for_arrays():
-    eff = de.calc_temp_cor(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
+def test_lin_cor_for_arrays():
+    r = de.calc_temp_cor(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
                            sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]))
-    assert eff == pytest.approx(0.8940281850583509, rel=1e-4)
+    assert r == pytest.approx(0.8940281850583509, rel=1e-4)
+
+def test_nonlin_cor_for_arrays():
+    r = de.calc_temp_cor(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
+                         sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
+                         r='spearman')
+    assert r == pytest.approx(0.8406680016960504, rel=1e-4)
+
+def test_bias_area_for_arrays():
+    b_area = de.calc_bias_area(np.array([.25, .1, 0, -.1, -.25]))
+    assert b_area == pytest.approx(0.13950000057394876, rel=1e-4)
+
+def test_brel_mean_for_arrays():
+    brel_mean = de.calc_brel_mean(obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
+                                  sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]))
+    assert brel_mean == pytest.approx(0.09330065359477124, rel=1e-4)
 
 def test_brel_mean_simulation_equals_obs_mean():
     brel_mean = de.calc_brel_mean(obs=np.array([1, 2, 3, 4, 5]),
@@ -81,8 +96,8 @@ def test_bias_slope_for_equal_arrays():
     assert b_slope == 0
 
 def test_arctan():
-    diag = np.arctan2(0, 0)
-    assert diag == 0
+    phi = np.arctan2(0, 0)
+    assert phi == 0
 
 def test_fdc_sort():
     arr = np.array([1, 2, 3, 4, 5])
