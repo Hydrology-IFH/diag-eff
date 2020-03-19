@@ -335,7 +335,7 @@ if __name__ == "__main__":
     obs_sim = pd.DataFrame(index=df_ts.index, columns=['Qobs', 'Qsim'])
     obs_sim.loc[:, 'Qobs'] = df_ts.loc[:, 'Qobs']
     # generate timing error
-    tss = generate_errors.timing(df_ts.copy(), random=True)  # shuffling
+    tss = generate_errors.timing(df_ts.copy(), shuffle=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tss.iloc[:, 0].values
     util.fdc_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_fdc[0, 4],
                         fig_num_fdc[4])
@@ -608,7 +608,7 @@ if __name__ == "__main__":
     # generate negative constant error
     tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)
     tsn.iloc[:, 0] = tsd.iloc[:, 0].values - tso  # negative offset
-    tst = generate_errors.timing(tsn, random=True)  # shuffling
+    tst = generate_errors.timing(tsn, shuffle=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[1, 4],
                          fig_num_ts[9])
@@ -663,7 +663,7 @@ if __name__ == "__main__":
     # generate positive constant error
     tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)
     tsn.iloc[:, 0] = tsd.iloc[:, 0].values + tso  # negative offset
-    tst = generate_errors.timing(tsn, random=True)  # shuffling
+    tst = generate_errors.timing(tsn, shuffle=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 0],
                          fig_num_ts[10])
@@ -718,7 +718,7 @@ if __name__ == "__main__":
     # generate positive constant offset
     tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)
     tsp.iloc[:, 0] = tsd.iloc[:, 0].values - tso  # negative offset
-    tst = generate_errors.timing(tsp, random=True)  # shuffling
+    tst = generate_errors.timing(tsp, shuffle=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 1],
                          fig_num_ts[11])
@@ -773,7 +773,7 @@ if __name__ == "__main__":
     # generate positve constant offset
     tso = generate_errors.constant(obs_sim.iloc[:, 0].values, offset=.25)
     tsp.iloc[:, 0] = tsd.iloc[:, 0].values + tso  # positve offset
-    tst = generate_errors.timing(tsp, random=True)  # shuffling
+    tst = generate_errors.timing(tsp, shuffle=True)  # shuffling
     obs_sim.loc[:, 'Qsim'] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim['Qobs'], obs_sim['Qsim'], axes_ts[2, 2],
                          fig_num_ts[12])
@@ -928,6 +928,7 @@ if __name__ == "__main__":
     #                 fontsize=15)
 
     # export table
+    df_es = df_es.round(2)
     df_es_t = df_es.T
     path_csv = os.path.join(os.getcwd(),
                             'figures/technical_note/table_eff_comp.csv')

@@ -4,6 +4,8 @@ examples.ipynb
 misc.py
 signatures.py
 glob_eval.py
+.Rhistory
+test.png
 .ipynb_checkpoints/
 de/__pycache__/
 tests/__pycache__/
@@ -13,3 +15,6 @@ paper/
 figures/
 *.docx
 *.graffle
+*.R
+*.Rmd
+*.nb.html

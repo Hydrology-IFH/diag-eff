@@ -142,27 +142,6 @@ def calc_brel_rest(obs, sim, sort=True):
 
     return brel_rest
 
-def integrand(y, x):
-    """
-    Function to intergrate bias.
-
-    f(x)
-
-    Parameters
-    ----------
-    y : array_like
-        time series
-
-    x : float
-
-    Returns
-    ----------
-    y[i] : float
-
-    """
-    i = int(x * len(y))  # convert to index
-    return y[i]
-
 def calc_bias_area(brel_rest):
     r"""
     Calculate absolute bias area for entire flow duration curve.
@@ -174,7 +153,7 @@ def calc_bias_area(brel_rest):
 
     Returns
     ----------
-    b_area[0] : float
+    b_area : float
         bias area
 
     Notes
@@ -193,14 +172,13 @@ def calc_bias_area(brel_rest):
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
     >>> b_rest = de.calc_brel_rest(obs, sim)
     >>> de.calc_bias_area(b_rest)
-    0.11527287549968694
+    0.1112908496732026
     """
-    brel_rest_abs = abs(brel_rest)
-    # area of bias
-    b_area = integrate.quad(lambda x: integrand(brel_rest_abs, x), 0.001, .999,
-                            limit=10000)
+    perc = np.linspace(0, 1, len(brel_rest))
+    # area of absolute bias
+    b_area = integrate.simps(abs(brel_rest), perc)
 
-    return b_area[0]
+    return b_area
 
 def calc_bias_dir(brel_rest):
     r"""
@@ -232,14 +210,13 @@ def calc_bias_dir(brel_rest):
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
     >>> b_rest = de.calc_brel_rest(obs, sim)
     >>> de.calc_bias_dir(b_rest)
-    -0.0160625816993464
+    -0.014705882352941155
     """
+    mid_idx = int(len(brel_rest)/2)
     # integral of relative bias < 50 %
-    hf_area = integrate.quad(lambda x: integrand(brel_rest, x), 0.001, .5,
-                             limit=10000)
-
+    perc = np.linspace(0, .5, mid_idx)
     # direction of bias
-    b_dir = hf_area[0]
+    b_dir = integrate.simps(brel_rest[:mid_idx], perc)
 
     return b_dir
 
@@ -283,7 +260,7 @@ def calc_bias_slope(b_area, b_dir):
     >>> b_dir = de.calc_bias_dir(b_rest)
     >>> b_area = de.calc_bias_area(b_rest)
     >>> de.calc_bias_slope(b_area, b_dir)
-    0.11527287549968694
+    0.1112908496732026
     """
     if b_dir > 0:
         b_slope = b_area * (-1)
@@ -384,7 +361,7 @@ def calc_de(obs, sim, sort=True):
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
     >>> de.calc_de(obs, sim)
-    0.8177285723180813
+    0.8202204384691575
     """
     if len(obs) != len(sim):
         raise AssertionError("Arrays are not of equal length!")
