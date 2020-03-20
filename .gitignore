@@ -31,22 +31,17 @@ docs/_build/
 *.nb.html
 
 # Python
-make_index.py
+#make_index.py
 examples.ipynb
 de/misc.py
 signatures.py
 glob_eval.py
 
 # R
-example_reticulate.R
+#example_reticulate.R
 .Rhistory
 *.R
 *.Rmd
-
-# Word
-paper/~$chnical_note_DE_2019.docx
-paper/technical_note_DE_2020.docx
-paper/technical_note_DE_2020.pdf
 
 # cache
 de/__pycache__/
@@ -57,11 +52,11 @@ __pycache__/
 *.spydata
 
 # Shell
-ship_to_testpypi.sh
-ship_to_pypi.sh
-ship_to_conda.sh
+#ship_to_testpypi.sh
+#ship_to_pypi.sh
+#ship_to_conda.sh
 
 # images
 figures/*
-logo.graffle
+#logo.graffle
 test.png
