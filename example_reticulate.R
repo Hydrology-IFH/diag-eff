@@ -24,6 +24,9 @@ conda_install("de-reticulate", "scipy")
 conda_install("de-reticulate", "matplotlib")
 # install seaborn
 conda_install("de-reticulate", "seaborn")
+# install tk
+conda_install("de-reticulate", "tk")
+
 # install de
 # conda_install("de-reticulate", "de")
 
@@ -34,10 +37,10 @@ np <- import("numpy")
 pd <- import("pandas")
 sp <- import("scipy")
 mpl <- import("matplotlib")
-#mpl$use("Agg", force = TRUE)
+mpl$use("Agg", force = TRUE)
 plt <- import("matplotlib.pyplot")
 sns <- import("seaborn")
-# de <- import("de")
+de <- import("de")
 
 path_wd <- "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency"
 setwd(path_wd)
@@ -60,15 +63,18 @@ fig$show()
 fig$savefig('diagnostic_polar_plot.png')
 
 repl_python()
+# copy+paste the lines below to the interpreter
 import os
-PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/'
+PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg'
 os.chdir(PATH)
 from de import de
 from de import util
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 
 # set path to example data
-path = os.path.join(os.getcwd(),
-                    '/examples/camels_example_data/13331500_94_model_output.txt')
+path = os.path.join(os.getcwd(), 'examples/camels_example_data/13331500_94_model_output.txt')
 
 # import example data as dataframe
 df_cam = util.import_camels_obs_sim(path)
@@ -77,9 +83,15 @@ df_cam = util.import_camels_obs_sim(path)
 obs_arr = df_cam['Qobs'].values
 sim_arr = df_cam['Qsim'].values
 
+plt.plot(obs_arr)
+plt.show()
+
 # calculate diagnostic efficiency
 sig_de = de.calc_de(obs_arr, sim_arr)
 
 # diagnostic polar plot
 de.diag_polar_plot(obs_arr, sim_arr)
+plt.show()
+
+# quit the interpreter
 exit

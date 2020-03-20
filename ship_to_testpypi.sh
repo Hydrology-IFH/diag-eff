@@ -22,7 +22,7 @@ python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/* --
 # after revisions adjust versioneer style in setup.cfg
 
 # installing your newly uploaded package
-python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps de-schwemro
+python3 -m pip install --index-url https://test.pypi.org/simple/ de==0.0.1.post0.dev4
 
 # further steps:
 # python
