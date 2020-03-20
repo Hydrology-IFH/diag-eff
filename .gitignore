@@ -1,9 +1,15 @@
 .DS_Store
+ship_to_testpypi.sh
+ship_to_pypi.sh
+ship_to_conda.sh
+example_reticulate.R
 make_index.py
 examples.ipynb
 misc.py
 signatures.py
 glob_eval.py
+logo.graffle
+paper/*.docx
 .Rhistory
 test.png
 .ipynb_checkpoints/
@@ -18,7 +24,7 @@ paper/
 *.spydata
 figures/
 *.docx
-*.graffle
+logo.graffle
 *.R
 *.Rmd
 *.nb.html
