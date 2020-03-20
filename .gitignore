@@ -38,7 +38,7 @@ signatures.py
 glob_eval.py
 
 # R
-example_reticulate.R
+#example_reticulate.R
 .Rhistory
 *.R
 *.Rmd
