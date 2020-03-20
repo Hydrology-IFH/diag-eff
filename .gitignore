@@ -9,7 +9,8 @@ misc.py
 signatures.py
 glob_eval.py
 logo.graffle
-paper/*.docx
+paper/technical_note_DE_2020.docx
+paper/technical_note_DE_2020.pdf
 .Rhistory
 test.png
 .ipynb_checkpoints/
@@ -23,7 +24,6 @@ paper/
 *.bat
 *.spydata
 figures/
-*.docx
 logo.graffle
 *.R
 *.Rmd
