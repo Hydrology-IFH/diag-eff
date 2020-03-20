@@ -79,7 +79,7 @@ de.diag_polar_plot(obs_arr, sim_arr)
 ```
 ## Usage in R
 
-In order to run `de`in R, **reticulate** can be used as an interface to Python.
+In order to run `de` in R, **reticulate** can be used as an interface to Python.
 
 Non-interactive mode:
 
@@ -138,6 +138,8 @@ py_install("de")
 
 # start Python interpreter in R
 repl_python()
+```
+```python
 # copy+paste the lines below to the interpreter
 import os
 PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg'
