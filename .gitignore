@@ -9,6 +9,10 @@ test.png
 .ipynb_checkpoints/
 de/__pycache__/
 tests/__pycache__/
+__pycache__/
+/build
+/de.egg-info
+/dist
 paper/
 *.bat
 *.spydata
@@ -18,3 +22,4 @@ figures/
 *.R
 *.Rmd
 *.nb.html
+*.sh

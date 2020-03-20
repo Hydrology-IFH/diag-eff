@@ -1,4 +1,6 @@
 include README.md
 include LICENSE
+include requirements.txt
+recursive-exclude * *.py[co]
 include versioneer.py
 include de/_version.py
