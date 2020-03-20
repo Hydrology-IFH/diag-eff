@@ -13,52 +13,44 @@ management of time series is handled using pandas data frame objects.
 """
 
 INSTALL_REQUIRES = [
-    'numpy',
-    'scipy',
-    'matplotlib',
-    'seaborn',
-    'pandas',
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "seaborn",
+    "pandas",
 ]
 TEST_REQUIRES = [
     # testing and coverage
-    'pytest', 'coverage', 'pytest-cov',
+    "pytest",
+    "coverage",
+    "pytest-cov",
     # to be able to run `python setup.py checkdocs`
-    'collective.checkdocs', 'pygments',
+    "collective.checkdocs",
+    "pygments",
 ]
 
 setup(
-    name='de',
-
+    name="de",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-
-    description='DE: Diagnostic Efficiency',
+    description="DE: Diagnostic Efficiency",
     long_description=long_description,
-
-    url='https://github.com/schwemro/de',
-
-    author='Robin Schwemmle, Dominic Demand, Markus Weiler',
-    author_email='robin.schwemmle@hydrology.uni-freiburg.de',
-
-    license='GPLv3',
-
+    url="https://github.com/schwemro/de",
+    author="Robin Schwemmle, Dominic Demand, Markus Weiler",
+    author_email="robin.schwemmle@hydrology.uni-freiburg.de",
+    license="GPLv3",
     classifiers=[
-        'Development Status :: 1 - Beta',
-
-        'Intended Audience :: Science/Research',
-        'Topic :: Scientific/Engineering :: Modelling',
-
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        "Development Status :: 1 - Beta",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Modelling",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
     python_requires=">=3.6",
-    packages=find_packages(exclude=['docs']),
+    packages=find_packages(exclude=["docs"]),
     include_package_data=True,
     install_requires=INSTALL_REQUIRES,
-    extras_require={
-        'test': TEST_REQUIRES + INSTALL_REQUIRES,
-    },
+    extras_require={"test": TEST_REQUIRES + INSTALL_REQUIRES,},
 )

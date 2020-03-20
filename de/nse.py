@@ -10,15 +10,16 @@ Nash-Sutcliffe efficiency measure.
 
 from scipy import stats
 import numpy as np
-# RunTimeWarning will not be displayed (division by zeros or NaN values)
-np.seterr(divide='ignore', invalid='ignore')
 
-__title__ = 'de'
-__version__ = '0.1'
-#__build__ = 0x001201
-__author__ = 'Robin Schwemmle'
-__license__ = 'GNU GPLv3'
-#__docformat__ = 'markdown'
+# RunTimeWarning will not be displayed (division by zeros or NaN values)
+np.seterr(divide="ignore", invalid="ignore")
+
+__title__ = "de"
+__version__ = "0.1"
+# __build__ = 0x001201
+__author__ = "Robin Schwemmle"
+__license__ = "GNU GPLv3"
+# __docformat__ = 'markdown'
 
 
 def calc_nse(obs, sim):
@@ -64,12 +65,13 @@ def calc_nse(obs, sim):
     """
     if len(obs) != len(sim):
         raise AssertionError("Arrays are not of equal length!")
-    sim_obs_diff = np.sum((sim - obs)**2)
+    sim_obs_diff = np.sum((sim - obs) ** 2)
     obs_mean = np.mean(obs)
-    obs_diff_mean = np.sum((obs - obs_mean)**2)
-    sig = 1 - (sim_obs_diff/obs_diff_mean)
+    obs_diff_mean = np.sum((obs - obs_mean) ** 2)
+    sig = 1 - (sim_obs_diff / obs_diff_mean)
 
     return sig
+
 
 def calc_nse_dec(obs, sim):
     r"""
@@ -118,9 +120,10 @@ def calc_nse_dec(obs, sim):
     nse_alpha = calc_nse_alpha(obs, sim)
     nse_beta = calc_nse_beta(obs, sim)
     nse_r = calc_nse_r(obs, sim)
-    sig = 2 * nse_alpha * nse_r - nse_alpha**1 - nse_beta**2
+    sig = 2 * nse_alpha * nse_r - nse_alpha ** 1 - nse_beta ** 2
 
     return sig
+
 
 def calc_nse_beta(obs, sim):
     r"""
@@ -169,9 +172,10 @@ def calc_nse_beta(obs, sim):
     sim_mean = np.mean(sim)
     obs_mean = np.mean(obs)
     obs_std = np.std(obs)
-    nse_beta = (sim_mean - obs_mean)/obs_std
+    nse_beta = (sim_mean - obs_mean) / obs_std
 
     return nse_beta
+
 
 def calc_nse_alpha(obs, sim):
     r"""
@@ -220,9 +224,10 @@ def calc_nse_alpha(obs, sim):
     # calculate alpha term
     obs_std = np.std(obs)
     sim_std = np.std(sim)
-    nse_alpha = sim_std/obs_std
+    nse_alpha = sim_std / obs_std
 
     return nse_alpha
+
 
 def calc_nse_r(obs, sim):
     """

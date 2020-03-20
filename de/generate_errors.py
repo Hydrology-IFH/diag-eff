@@ -13,16 +13,18 @@ Mimicking three different error types:
 
 import numpy as np
 import random
+
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
-np.seterr(divide='ignore', invalid='ignore')
+np.seterr(divide="ignore", invalid="ignore")
 import pandas as pd
 
-__title__ = 'de'
-__version__ = '0.1'
-#__build__ = 0x001201
-__author__ = 'Robin Schwemmle'
-__license__ = 'GNU GPLv3'
-#__docformat__ = 'markdown'
+__title__ = "de"
+__version__ = "0.1"
+# __build__ = 0x001201
+__author__ = "Robin Schwemmle"
+__license__ = "GNU GPLv3"
+# __docformat__ = 'markdown'
+
 
 def constant(ts, offset=1.5):
     """
@@ -49,6 +51,7 @@ def constant(ts, offset=1.5):
 
     return ts_const
 
+
 def negative_dynamic(ts, prop=0.5):
     """
     Generate negative dynamic error (i.e Underestimate high flows -
@@ -70,13 +73,13 @@ def negative_dynamic(ts, prop=0.5):
     ts_dyn : dataframe
         Time series with negative dynamic error
     """
-    obs_sim = pd.DataFrame(index=ts.index, columns=['Qobs', 'Qsim'])
+    obs_sim = pd.DataFrame(index=ts.index, columns=["Qobs", "Qsim"])
     obs_sim.iloc[:, 0] = ts.iloc[:, 0]
     # sort values by descending order
-    obs_sort = obs_sim.sort_values(by='Qobs', ascending=False)
+    obs_sort = obs_sim.sort_values(by="Qobs", ascending=False)
     nn = len(obs_sim.index)
     # factors to decrease/increase runoff
-    downup = np.linspace(1.0-prop, 1.0+prop, nn)
+    downup = np.linspace(1.0 - prop, 1.0 + prop, nn)
     # tilting the fdc at median
     obs_sort.iloc[:, 1] = np.multiply(obs_sort.iloc[:, 0].values, downup)
     # sort by index
@@ -84,6 +87,7 @@ def negative_dynamic(ts, prop=0.5):
     ts_dyn = obs_sim.iloc[:, 1].copy().to_frame()
 
     return ts_dyn
+
 
 def positive_dynamic(ts, prop=0.5):
     """
@@ -106,13 +110,13 @@ def positive_dynamic(ts, prop=0.5):
     ts_dyn : dataframe
         Time series with positive dynamic error
     """
-    obs_sim = pd.DataFrame(index=ts.index, columns=['Qobs', 'Qsim'])
+    obs_sim = pd.DataFrame(index=ts.index, columns=["Qobs", "Qsim"])
     obs_sim.iloc[:, 0] = ts.iloc[:, 0]
     # sort values by descending order
-    obs_sort = obs_sim.sort_values(by='Qobs', ascending=False)
+    obs_sort = obs_sim.sort_values(by="Qobs", ascending=False)
     nn = len(obs_sim.index)
     # factors to decrease/increase runoff
-    updown = np.linspace(1.0+prop, 1.0-prop, nn)
+    updown = np.linspace(1.0 + prop, 1.0 - prop, nn)
     # tilting the fdc at median
     obs_sort.iloc[:, 1] = np.multiply(obs_sort.iloc[:, 0].values, updown)
     # sort by index
@@ -120,6 +124,7 @@ def positive_dynamic(ts, prop=0.5):
     ts_dyn = obs_sim.iloc[:, 1].copy().to_frame()
 
     return ts_dyn
+
 
 def timing(ts, tshift=3, shuffle=True):
     """
