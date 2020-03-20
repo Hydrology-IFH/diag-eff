@@ -33,7 +33,7 @@ docs/_build/
 # Python
 make_index.py
 examples.ipynb
-#de/misc.py
+de/misc.py
 signatures.py
 glob_eval.py
 
