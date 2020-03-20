@@ -3,7 +3,8 @@
 import os
 # set path to fix bug in basemap lib
 os.environ['PROJ_LIB'] = '/Users/robinschwemmle/anaconda3/envs/de/share/proj/'
-PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency'
+PATH_FIG = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures'
+PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg'
 os.chdir(PATH)
 import pandas as pd
 import numpy as np
@@ -159,12 +160,12 @@ if __name__ == "__main__":
         ll_vars = ['brel_mean', 'b_area', 'temp_cor', 'de', 'b_dir', 'b_slope',
            'diag', 'kge', 'alpha', 'beta', 'nse', 'perennial']
         meta_eff = meta_all.loc[:, ll_vars].join(df_meta)
-        path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%smeta_eff.csv' % (tier)
+        path_csv = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures/%smeta_eff.csv' % (tier)
         meta_eff.to_csv(path_csv, sep=';')
 
     # # generate index first (see make_index.py)
     # # import common index
-    # path_idx = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/meta_idx.csv'
+    # path_idx = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures/meta_idx.csv'
     # df_idx = pd.read_csv(path_idx, sep=';', na_values=-9999, index_col=0)
 
     # # # remove outliers
@@ -214,7 +215,7 @@ if __name__ == "__main__":
     # p2.multi_line(xs="xs", ys="ys", source=source,
     #               line_color='red',
     #               line_width=2)
-    # output_file("/Users/robinschwemmle/Downloads/interactive_fdc.html",
+    # output_file("/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/interactive_fdc.html",
     #             title="interactive FDCs")
     # show(gridplot([p1, p2], ncols=2))
 
@@ -265,13 +266,13 @@ if __name__ == "__main__":
     # multi polar plot
     fig1, fig2 = de.diag_polar_plot_multi(brel_mean_arr, b_area_arr, temp_cor_arr,
                                           eff_de_arr, b_dir_arr, phi_arr, extended=True)
-    fig1_png = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%polar_de.png' % (tier)
+    fig1_png = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures/%polar_de.png' % (tier)
     fig1.savefig(fig1_png, dpi=250)
-    fig1_pdf = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%spolar_de.pdf' % (tier)
+    fig1_pdf = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures/%spolar_de.pdf' % (tier)
     fig1.savefig(fig1_pdf, dpi=250)
-    fig2_png = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%sde_kde_bi.png' % (tier)
+    fig2_png = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures/%sde_kde_bi.png' % (tier)
     fig2.savefig(fig2_png, dpi=250)
-    fig2_pdf = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%sde_kde_bi.pdf' % (tier)
+    fig2_pdf = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures/%sde_kde_bi.pdf' % (tier)
     fig2.savefig(fig2_pdf, dpi=250)
 
     # # make arrays
@@ -316,7 +317,7 @@ if __name__ == "__main__":
 #        cbar.ax.xaxis.set_label_position('top')
 #        cbar.ax.xaxis.set_ticks_position('top')
 #        fig.tight_layout(rect=[0, .13, 1, 1])
-#        fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/%sde_glob.png' % (tier)
+#        fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/glob_eval/figures/%sde_glob.png' % (tier)
 #        fig.savefig(fig_path, dpi=250)
 #
 #        # EU map visualizing the spatial distribution of DE
@@ -333,7 +334,7 @@ if __name__ == "__main__":
 #        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, de_arr, cmap='Reds_r',
 #                     scale=2, scale_units='inches', angles='xy', norm=norm_de)
 #        fig.tight_layout(rect=[0, .13, 1, 1])
-#        fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/%sde_eu.png' % (tier)
+#        fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/glob_eval/figures/%sde_eu.png' % (tier)
 #        fig.savefig(fig_path, dpi=250)
 #
 #
@@ -351,7 +352,7 @@ if __name__ == "__main__":
 #        q = m.quiver(lons, lats, b_slope_arr, brel_mean_arr, de_arr, cmap='Reds_r',
 #                     scale=2, scale_units='inches', angles='xy', norm=norm_de)
 #        fig.tight_layout(rect=[0, .13, 1, 1])
-#        fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/figures/glob_eval/%sde_us.png' % (tier)
+#        fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_model_efficiency/glob_eval/figures/%sde_us.png' % (tier)
 #        fig.savefig(fig_path, dpi=250)
 #
     # # DE global map with DE colorbar
@@ -428,9 +429,9 @@ if __name__ == "__main__":
     #               norm=norm_de)
 
     # fig.tight_layout(rect=[0, .13, 1, 1])
-    # fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%sde_de_glob_us_eu.png' % (tier)
+    # fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures/%sde_de_glob_us_eu.png' % (tier)
     # fig.savefig(fig_path, dpi=250)
-    # fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%sde_de_glob_us_eu.pdf' % (tier)
+    # fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures/%sde_de_glob_us_eu.pdf' % (tier)
     # fig.savefig(fig_path, dpi=250)
 
     # # DE global map with r colorbar
@@ -507,7 +508,7 @@ if __name__ == "__main__":
     #               norm=norm_de)
 
     # fig.tight_layout(rect=[0, .13, 1, 1])
-    # fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%sde_r_glob_us_eu.png' % (tier)
+    # fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures/%sde_r_glob_us_eu.png' % (tier)
     # fig.savefig(fig_path, dpi=250)
-    # fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/glob_eval/%sde_r_glob_us_eu.pdf' % (tier)
+    # fig_path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/glob_eval/figures/%sde_r_glob_us_eu.pdf' % (tier)
     # fig.savefig(fig_path, dpi=250)

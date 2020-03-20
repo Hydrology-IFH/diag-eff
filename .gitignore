@@ -1,31 +1,67 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
 .DS_Store
-ship_to_testpypi.sh
-ship_to_pypi.sh
-ship_to_conda.sh
-example_reticulate.R
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Sphinx documentation
+docs/_build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+.ipynb_checkpoints/
+*.nb.html
+
+# Python
 make_index.py
 examples.ipynb
-misc.py
+de/misc.py
 signatures.py
 glob_eval.py
-logo.graffle
+
+# R
+example_reticulate.R
+.Rhistory
+*.R
+*.Rmd
+
+# Word
+paper/~$chnical_note_DE_2019.docx
 paper/technical_note_DE_2020.docx
 paper/technical_note_DE_2020.pdf
-.Rhistory
-test.png
-.ipynb_checkpoints/
+
+# cache
 de/__pycache__/
 tests/__pycache__/
 __pycache__/
-/build
-/de.egg-info
-/dist
-paper/
-*.bat
+
+# Spyder
 *.spydata
-figures/
+
+# Shell
+ship_to_testpypi.sh
+ship_to_pypi.sh
+ship_to_conda.sh
+
+# images
+figures/*
 logo.graffle
-*.R
-*.Rmd
-*.nb.html
-*.sh
+test.png

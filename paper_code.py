@@ -3,7 +3,8 @@
 
 import os  # load modules first before importing .spydata
 
-PATH = "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/"
+PATH = "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg"
+PATH_FIG = "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/technical_note/figures"
 os.chdir(PATH)
 import pandas as pd
 import numpy as np
@@ -843,9 +844,9 @@ if __name__ == "__main__":
     axes_fdc[1, 3].legend(loc=6, bbox_to_anchor=(1.18, 0.85))
     axes_ts[2, 2].legend(loc=6, bbox_to_anchor=(1.18, 0.85))
 
-    path_png = os.path.join(os.getcwd(), "figures/technical_note/fdc_errors.png")
+    path_png = os.path.join(PATH_FIG, "fdc_errors.png")
     fig_fdc.savefig(path_png, dpi=250)
-    path_png = os.path.join(os.getcwd(), "figures/technical_note/ts_errors.png")
+    path_png = os.path.join(PATH_FIG, "ts_errors.png")
     fig_ts.savefig(path_png, dpi=250)
 
     # -----------------------------------------------------------------
@@ -883,7 +884,7 @@ if __name__ == "__main__":
     fig_kge = util.diag_polar_plot_kge_multi_fc(
         beta_arr, alpha_arr, temp_cor_arr, kge_arr, idx
     )
-    path = os.path.join(os.getcwd(), "figures/technical_note/kge_diag.pdf")
+    path = os.path.join(PATH_FIG, "kge_diag.pdf")
     fig_kge.savefig(path, dpi=250)
 
     ### scatterplots DE, KGE and NSE ###
@@ -950,7 +951,7 @@ if __name__ == "__main__":
     ax3.text(0.05, 0.1, "1:1", rotation=45, transform=ax3.transAxes)
 
     fig.subplots_adjust(wspace=0.45, bottom=0.2)
-    path_png = os.path.join(os.getcwd(), "figures/technical_note/scatter_eff_comp.png")
+    path_png = os.path.join(PATH_FIG, "scatter_eff_comp.png")
     fig.savefig(path_png, dpi=250)
     # for i, txt in enumerate(df_es.index):
     #     ax.annotate(txt, (alpha_arr[i] - 1, brel_mean_arr[i]), color='black',
@@ -961,12 +962,12 @@ if __name__ == "__main__":
     # export table
     df_es = df_es.round(2)
     df_es_t = df_es.T
-    path_csv = os.path.join(os.getcwd(), "figures/technical_note/table_eff_comp.csv")
+    path_csv = os.path.join(PATH_FIG, "table_eff_comp.csv")
     df_es_t = df_es_t.round(2)
     df_es_t.to_csv(path_csv, header=True, index=True, sep=";")
     df_es_t = df_es_t.loc[["de", "kge", "nse"], :]
     df_es_t = df_es_t.round(2)
-    path_csv = os.path.join(os.getcwd(), "figures/technical_note/table_eff_eff.csv")
+    path_csv = os.path.join(PATH_FIG, "table_eff_eff.csv")
     df_es_t.to_csv(path_csv, header=True, index=True, sep=";")
 
     # ==========================================================
@@ -1095,9 +1096,9 @@ if __name__ == "__main__":
     )
 
     fig.subplots_adjust(wspace=0.3)
-    path_png = os.path.join(os.getcwd(), "figures/technical_note/ts_fdc_real_case.png")
+    path_png = os.path.join(PATH_FIG, "ts_fdc_real_case.png")
     fig.savefig(path_png, dpi=250)
-    path_pdf = os.path.join(os.getcwd(), "figures/technical_note/ts_fdc_real_case.pdf")
+    path_pdf = os.path.join(PATH_FIG, "ts_fdc_real_case.pdf")
     fig.savefig(path_pdf, dpi=250)
 
     # make arrays
@@ -1212,7 +1213,7 @@ if __name__ == "__main__":
     df_eff_cam.iloc[2, 10] = nse.calc_nse(obs_arr, sim_arr)
 
     path_csv = os.path.join(
-        os.getcwd(), "figures/technical_note/table_eff_real_case.csv"
+        PATH_FIG, "table_eff_real_case.csv"
     )
     df_eff_cam.to_csv(path_csv, header=True, index=True, sep=";")
 
@@ -1237,7 +1238,7 @@ if __name__ == "__main__":
         ax_lim=0,
     )
 
-    path_pdf = os.path.join(os.getcwd(), "figures/technical_note/de_diag_real_case.pdf")
+    path_pdf = os.path.join(PATH_FIG, "de_diag_real_case.pdf")
     fig_de.savefig(path_pdf, dpi=250)
 
     ### multi KGE plot ###
@@ -1250,6 +1251,6 @@ if __name__ == "__main__":
         beta_arr, alpha_arr, temp_cor_arr, kge_arr, idx, ax_lim=0
     )
     path_pdf = os.path.join(
-        os.getcwd(), "figures/technical_note/kge_diag_real_case.pdf"
+        PATH_FIG, "kge_diag_real_case.pdf"
     )
     fig_kge.savefig(path_pdf, dpi=250)
