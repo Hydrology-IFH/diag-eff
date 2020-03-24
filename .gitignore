@@ -55,6 +55,8 @@ __pycache__/
 ship_to_testpypi.sh
 ship_to_pypi.sh
 ship_to_conda.sh
+docs/make.sh
+run_tests.sh
 
 # images
 figures/*

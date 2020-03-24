@@ -5,7 +5,7 @@ Info: `de` needs Python >= 3.6!
 ##### Development branch
 [![Build Status](https://travis-ci.com/schwemro/de.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master)](https://travis-ci.com/schwemro/de)
 [![Documentation Status](https://readthedocs.org/projects/de/badge/?version=latest)](https://de.readthedocs.io/en/latest/?badge=latest)
-[![codecov](https://codecov.io/gh/schwemro/de/branch/master/graph/badge.svg)](https://codecov.io/gh/schwemro/de)
+[![codecov](https://codecov.io/gh/schwemro/de/branch/master/graph/badge.svg?token=AmLX6d2FuR)](https://codecov.io/gh/schwemro/de)
 [![PyPI version shields.io](https://img.shields.io/pypi/v/de.svg)](https://pypi.python.org/pypi/de/)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 [![Binder](http://mybinder.org/badge_logo.svg)](http://mybinder.org/v2/gh/binder-examples/conda_environment/master?filepath=index.ipynb)

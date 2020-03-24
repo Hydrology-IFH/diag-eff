@@ -36,7 +36,7 @@ setup(
     description="DE: Diagnostic Efficiency",
     long_description=long_description,
     url="https://github.com/schwemro/de",
-    author="Robin Schwemmle, Dominic Demand, Markus Weiler",
+    author="Robin Schwemmle",
     author_email="robin.schwemmle@hydrology.uni-freiburg.de",
     license="GPLv3",
     classifiers=[
@@ -56,5 +56,5 @@ setup(
     packages=find_packages(exclude=["docs"]),
     include_package_data=True,
     install_requires=INSTALL_REQUIRES,
-    extras_require={"test": TEST_REQUIRES + INSTALL_REQUIRES,},
+    extras_require={"test": TEST_REQUIRES + INSTALL_REQUIRES, },
 )

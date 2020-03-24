@@ -7,10 +7,12 @@ omit =
   # omit single files
   setup.py
   glob_eval.py
+  make_index.py
   paper_code.py
   versioneer.py
   de/signatures.py
   de/_version.py
+  de/misc.py
 
 [report]
 show_missing = True
