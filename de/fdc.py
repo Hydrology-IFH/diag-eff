@@ -21,12 +21,6 @@ import seaborn as sns
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
 sns.set_context("paper", font_scale=1.5)
 
-__title__ = "de"
-__version__ = "0.1"
-# __build__ = 0x001201
-__author__ = "Robin Schwemmle"
-__license__ = "GNU GPLv3"
-# __docformat__ = 'markdown'
 
 _mmd = r"[mm $d^{-1}$]"
 _m3s = r"[$m^{3}$ $s^{-1}$]"

@@ -17,16 +17,19 @@ Info: `de` needs Python >= 3.6!
 In case you use de in other software or scientific publications,
 please reference this module. It is published and has a DOI. It can be cited
 as:
+
     Schwemmle, R., Demand, D., and Weiler, M.: Diagnostic efficiency – specific
-    evaluation of model performance, Hydrol. Earth Syst. Sci., X, xxxx-xxxx,
-    DOI: [xxx](https://doi.org/xxxx), 2020.
+    evaluation of model performance, Hydrol. Earth Syst. Sci. Discusss,
+    DOI: [https://doi.org/10.5194/hess-2020-xxx](https://doi.org/10.5194/hess-2020-xxx),
+    2020.
 
 ## Full Documentation
 
 The full documentation can be found at: https://de.readthedocs.io
 
 ## License
-This software can be distributed freely under the GPL v3 license. Please read the LICENSE for further information.
+This software can be distributed freely under the GPL v3 license. Please read
+the LICENSE for further information.
 
 © 2019, Robin Schwemmle (<robin.schwemmle@hydrology.uni-freiburg.de>)
 

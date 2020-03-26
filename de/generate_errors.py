@@ -18,13 +18,6 @@ import random
 np.seterr(divide="ignore", invalid="ignore")
 import pandas as pd
 
-__title__ = "de"
-__version__ = "0.1"
-# __build__ = 0x001201
-__author__ = "Robin Schwemmle"
-__license__ = "GNU GPLv3"
-# __docformat__ = 'markdown'
-
 
 def constant(ts, offset=1.5):
     """

@@ -14,13 +14,6 @@ import numpy as np
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
 np.seterr(divide="ignore", invalid="ignore")
 
-__title__ = "de"
-__version__ = "0.1"
-# __build__ = 0x001201
-__author__ = "Robin Schwemmle"
-__license__ = "GNU GPLv3"
-# __docformat__ = 'markdown'
-
 
 def calc_nse(obs, sim):
     r"""

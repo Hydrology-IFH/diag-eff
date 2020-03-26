@@ -17,12 +17,6 @@ import matplotlib.pyplot as plt
 import scipy as sp
 import seaborn as sns
 
-__title__ = 'de'
-__version__ = '0.1'
-#__build__ = 0x001201
-__author__ = 'Robin Schwemmle'
-__license__ = 'GNU GPLv3'
-#__docformat__ = 'markdown'
 
 def sort_obs(ts):
     """
