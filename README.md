@@ -2,7 +2,6 @@
 
 Info: `de` needs Python >= 3.6!
 
-##### Development branch
 [![Build Status](https://travis-ci.com/schwemro/de.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master)](https://travis-ci.com/schwemro/de)
 [![Documentation Status](https://readthedocs.org/projects/de/badge/?version=latest)](https://de.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/schwemro/de/branch/master/graph/badge.svg?token=AmLX6d2FuR)](https://codecov.io/gh/schwemro/de)

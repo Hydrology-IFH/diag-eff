@@ -8,7 +8,7 @@ https://ncar.github.io/hydrology/datasets/CAMELS_timeseries.
 
 `_model_output.txt`: file with observed and simulated streamflow time series
 
-## Reference
+### Reference
 
 Addor, N., Newman, A. J., Mizukami, N., and Clark, M. P.: The CAMELS data set:
 catchment attributes and meteorology for large-sample studies, version 2.0 ed.,
