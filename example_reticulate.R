@@ -48,7 +48,7 @@ source_python('de/de.py')
 source_python('de/util.py')
 
 # set path to example data
-path_cam <- file.path(path_wd, 'examples/camels_example_data/13331500_94_model_output.txt')
+path_cam <- file.path(path_wd, 'examples/13331500_94_model_output.txt')
 
 # import example data as dataframe
 df_cam <- import_camels_obs_sim(path_cam)
@@ -74,7 +74,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 # set path to example data
-path = os.path.join(os.getcwd(), 'examples/camels_example_data/13331500_94_model_output.txt')
+path = os.path.join(os.getcwd(), 'examples/13331500_94_model_output.txt')
 
 # import example data as dataframe
 df_cam = util.import_camels_obs_sim(path)

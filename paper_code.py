@@ -28,20 +28,20 @@ if __name__ == "__main__":
     # 619.11 km2; AI: 0.82
     area = 619.11
     path = os.path.join(
-        os.getcwd(), "examples/camels_example_data/13331500_streamflow_qc.txt"
+        os.getcwd(), "examples/13331500_streamflow_qc.txt"
     )
     ## 191.55 km2; AI: 2.04
     # area = 191.55
     # path = os.path.join(os.getcwd(),
-    #                     'examples/camels_example_data/06332515_streamflow_qc.txt')
+    #                     'examples/06332515_streamflow_qc.txt')
     ## 190.65 km2; AI: 2.98
     # area = 190.65
     # path = os.path.join(os.getcwd(),
-    #                     'examples/camels_example_data/09512280_streamflow_qc.txt')
+    #                     'examples/09512280_streamflow_qc.txt')
     ## 66.57 km2; AI: 0.27
     # area = 66.57
     # path = os.path.join(os.getcwd(),
-    #                     'examples/camels_example_data/12114500_streamflow_qc.txt')
+    #                     'examples/12114500_streamflow_qc.txt')
 
     # import observed time series
     df_ts = util.import_camels_ts(path, sep=r"\s+", catch_area=area)
@@ -74,7 +74,8 @@ if __name__ == "__main__":
         "(l)",
         "(m)",
     ]
-    fig_ts, axes_ts = plt.subplots(3, 5, sharey=True, sharex=True, figsize=(14, 9))
+    fig_ts, axes_ts = plt.subplots(3, 5, sharey=True, sharex=True,
+                                   figsize=(14, 9))
     fig_ts.text(0.5, 0.05, "Time [Years]", ha="center", va="center")
     fig_ts.text(
         0.08, 0.5, r"[mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
@@ -151,11 +152,13 @@ if __name__ == "__main__":
     obs_sim = pd.DataFrame(index=df_ts.index, columns=["Qobs", "Qsim"])
     obs_sim.loc[:, "Qobs"] = df_ts.loc[:, "Qobs"]
     # generate positive constant error
-    obs_sim.loc[:, "Qsim"] = generate_errors.constant(df_ts["Qobs"].values, offset=1.25)
+    obs_sim.loc[:, "Qsim"] = generate_errors.constant(df_ts["Qobs"].values,
+                                                      offset=1.25)
     util.fdc_obs_sim_ax(
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[0, 0], fig_num_fdc[0]
     )
-    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 0], fig_num_ts[0])
+    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 0],
+                         fig_num_ts[0])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -202,11 +205,13 @@ if __name__ == "__main__":
     obs_sim = pd.DataFrame(index=df_ts.index, columns=["Qobs", "Qsim"])
     obs_sim.loc[:, "Qobs"] = df_ts.loc[:, "Qobs"]
     # generate negative constant error
-    obs_sim.loc[:, "Qsim"] = generate_errors.constant(df_ts["Qobs"].values, offset=0.75)
+    obs_sim.loc[:, "Qsim"] = generate_errors.constant(df_ts["Qobs"].values,
+                                                      offset=0.75)
     util.fdc_obs_sim_ax(
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[0, 1], fig_num_fdc[1]
     )
-    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 1], fig_num_ts[1])
+    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 1],
+                         fig_num_ts[1])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -258,7 +263,8 @@ if __name__ == "__main__":
     util.fdc_obs_sim_ax(
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[0, 2], fig_num_fdc[2]
     )
-    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 2], fig_num_ts[2])
+    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 2],
+                         fig_num_ts[2])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -310,7 +316,8 @@ if __name__ == "__main__":
     util.fdc_obs_sim_ax(
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[0, 3], fig_num_fdc[3]
     )
-    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 3], fig_num_ts[3])
+    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 3],
+                         fig_num_ts[3])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -362,7 +369,8 @@ if __name__ == "__main__":
     util.fdc_obs_sim_ax(
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[0, 4], fig_num_fdc[4]
     )
-    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 4], fig_num_ts[4])
+    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 4],
+                         fig_num_ts[4])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -416,7 +424,8 @@ if __name__ == "__main__":
     util.fdc_obs_sim_ax(
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[1, 0], fig_num_fdc[5]
     )
-    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 0], fig_num_ts[5])
+    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 0],
+                         fig_num_ts[5])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -470,7 +479,8 @@ if __name__ == "__main__":
     util.fdc_obs_sim_ax(
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[1, 1], fig_num_fdc[6]
     )
-    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 1], fig_num_ts[6])
+    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 1],
+                         fig_num_ts[6])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -524,7 +534,8 @@ if __name__ == "__main__":
     util.fdc_obs_sim_ax(
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[1, 2], fig_num_fdc[7]
     )
-    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 2], fig_num_ts[7])
+    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 2],
+                         fig_num_ts[7])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -578,7 +589,8 @@ if __name__ == "__main__":
     util.fdc_obs_sim_ax(
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[1, 3], fig_num_fdc[8]
     )
-    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 3], fig_num_ts[8])
+    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 3],
+                         fig_num_ts[8])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -632,7 +644,8 @@ if __name__ == "__main__":
     tsn.iloc[:, 0] = tsd.iloc[:, 0].values - tso  # negative offset
     tst = generate_errors.timing(tsn, shuffle=True)  # shuffling
     obs_sim.loc[:, "Qsim"] = tst.iloc[:, 0].values
-    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 4], fig_num_ts[9])
+    util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 4],
+                         fig_num_ts[9])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -896,7 +909,8 @@ if __name__ == "__main__":
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(16, 5))
     # scatterplots DE, KGE and NSE
     sc = sns.scatterplot(kge_arr, de_arr, color="black", s=60, ax=ax1)
-    sc1 = sns.scatterplot(nse_arr, de_arr, color="red", s=30, marker="X", ax=ax1)
+    sc1 = sns.scatterplot(nse_arr, de_arr, color="red", s=30, marker="X",
+                          ax=ax1)
     ax1.plot([-2.05, 1.05], [-2.05, 1.05], ls="--", c=".3")
     ax1.set_ylim(-2.05, 1.05)
     ax1.set_xlim(-2.05, 1.05)
@@ -909,7 +923,8 @@ if __name__ == "__main__":
     #     ax.annotate(txt, (nse_arr[i], de_arr[i]), color='red', fontsize=15)
 
     # scatterplot DE and KGE components inter-comparison
-    sc = sns.scatterplot(beta_arr - 1, brel_mean_arr, color="black", s=60, ax=ax2)
+    sc = sns.scatterplot(beta_arr - 1, brel_mean_arr, color="black", s=60,
+                         ax=ax2)
     sc1 = sns.scatterplot(
         alpha_arr - 1, b_slope_arr, color="red", s=30, marker="X", ax=ax2
     )
@@ -925,12 +940,14 @@ if __name__ == "__main__":
         transform=ax2.transAxes,
         rotation=90,
     )
-    ax2.text(0.4, -0.22, r"$\alpha$ - 1 [-]", color="red", transform=ax2.transAxes)
+    ax2.text(0.4, -0.22, r"$\alpha$ - 1 [-]", color="red",
+             transform=ax2.transAxes)
     ax2.text(0.03, 0.93, "(b)", transform=ax2.transAxes)
     ax2.text(0.05, 0.1, "1:1", rotation=45, transform=ax2.transAxes)
 
     # scatterplot DE and KGE components intra-comparison
-    sc = sns.scatterplot(b_slope_arr, brel_mean_arr, color="black", s=60, ax=ax3)
+    sc = sns.scatterplot(b_slope_arr, brel_mean_arr, color="black", s=60,
+                         ax=ax3)
     sc1 = sns.scatterplot(
         alpha_arr - 1, beta_arr - 1, color="red", s=30, marker="X", ax=ax3
     )
@@ -946,7 +963,8 @@ if __name__ == "__main__":
         transform=ax3.transAxes,
         rotation=90,
     )
-    ax3.text(0.4, -0.23, r"$\alpha$ - 1 [-]", color="red", transform=ax3.transAxes)
+    ax3.text(0.4, -0.23, r"$\alpha$ - 1 [-]", color="red",
+             transform=ax3.transAxes)
     ax3.text(0.03, 0.93, "(c)", transform=ax3.transAxes)
     ax3.text(0.05, 0.1, "1:1", rotation=45, transform=ax3.transAxes)
 
@@ -991,21 +1009,23 @@ if __name__ == "__main__":
     df_eff_cam = pd.DataFrame(index=idx, columns=cols, dtype=np.float64)
 
     path_cam1 = os.path.join(
-        os.getcwd(), "examples/camels_example_data/13331500_05_model_output.txt"
+        os.getcwd(), "examples/13331500_05_model_output.txt"
     )
     path_cam2 = os.path.join(
-        os.getcwd(), "examples/camels_example_data/13331500_48_model_output.txt"
+        os.getcwd(), "examples/13331500_48_model_output.txt"
     )
     path_cam3 = os.path.join(
-        os.getcwd(), "examples/camels_example_data/13331500_94_model_output.txt"
+        os.getcwd(), "examples/13331500_94_model_output.txt"
     )
     df_cam1 = util.import_camels_obs_sim(path_cam1)
     df_cam2 = util.import_camels_obs_sim(path_cam2)
     df_cam3 = util.import_camels_obs_sim(path_cam3)
 
     fig, axes = plt.subplots(3, 2, figsize=(10, 10), sharex="col")
-    fig.text(0.06, 0.5, r"[mm $d^{-1}$]", ha="center", va="center", rotation="vertical")
-    fig.text(0.5, 0.5, r"[mm $d^{-1}$]", ha="center", va="center", rotation="vertical")
+    fig.text(0.06, 0.5, r"[mm $d^{-1}$]", ha="center", va="center",
+             rotation="vertical")
+    fig.text(0.5, 0.5, r"[mm $d^{-1}$]", ha="center", va="center",
+             rotation="vertical")
     fig.text(0.25, 0.05, "Time [Years]", ha="center", va="center")
     fig.text(0.75, 0.05, "Exceedence probabilty [-]", ha="center", va="center")
 
