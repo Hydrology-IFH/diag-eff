@@ -19,7 +19,7 @@ please reference this module. It is published and has a DOI. It can be cited
 as:
 
     Schwemmle, R., Demand, D., and Weiler, M.: Diagnostic efficiency – specific
-    evaluation of model performance, Hydrol. Earth Syst. Sci. Discusss,
+    evaluation of model performance, Hydrol. Earth Syst. Sci. Discuss.,
     DOI: [https://doi.org/10.5194/hess-2020-xxx](https://doi.org/10.5194/hess-2020-xxx),
     2020.
 
@@ -82,7 +82,8 @@ de.diag_polar_plot(obs_arr, sim_arr)
 ```
 ## Usage in R
 
-In order to run `de` in R, **reticulate** can be used as an interface to Python.
+In order to run `de` in R, [**reticulate**](https://rstudio.github.io/reticulate/index.html)
+can be used as an interface to Python.
 
 Non-interactive mode:
 
