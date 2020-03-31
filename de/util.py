@@ -607,10 +607,10 @@ def diag_polar_plot_multi_fc(
     return fig
 
 
-def diag_polar_plot_kge_multi_fc(
+def polar_plot_multi_fc(
     kge_beta, alpha_or_gamma, kge_r, sig_kge, fc, ax_lim=-0.6
 ):  # pragma: no cover
-    """Diagnostic polar plot of Kling-Gupta efficiency (KGE) with multiple
+    """Polar plot of Kling-Gupta efficiency (KGE) with multiple
     values.
 
     Parameters

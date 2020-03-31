@@ -427,9 +427,9 @@ def calc_kge_skill(obs, sim, bench, r="pearson", var="std"):
     return eff
 
 
-def diag_polar_plot(obs, sim, r="pearson", var="std"):
+def polar_plot(obs, sim, r="pearson", var="std"):
     r"""
-    Diagnostic polar plot of Diagnostic efficiency (KGE) for a single
+    Polar plot of Diagnostic efficiency (KGE) for a single
     evaluation.
 
     Parameters
@@ -468,7 +468,7 @@ def diag_polar_plot(obs, sim, r="pearson", var="std"):
     # calculate beta term
     obs_mean = np.mean(obs)
     sim_mean = np.mean(sim)
-    kge_alpha = sim_mean / obs_mean
+    kge_beta = sim_mean / obs_mean
 
     # calculate gamma term
     if var == "cv":
@@ -480,12 +480,12 @@ def diag_polar_plot(obs, sim, r="pearson", var="std"):
         kge_r = calc_temp_cor(obs, sim, r=r)
 
         eff = 1 - np.sqrt(
-            (kge_alpha - 1) ** 2 + (kge_gamma - 1) ** 2 + (kge_r - 1) ** 2
+            (kge_beta - 1) ** 2 + (kge_gamma - 1) ** 2 + (kge_r - 1) ** 2
         )
 
         # convert to radians
         # (y, x) Trigonometric inverse tangent
-        phi = np.arctan2(kge_alpha - 1, kge_gamma - 1)
+        phi = np.arctan2(kge_beta - 1, kge_gamma - 1)
 
         # convert temporal correlation to color
         norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
@@ -674,14 +674,14 @@ def diag_polar_plot(obs, sim, r="pearson", var="std"):
     elif var == "std":
         obs_std = np.std(obs)
         sim_std = np.std(sim)
-        kge_beta = sim_std / obs_std
+        kge_alpha = sim_std / obs_std
         kge_r = calc_temp_cor(obs, sim, r=r)
 
-        eff = 1 - np.sqrt((kge_alpha - 1) ** 2 + (kge_beta - 1) ** 2 + (kge_r - 1) ** 2)
+        eff = 1 - np.sqrt((kge_beta - 1) ** 2 + (kge_alpha - 1) ** 2 + (kge_r - 1) ** 2)
 
         # convert to radians
         # (y, x) Trigonometric inverse tangent
-        phi = np.arctan2(kge_alpha - 1, kge_beta - 1)
+        phi = np.arctan2(kge_beta - 1, kge_alpha - 1)
 
         # convert temporal correlation to color
         norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
@@ -869,11 +869,11 @@ def diag_polar_plot(obs, sim, r="pearson", var="std"):
         return fig
 
 
-def diag_polar_plot_multi(
+def polar_plot_multi(
     kge_beta, alpha_or_gamma, kge_r, eff_kge, var="std", extended=False
 ):
     r"""
-    Diagnostic polar plot for Kling-Gupta efficiency (KGE) for multiple
+    Polar plot for Kling-Gupta efficiency (KGE) for multiple
     evaluations.
 
     Parameters

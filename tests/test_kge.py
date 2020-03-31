@@ -76,7 +76,7 @@ def test_temp_cor_for_arrays():
 def test_single_diag_polar_plot():
     obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    fig = kge.diag_polar_plot(obs, sim)
+    fig = kge.polar_plot(obs, sim)
 
     return fig
 
@@ -89,6 +89,6 @@ def test_multi_diag_polar_plot():
     alpha = np.array([1.15, 1.1, 1.2, 1.1, 1.1, 1.2])
     r = np.array([0.9, 0.85, 0.8, 0.9, 0.85, 0.9])
     eff_kge = np.array([0.79, 0.77, 0.65, 0.83, 0.81, 0.73])
-    fig = kge.diag_polar_plot_multi(beta, alpha, r, eff_kge)
+    fig = kge.polar_plot_multi(beta, alpha, r, eff_kge)
 
     return fig

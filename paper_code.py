@@ -894,7 +894,7 @@ if __name__ == "__main__":
     temp_cor_arr = df_es["temp_cor"].values
     kge_arr = df_es["kge"].values
 
-    fig_kge = util.diag_polar_plot_kge_multi_fc(
+    fig_kge = util.polar_plot_multi_fc(
         beta_arr, alpha_arr, temp_cor_arr, kge_arr, idx
     )
     path = os.path.join(PATH_FIG, "kge_diag.pdf")
@@ -1267,7 +1267,7 @@ if __name__ == "__main__":
     beta_arr = df_eff_cam["beta"].values
     kge_arr = df_eff_cam["kge"].values
 
-    fig_kge = util.diag_polar_plot_kge_multi_fc(
+    fig_kge = util.polar_plot_multi_fc(
         beta_arr, alpha_arr, temp_cor_arr, kge_arr, idx, ax_lim=0
     )
     path_pdf = os.path.join(
