@@ -265,7 +265,7 @@ div.rendered_html tbody tr:hover {
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="n">PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg&#39;</span><span class="p">)</span>
+<span class="n">PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff&#39;</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -291,9 +291,9 @@ that includes representation of physical processes such as evapotranspiration, p
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">path_cam1</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg/examples/13331500_05_model_output.txt&#39;</span><span class="p">)</span>
-<span class="n">path_cam2</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg/examples/13331500_48_model_output.txt&#39;</span><span class="p">)</span>
-<span class="n">path_cam3</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg/examples/13331500_94_model_output.txt&#39;</span><span class="p">)</span>
+<span></span><span class="n">path_cam1</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_05_model_output.txt&#39;</span><span class="p">)</span>
+<span class="n">path_cam2</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_48_model_output.txt&#39;</span><span class="p">)</span>
+<span class="n">path_cam3</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_94_model_output.txt&#39;</span><span class="p">)</span>
 
 <span class="n">df_cam1</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_obs_sim</span><span class="p">(</span><span class="n">path_cam1</span><span class="p">)</span>
 <span class="n">df_cam2</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_obs_sim</span><span class="p">(</span><span class="n">path_cam2</span><span class="p">)</span>

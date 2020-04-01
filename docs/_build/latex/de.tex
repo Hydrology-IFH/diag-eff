@@ -231,10 +231,10 @@
 
 
 
-\chapter{Welcome to de’s documentation!}
-\label{\detokenize{index:welcome-to-de-s-documentation}}
-\sphinxtitleref{de} is a package for diagnostic evaluation of hydrologic simulations. It
-includes one main module \sphinxtitleref{de.de}. The module provides functions for calculating
+\chapter{Welcome to diag\sphinxhyphen{}eff’s documentation!}
+\label{\detokenize{index:welcome-to-diag-eff-s-documentation}}
+\sphinxtitleref{diag\sphinxhyphen{}eff} is a package for diagnostic evaluation of hydrologic simulations. It
+includes one main module \sphinxtitleref{de}. The module provides functions for calculating
 model performance and for diagnostics.
 
 
@@ -245,7 +245,7 @@ please reference this module. It is published and has a DOI. It can be cited
 as:
 \begin{quote}
 
-Robin Schwemmle, Dominic Demand \& Markus Weiler (2020). de 0.1:
+Robin Schwemmle, Dominic Demand \& Markus Weiler (2020). diag\sphinxhyphen{}eff 0.1:
 Diagnostic efficiency \textendash{} specific evaluation of model performance.
 (Version v0.1). Zenodo. \sphinxurl{http://doi.org/10.5281/zenodo}…
 \end{quote}
@@ -263,7 +263,7 @@ uploaded to the Python Package Index.
 The version from PyPI can directly be installed using pip
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-pip install de
+pip install diag\PYGZhy{}eff
 \end{sphinxVerbatim}
 
 
@@ -272,9 +272,10 @@ pip install de
 The most recent version from GitHub can be installed like:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-git clone https://github.com/schwemro/de.git
-\PYG{n+nb}{cd} de
-python setup.py install
+git clone https://github.com/schwemro/diag\PYGZhy{}eff.git
+\PYG{n+nb}{cd} diag\PYGZhy{}eff
+pip install \PYGZhy{}r requirements.txt
+pip install \PYGZhy{}e .
 \end{sphinxVerbatim}
 
 
@@ -305,7 +306,7 @@ can be easily demonstrated on the provided example dataset.
 \PYG{g+gp}{In [2]: }\PYG{k+kn}{from} \PYG{n+nn}{de} \PYG{k+kn}{import} \PYG{n}{util}
 
 \PYG{g+go}{\PYGZsh{} path to example data}
-\PYG{g+gp}{In [3]: }\PYG{n}{path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/pkg/examples/13331500\PYGZus{}05\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}
+\PYG{g+gp}{In [3]: }\PYG{n}{path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}05\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}
 
 \PYG{g+go}{\PYGZsh{} import observed time series}
 \PYG{g+gp}{In [4]: }\PYG{n}{df\PYGZus{}ts} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path}\PYG{p}{)}
@@ -329,7 +330,7 @@ can be easily demonstrated on the provided example dataset.
 \PYG{g+gp}{In [9]: }\PYG{k+kn}{from} \PYG{n+nn}{de} \PYG{k+kn}{import} \PYG{n}{util}
 
 \PYG{g+go}{\PYGZsh{} path to example data}
-\PYG{g+gp}{In [10]: }\PYG{n}{path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/pkg/examples/13331500\PYGZus{}05\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}
+\PYG{g+gp}{In [10]: }\PYG{n}{path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}05\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}
 
 \PYG{g+go}{\PYGZsh{} import observed time series}
 \PYG{g+gp}{In [11]: }\PYG{n}{df\PYGZus{}ts} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path}\PYG{p}{)}
@@ -362,7 +363,7 @@ This notebook provides a proof of concept for Diagnostic Efficiency.
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \llap{\color{nbsphinxin}[1]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{k+kn}{import} \PYG{n+nn}{sys}
 \PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}
-\PYG{n}{PATH} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/pkg}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{PATH} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
 \PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{insert}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{PATH}\PYG{p}{)}
 
 \PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k}{as} \PYG{n+nn}{pd}
@@ -388,7 +389,7 @@ The observed and simulated streamflow time series are part of the open\sphinxhyp
 \sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \llap{\color{nbsphinxin}[2]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{n}{area} \PYG{o}{=} \PYG{l+m+mf}{619.11}  \PYG{c+c1}{\PYGZsh{} catchment area in km2 to convert runoff to mm/day}
-\PYG{n}{path} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/pkg/examples/13331500\PYGZus{}streamflow\PYGZus{}qc.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{path} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}streamflow\PYGZus{}qc.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
 \PYG{n}{df\PYGZus{}ts} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}ts}\PYG{p}{(}\PYG{n}{path}\PYG{p}{,} \PYG{n}{sep}\PYG{o}{=}\PYG{l+s+sa}{r}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZbs{}}\PYG{l+s+s2}{s+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{catch\PYGZus{}area}\PYG{o}{=}\PYG{n}{area}\PYG{p}{)} \PYG{c+c1}{\PYGZsh{} import observed time series}
 \PYG{n}{fig\PYGZus{}ts} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{plot\PYGZus{}ts}\PYG{p}{(}\PYG{n}{df\PYGZus{}ts}\PYG{p}{)}
 \end{sphinxVerbatim}
@@ -635,7 +636,7 @@ This notebook demonstrates the applicability of Diagnostic Efficiency to a real 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \llap{\color{nbsphinxin}[17]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{k+kn}{import} \PYG{n+nn}{sys}
 \PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}
-\PYG{n}{PATH} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/pkg}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{PATH} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
 \PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{insert}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{PATH}\PYG{p}{)}
 
 \PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k}{as} \PYG{n+nn}{pd}
@@ -662,9 +663,9 @@ that includes representation of physical processes such as evapotranspiration, p
 \sphinxsetup{VerbatimColor={named}{nbsphinx-code-bg}}
 \sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\llap{\color{nbsphinxin}[4]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{n}{path\PYGZus{}cam1} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/pkg/examples/13331500\PYGZus{}05\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{n}{path\PYGZus{}cam2} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/pkg/examples/13331500\PYGZus{}48\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{n}{path\PYGZus{}cam3} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/pkg/examples/13331500\PYGZus{}94\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\llap{\color{nbsphinxin}[4]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{n}{path\PYGZus{}cam1} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}05\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{path\PYGZus{}cam2} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}48\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{path\PYGZus{}cam3} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}94\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
 
 \PYG{n}{df\PYGZus{}cam1} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path\PYGZus{}cam1}\PYG{p}{)}
 \PYG{n}{df\PYGZus{}cam2} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path\PYGZus{}cam2}\PYG{p}{)}

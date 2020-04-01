@@ -22,7 +22,7 @@
    "source": [
     "import sys\n",
     "from pathlib import Path  \n",
-    "PATH = Path('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg')\n",
+    "PATH = Path('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff')\n",
     "sys.path.insert(0, PATH)\n",
     "\n",
     "import pandas as pd\n",
@@ -70,7 +70,7 @@
    ],
    "source": [
     "area = 619.11  # catchment area in km2 to convert runoff to mm/day\n",
-    "path = Path('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg/examples/13331500_streamflow_qc.txt')\n",
+    "path = Path('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_streamflow_qc.txt')\n",
     "df_ts = util.import_camels_ts(path, sep=r\"\\s+\", catch_area=area) # import observed time series\n",
     "fig_ts = util.plot_ts(df_ts)"
    ]

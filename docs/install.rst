@@ -24,7 +24,8 @@ The most recent version from GitHub can be installed like:
 
     git clone https://github.com/schwemro/diag-eff.git
     cd diag-eff
-    python setup.py install
+    pip install -r requirements.txt
+    pip install -e .
 
 Note
 ----

@@ -4,8 +4,8 @@ Info: `diag-eff` needs Python >= 3.6!
 
 [![Build Status](https://travis-ci.com/schwemro/diag-eff.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master)](https://travis-ci.com/schwemro/diag-eff)
 [![Documentation Status](https://readthedocs.org/projects/diag-eff/badge/?version=latest)](https://diag-eff.readthedocs.io/en/latest/?badge=latest)
-[![codecov](https://codecov.io/gh/schwemro/diag-eff/branch/master/graph/badge.svg?token=AmLX6d2FuR)](https://codecov.io/gh/schwemro/diag-eff)
-[![PyPI version shields.io](https://img.shields.io/pypi/v/de.svg)](https://pypi.python.org/pypi/de/)
+[![codecov](https://codecov.io/gh/schwemro/de/branch/master/graph/badge.svg?token=AmLX6d2FuR)](https://codecov.io/gh/schwemro/de)
+[![PyPI version shields.io](https://img.shields.io/pypi/v/diag-eff.svg)](https://pypi.python.org/pypi/diag-eff/)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 [![Binder](http://mybinder.org/badge_logo.svg)](http://mybinder.org/v2/gh/binder-examples/conda_environment/master?filepath=index.ipynb)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
@@ -53,6 +53,7 @@ GIT:
 ```bash
 git clone https://github.com/schwemro/diag-eff.git
 cd diag-eff
+pip install -r requirements.txt
 pip install -e .
 ```
 
