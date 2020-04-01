@@ -36,7 +36,7 @@ the LICENSE for further information.
 
 `diag-eff` is an open-source toolbox written in Python for specific evaluation of
 model performance. The toolbox provides functions to calculate the Diagnostic
-Efficiency metric and and fucntions to visualize contribution of metric terms
+Efficiency metric and and functions to visualize contribution of metric terms
 by diagnostic polar plots. Additionally, functions to calculate KGE and NSE
 are available.
 
@@ -107,7 +107,7 @@ sp <- import("scipy")
 mpl <- import("matplotlib")
 plt <- import("matplotlib.pyplot")
 sns <- import("seaborn")
-de <- import("diag-eff")
+de <- import("de")
 
 # set path to example data
 path_cam <- file.path(path_wd,
@@ -117,7 +117,7 @@ path_cam <- file.path(path_wd,
 df_cam <- import_camels_obs_sim(path_cam)
 
 # calculate diagnostic efficiency
-sig_de <- calc_de(df_cam$Qobs, df_cam$Qsim)
+eff_de <- calc_de(df_cam$Qobs, df_cam$Qsim)
 
 # diagnostic polar plot
 fig <- diag_polar_plot(df_cam$Qobs, df_cam$Qsim)
