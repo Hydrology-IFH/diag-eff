@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # set path to project folder
-cd /Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg
+cd /Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff
 
 # git tags are required for versioning
 # git tag 0.0.1
@@ -22,7 +22,7 @@ python3 -m twine upload --repository-url https://pypi.org/legacy/ dist/*
 # after revisions adjust versioneer style in setup.cfg
 
 # installing your newly uploaded package
-pip3 install de
+pip3 install diag-eff
 
 # further steps:
 # python

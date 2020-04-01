@@ -7,7 +7,7 @@ library(reticulate)
 # py_install("scipy")
 # py_install("matplotlib")
 # py_install("seaborn")
-# py_install("de")
+# py_install("diag-eff")
 
 # conda installation (requires anaconda. if conda is not installed on your
 # computer use pip installation instead)
@@ -28,7 +28,7 @@ conda_install("de-reticulate", "seaborn")
 conda_install("de-reticulate", "tk")
 
 # install de
-# conda_install("de-reticulate", "de")
+# conda_install("de-reticulate", "diag-eff")
 
 use_condaenv("de-reticulate")
 # import Python modules
@@ -65,7 +65,7 @@ fig$savefig('diagnostic_polar_plot.png')
 repl_python()
 # copy+paste the lines below to the interpreter
 import os
-PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg'
+PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff'
 os.chdir(PATH)
 from de import de
 from de import util

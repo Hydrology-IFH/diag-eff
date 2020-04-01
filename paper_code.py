@@ -3,7 +3,7 @@
 
 import os  # load modules first before importing .spydata
 
-PATH = "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg"
+PATH = "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff"
 PATH_FIG = "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/technical_note/figures"
 os.chdir(PATH)
 import pandas as pd
@@ -880,10 +880,8 @@ if __name__ == "__main__":
     fig_de = util.diag_polar_plot_multi_fc(
         brel_mean_arr, b_area_arr, temp_cor_arr, de_arr, b_dir_arr, phi_arr, idx
     )
-    fig_de.savefig(
-        "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/figures/technical_note/de_diag.pdf",
-        dpi=250,
-    )
+    path = os.path.join(PATH_FIG, "de_diag.pdf")
+    fig_de.savefig(path, dpi=250)
 
     ### multi KGE plot ###
     # make arrays

@@ -1,11 +1,11 @@
-"""Setup for the de package."""
+"""Setup for the diag-eff package."""
 
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 import versioneer
 
-long_description = """de is an open-source toolbox written in Python for
+long_description = """diag-eff is an open-source toolbox written in Python for
 specific evaluation of model performance. The toolbox provides functions to
 calculate the Diagnostic Efficiency metric and and fucntions to visualize
 contribution of metric terms by diagnostic polar plots. Note that the data
@@ -30,12 +30,12 @@ TEST_REQUIRES = [
 ]
 
 setup(
-    name="de",
+    name="diag-eff",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    description="DE: Diagnostic Efficiency",
+    description="diag-eff: Diagnostic Efficiency",
     long_description=long_description,
-    url="https://github.com/schwemro/de",
+    url="https://github.com/schwemro/diag-eff",
     author="Robin Schwemmle",
     author_email="robin.schwemmle@hydrology.uni-freiburg.de",
     license="GPLv3",

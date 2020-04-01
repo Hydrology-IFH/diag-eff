@@ -1,10 +1,10 @@
-# Diagnostic efficiency <img src="logo.png" align="right" width="120" />
+# diag-eff <img src="logo.png" align="right" width="120" />
 
-Info: `de` needs Python >= 3.6!
+Info: `diag-eff` needs Python >= 3.6!
 
-[![Build Status](https://travis-ci.com/schwemro/de.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master)](https://travis-ci.com/schwemro/de)
-[![Documentation Status](https://readthedocs.org/projects/de/badge/?version=latest)](https://de.readthedocs.io/en/latest/?badge=latest)
-[![codecov](https://codecov.io/gh/schwemro/de/branch/master/graph/badge.svg?token=AmLX6d2FuR)](https://codecov.io/gh/schwemro/de)
+[![Build Status](https://travis-ci.com/schwemro/diag-eff.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master)](https://travis-ci.com/schwemro/diag-eff)
+[![Documentation Status](https://readthedocs.org/projects/diag-eff/badge/?version=latest)](https://diag-eff.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/schwemro/diag-eff/branch/master/graph/badge.svg?token=AmLX6d2FuR)](https://codecov.io/gh/schwemro/diag-eff)
 [![PyPI version shields.io](https://img.shields.io/pypi/v/de.svg)](https://pypi.python.org/pypi/de/)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 [![Binder](http://mybinder.org/badge_logo.svg)](http://mybinder.org/v2/gh/binder-examples/conda_environment/master?filepath=index.ipynb)
@@ -13,7 +13,7 @@ Info: `de` needs Python >= 3.6!
 
 ## How to cite
 
-In case you use `de` in other software or scientific publications,
+In case you use `diag-eff` in other software or scientific publications,
 please reference this module. It is published and has a DOI. It can be cited
 as:
 
@@ -24,7 +24,7 @@ as:
 
 ## Full Documentation
 
-The full documentation can be found at: https://de.readthedocs.io
+The full documentation can be found at: https://diag-eff.readthedocs.io
 
 ## License
 This software can be distributed freely under the GPL v3 license. Please read
@@ -34,7 +34,7 @@ the LICENSE for further information.
 
 ## Description
 
-`de` is an open-source toolbox written in Python for specific evaluation of
+`diag-eff` is an open-source toolbox written in Python for specific evaluation of
 model performance. The toolbox provides functions to calculate the Diagnostic
 Efficiency metric and and fucntions to visualize contribution of metric terms
 by diagnostic polar plots. Additionally, functions to calculate KGE and NSE
@@ -44,15 +44,15 @@ are available.
 PyPI:
 
 ```bash
-pip install de
+pip install diag-eff
 ```
 
 
 GIT:
 
 ```bash
-git clone https://github.com/schwemro/de.git
-cd de
+git clone https://github.com/schwemro/diag-eff.git
+cd diag-eff
 pip install -e .
 ```
 
@@ -81,7 +81,7 @@ de.diag_polar_plot(obs_arr, sim_arr)
 ```
 ## Usage in R
 
-In order to run `de` in R, [**reticulate**](https://rstudio.github.io/reticulate/index.html)
+In order to run `diag-eff` in R, [**reticulate**](https://rstudio.github.io/reticulate/index.html)
 can be used as an interface to Python.
 
 Non-interactive mode:
@@ -96,7 +96,7 @@ py_install("pandas")
 py_install("scipy")
 py_install("matplotlib")
 py_install("seaborn")
-py_install("de")
+py_install("diag-eff")
 
 # import Python modules
 os <- import("os")
@@ -106,7 +106,7 @@ sp <- import("scipy")
 mpl <- import("matplotlib")
 plt <- import("matplotlib.pyplot")
 sns <- import("seaborn")
-de <- import("de")
+de <- import("diag-eff")
 
 # set path to example data
 path_cam <- file.path(path_wd,
@@ -137,7 +137,7 @@ py_install("scipy")
 py_install("matplotlib")
 py_install("seaborn")
 py_install("tk")
-py_install("de")
+py_install("diag-eff")
 
 # start Python interpreter in R
 repl_python()
@@ -145,7 +145,7 @@ repl_python()
 ```python
 # copy+paste the lines below to the interpreter
 import os
-PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg'
+PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff'
 os.chdir(PATH)
 from de import de
 from de import util

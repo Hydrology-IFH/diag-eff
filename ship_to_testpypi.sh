@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # set path to project folder
-cd /Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg
+cd /Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff
 
 # git tags are required for versioning
 # git tag 0.0.1
