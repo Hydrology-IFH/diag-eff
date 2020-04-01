@@ -49,16 +49,11 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">random</span>
+
 <span class="c1"># RunTimeWarning will not be displayed (division by zeros or NaN values)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="n">__title__</span> <span class="o">=</span> <span class="s1">&#39;de&#39;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.1&#39;</span>
-<span class="c1">#__build__ = 0x001201</span>
-<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Robin Schwemmle&#39;</span>
-<span class="n">__license__</span> <span class="o">=</span> <span class="s1">&#39;GNU GPLv3&#39;</span>
-<span class="c1">#__docformat__ = &#39;markdown&#39;</span>
 
 <div class="viewcode-block" id="constant"><a class="viewcode-back" href="../../reference/generate_errors.html#de.generate_errors.constant">[docs]</a><span class="k">def</span> <span class="nf">constant</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">1.5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -85,6 +80,7 @@
 
     <span class="k">return</span> <span class="n">ts_const</span></div>
 
+
 <div class="viewcode-block" id="negative_dynamic"><a class="viewcode-back" href="../../reference/generate_errors.html#de.generate_errors.negative_dynamic">[docs]</a><span class="k">def</span> <span class="nf">negative_dynamic</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate negative dynamic error (i.e Underestimate high flows -</span>
@@ -106,13 +102,13 @@
 <span class="sd">    ts_dyn : dataframe</span>
 <span class="sd">        Time series with negative dynamic error</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">obs_sim</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Qobs&#39;</span><span class="p">,</span> <span class="s1">&#39;Qsim&#39;</span><span class="p">])</span>
+    <span class="n">obs_sim</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Qobs&quot;</span><span class="p">,</span> <span class="s2">&quot;Qsim&quot;</span><span class="p">])</span>
     <span class="n">obs_sim</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
     <span class="c1"># sort values by descending order</span>
-    <span class="n">obs_sort</span> <span class="o">=</span> <span class="n">obs_sim</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;Qobs&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">obs_sort</span> <span class="o">=</span> <span class="n">obs_sim</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;Qobs&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">nn</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs_sim</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
     <span class="c1"># factors to decrease/increase runoff</span>
-    <span class="n">downup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">prop</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">+</span><span class="n">prop</span><span class="p">,</span> <span class="n">nn</span><span class="p">)</span>
+    <span class="n">downup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">prop</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">prop</span><span class="p">,</span> <span class="n">nn</span><span class="p">)</span>
     <span class="c1"># tilting the fdc at median</span>
     <span class="n">obs_sort</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">obs_sort</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">downup</span><span class="p">)</span>
     <span class="c1"># sort by index</span>
@@ -120,6 +116,7 @@
     <span class="n">ts_dyn</span> <span class="o">=</span> <span class="n">obs_sim</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">ts_dyn</span></div>
+
 
 <div class="viewcode-block" id="positive_dynamic"><a class="viewcode-back" href="../../reference/generate_errors.html#de.generate_errors.positive_dynamic">[docs]</a><span class="k">def</span> <span class="nf">positive_dynamic</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -142,13 +139,13 @@
 <span class="sd">    ts_dyn : dataframe</span>
 <span class="sd">        Time series with positive dynamic error</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">obs_sim</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Qobs&#39;</span><span class="p">,</span> <span class="s1">&#39;Qsim&#39;</span><span class="p">])</span>
+    <span class="n">obs_sim</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Qobs&quot;</span><span class="p">,</span> <span class="s2">&quot;Qsim&quot;</span><span class="p">])</span>
     <span class="n">obs_sim</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
     <span class="c1"># sort values by descending order</span>
-    <span class="n">obs_sort</span> <span class="o">=</span> <span class="n">obs_sim</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;Qobs&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">obs_sort</span> <span class="o">=</span> <span class="n">obs_sim</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;Qobs&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">nn</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs_sim</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
     <span class="c1"># factors to decrease/increase runoff</span>
-    <span class="n">updown</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.0</span><span class="o">+</span><span class="n">prop</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">-</span><span class="n">prop</span><span class="p">,</span> <span class="n">nn</span><span class="p">)</span>
+    <span class="n">updown</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">prop</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">prop</span><span class="p">,</span> <span class="n">nn</span><span class="p">)</span>
     <span class="c1"># tilting the fdc at median</span>
     <span class="n">obs_sort</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">obs_sort</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">updown</span><span class="p">)</span>
     <span class="c1"># sort by index</span>
@@ -156,6 +153,7 @@
     <span class="n">ts_dyn</span> <span class="o">=</span> <span class="n">obs_sim</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">ts_dyn</span></div>
+
 
 <div class="viewcode-block" id="timing"><a class="viewcode-back" href="../../reference/generate_errors.html#de.generate_errors.timing">[docs]</a><span class="k">def</span> <span class="nf">timing</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">tshift</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>

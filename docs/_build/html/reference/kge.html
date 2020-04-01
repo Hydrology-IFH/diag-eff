@@ -91,12 +91,188 @@ Journal, 63, 1941-1953, 10.1080/02626667.2018.1552002, 2018.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="diagnostic-polar-plot">
-<h2>Diagnostic Polar Plot<a class="headerlink" href="#diagnostic-polar-plot" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bias-term">
+<h2>Bias term<a class="headerlink" href="#bias-term" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="de.kge.diag_polar_plot">
-<code class="sig-prename descclassname">de.kge.</code><code class="sig-name descname">diag_polar_plot</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">r='pearson'</em>, <em class="sig-param">var='std'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/kge.html#diag_polar_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.kge.diag_polar_plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Diagnostic polar plot of Diagnostic efficiency (KGE) for a single
+<dt id="de.kge.calc_kge_beta">
+<code class="sig-prename descclassname">de.kge.</code><code class="sig-name descname">calc_kge_beta</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/kge.html#calc_kge_beta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.kge.calc_kge_beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the beta term of Kling-Gupta-Efficiency (KGE).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Observed time series as 1-D array</p></li>
+<li><p><strong>sim</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Simulated time series as 1-D array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>kge_beta</strong> – alpha value</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight">
+\[\beta = \frac{\mu_{sim}}{\mu_{obs}}\]</div>
+<p class="rubric">Examples</p>
+<p>Provide arrays with equal length</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">de</span><span class="o">.</span><span class="n">calc_kge_beta</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
+<span class="go">1.0980392156862746</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<p>Gupta, H. V., Kling, H., Yilmaz, K. K., and Martinez, G. F.: Decomposition
+of the mean squared error and NSE performance criteria: Implications for
+improving hydrological modelling, Journal of Hydrology, 377, 80-91,
+10.1016/j.jhydrol.2009.08.003, 2009.</p>
+<p>Kling, H., Fuchs, M., and Paulin, M.: Runoff conditions in the upper
+Danube basin under an ensemble of climate change scenarios, Journal of
+Hydrology, 424-425, 264-277, 10.1016/j.jhydrol.2012.01.011, 2012.</p>
+<p>Pool, S., Vis, M., and Seibert, J.: Evaluating model performance: towards a
+non-parametric variant of the Kling-Gupta efficiency, Hydrological Sciences
+Journal, 63, 1941-1953, 10.1080/02626667.2018.1552002, 2018.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="variability-term">
+<h2>Variability term<a class="headerlink" href="#variability-term" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="de.kge.calc_kge_alpha">
+<code class="sig-prename descclassname">de.kge.</code><code class="sig-name descname">calc_kge_alpha</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/kge.html#calc_kge_alpha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.kge.calc_kge_alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the alpha term of the Kling-Gupta-Efficiency (KGE).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Observed time series as 1-D array</p></li>
+<li><p><strong>sim</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Simulated time series</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>kge_alpha</strong> – alpha value</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight">
+\[\alpha = \frac{\sigma_{sim}}{\sigma_{obs}}\]</div>
+<p class="rubric">Examples</p>
+<p>Provide arrays with equal length</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kge</span><span class="o">.</span><span class="n">calc_kge_alpha</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
+<span class="go">1.2812057455166919</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<p>Gupta, H. V., Kling, H., Yilmaz, K. K., and Martinez, G. F.: Decomposition
+of the mean squared error and NSE performance criteria: Implications for
+improving hydrological modelling, Journal of Hydrology, 377, 80-91,
+10.1016/j.jhydrol.2009.08.003, 2009.</p>
+<p>Kling, H., Fuchs, M., and Paulin, M.: Runoff conditions in the upper
+Danube basin under an ensemble of climate change scenarios, Journal of
+Hydrology, 424-425, 264-277, 10.1016/j.jhydrol.2012.01.011, 2012.</p>
+<p>Pool, S., Vis, M., and Seibert, J.: Evaluating model performance: towards a
+non-parametric variant of the Kling-Gupta efficiency, Hydrological Sciences
+Journal, 63, 1941-1953, 10.1080/02626667.2018.1552002, 2018.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="de.kge.calc_kge_gamma">
+<code class="sig-prename descclassname">de.kge.</code><code class="sig-name descname">calc_kge_gamma</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/kge.html#calc_kge_gamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.kge.calc_kge_gamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the gamma term of Kling-Gupta-Efficiency (KGE).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Observed time series as 1-D array</p></li>
+<li><p><strong>sim</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Simulated time series as 1-D array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>kge_gamma</strong> – gamma value</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight">
+\[\gamma = \frac{CV_{sim}}{CV_{obs}}\]</div>
+<p class="rubric">Examples</p>
+<p>Provide arrays with equal length</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kge</span><span class="o">.</span><span class="n">calc_kge_gamma</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
+<span class="go">1.166812375381273</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<p>Gupta, H. V., Kling, H., Yilmaz, K. K., and Martinez, G. F.: Decomposition
+of the mean squared error and NSE performance criteria: Implications for
+improving hydrological modelling, Journal of Hydrology, 377, 80-91,
+10.1016/j.jhydrol.2009.08.003, 2009.</p>
+<p>Kling, H., Fuchs, M., and Paulin, M.: Runoff conditions in the upper
+Danube basin under an ensemble of climate change scenarios, Journal of
+Hydrology, 424-425, 264-277, 10.1016/j.jhydrol.2012.01.011, 2012.</p>
+<p>Pool, S., Vis, M., and Seibert, J.: Evaluating model performance: towards a
+non-parametric variant of the Kling-Gupta efficiency, Hydrological Sciences
+Journal, 63, 1941-1953, 10.1080/02626667.2018.1552002, 2018.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="correlation-term">
+<h2>Correlation term<a class="headerlink" href="#correlation-term" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="de.kge.calc_temp_cor">
+<code class="sig-prename descclassname">de.kge.</code><code class="sig-name descname">calc_temp_cor</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">r='pearson'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/kge.html#calc_temp_cor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.kge.calc_temp_cor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate temporal correlation between observed and simulated
+time series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Observed time series as 1-D array</p></li>
+<li><p><strong>sim</strong> (<em>(</em><em>N</em><em>,</em><em>)</em><em>array_like</em>) – Simulated time series</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Either Spearman correlation coefficient (‘spearman’) or Pearson
+correlation coefficient (‘pearson’) can be used to describe the
+temporalcorrelation. The default is to calculate the Pearson
+correlation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>temp_cor</strong> – correlation between observed and simulated time series</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Provide arrays with equal length</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">de</span><span class="o">.</span><span class="n">calc_temp_cor</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
+<span class="go">0.8940281850583509</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="polar-plot">
+<h2>Polar Plot<a class="headerlink" href="#polar-plot" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="de.kge.polar_plot">
+<code class="sig-prename descclassname">de.kge.</code><code class="sig-name descname">polar_plot</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">r='pearson'</em>, <em class="sig-param">var='std'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/kge.html#polar_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.kge.polar_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Polar plot of Diagnostic efficiency (KGE) for a single
 evaluation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -166,7 +342,10 @@ deviation.</p></li>
 <li class="toctree-l2"><a class="reference internal" href="generate_errors.html">generate_errors</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">kge</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#kling-gupta-efficiency">Kling-Gupta Efficiency</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#diagnostic-polar-plot">Diagnostic Polar Plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bias-term">Bias term</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variability-term">Variability term</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#correlation-term">Correlation term</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polar-plot">Polar Plot</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="nse.html">nse</a></li>

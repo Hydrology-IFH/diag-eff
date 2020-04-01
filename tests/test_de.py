@@ -47,30 +47,30 @@ def test_nonlin_cor_for_arrays():
 
 
 def test_bias_area_for_arrays():
-    brel_rest = de.calc_brel_rest(
+    brel_res = de.calc_brel_res(
         obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
         sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
     )
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     assert b_area == pytest.approx(0.1112908496732026, rel=1e-4)
 
 
 def test_bias_dir_for_arrays():
-    brel_rest = de.calc_brel_rest(
+    brel_res = de.calc_brel_res(
         obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
         sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
     )
-    b_dir = b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = b_dir = de.calc_bias_dir(brel_res)
     assert b_dir == pytest.approx(-0.014705882352941155, rel=1e-4)
 
 
 def test_bias_slope_for_arrays():
-    brel_rest = de.calc_brel_rest(
+    brel_res = de.calc_brel_res(
         obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
         sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
     )
-    b_area = de.calc_bias_area(brel_rest)
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
+    b_dir = de.calc_bias_dir(brel_res)
     b_slope = de.calc_bias_slope(b_area, b_dir)
     assert b_slope == pytest.approx(0.1112908496732026, rel=1e-4)
 
@@ -96,47 +96,47 @@ def test_brel_mean_for_equal_arrays():
 
 
 def test_brel_rest_simulation_equals_obs_mean():
-    brel_rest = de.calc_brel_rest(
+    brel_res = de.calc_brel_res(
         obs=np.array([1, 2, 3, 4, 5]), sim=np.array([3, 3, 3, 3, 3])
     )
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     assert b_area == pytest.approx(0.5116666666666666, rel=1e-4)
 
 
 def test_brel_rest_for_equal_arrays():
-    brel_rest = de.calc_brel_rest(obs=np.array([1, 2, 3]), sim=np.array([1, 2, 3]))
-    b_area = de.calc_bias_area(brel_rest)
+    brel_res = de.calc_brel_res(obs=np.array([1, 2, 3]), sim=np.array([1, 2, 3]))
+    b_area = de.calc_bias_area(brel_res)
     assert b_area == 0
 
 
 def test_bias_dir_simulation_equals_obs_mean():
-    brel_rest = de.calc_brel_rest(
+    brel_res = de.calc_brel_res(
         obs=np.array([1, 2, 3, 4, 5]), sim=np.array([3, 3, 3, 3, 3])
     )
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     assert b_dir < 0
 
 
 def test_bias_dir_for_equal_arrays():
-    brel_rest = de.calc_brel_rest(obs=np.array([1, 2, 3]), sim=np.array([1, 2, 3]))
-    b_dir = b_dir = de.calc_bias_dir(brel_rest)
+    brel_res = de.calc_brel_res(obs=np.array([1, 2, 3]), sim=np.array([1, 2, 3]))
+    b_dir = b_dir = de.calc_bias_dir(brel_res)
     assert b_dir == 0
 
 
 def test_bias_slope_simulation_equals_obs_mean():
-    brel_rest = de.calc_brel_rest(
+    brel_res = de.calc_brel_res(
         obs=np.array([1, 2, 3, 4, 5]), sim=np.array([3, 3, 3, 3, 3])
     )
-    b_area = de.calc_bias_area(brel_rest)
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
+    b_dir = de.calc_bias_dir(brel_res)
     b_slope = de.calc_bias_slope(b_area, b_dir)
     assert b_slope > 0.5
 
 
 def test_bias_slope_for_equal_arrays():
-    brel_rest = de.calc_brel_rest(obs=np.array([1, 2, 3]), sim=np.array([1, 2, 3]))
-    b_area = de.calc_bias_area(brel_rest)
-    b_dir = b_dir = de.calc_bias_dir(brel_rest)
+    brel_res = de.calc_brel_res(obs=np.array([1, 2, 3]), sim=np.array([1, 2, 3]))
+    b_area = de.calc_bias_area(brel_res)
+    b_dir = b_dir = de.calc_bias_dir(brel_res)
     b_slope = de.calc_bias_slope(b_area, b_dir)
     assert b_slope == 0
 

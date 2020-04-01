@@ -26,16 +26,22 @@
 \contentsline {section}{\numberline {2.4}Code Reference}{19}{section.2.4}
 \contentsline {subsection}{\numberline {2.4.1}de}{19}{subsection.2.4.1}
 \contentsline {subsubsection}{Diagnostic Efficiency}{19}{subsubsection*.15}
-\contentsline {subsubsection}{Diagnostic Polar Plot}{20}{subsubsection*.17}
-\contentsline {subsection}{\numberline {2.4.2}generate\_errors}{20}{subsection.2.4.2}
-\contentsline {subsubsection}{Constant error}{20}{subsubsection*.19}
-\contentsline {subsubsection}{Dynamic error}{21}{subsubsection*.21}
-\contentsline {subsubsection}{Timing error}{21}{subsubsection*.24}
-\contentsline {subsection}{\numberline {2.4.3}kge}{22}{subsection.2.4.3}
-\contentsline {subsubsection}{Kling\sphinxhyphen {}Gupta Efficiency}{22}{subsubsection*.26}
-\contentsline {subsubsection}{Diagnostic Polar Plot}{23}{subsubsection*.28}
-\contentsline {subsection}{\numberline {2.4.4}nse}{23}{subsection.2.4.4}
-\contentsline {subsubsection}{Nash\sphinxhyphen {}Sutcliffe Efficiency}{23}{subsubsection*.30}
-\contentsline {section}{\numberline {2.5}Changelog}{24}{section.2.5}
-\contentsline {subsection}{\numberline {2.5.1}Version 0.1}{24}{subsection.2.5.1}
-\contentsline {chapter}{Index}{25}{section*.32}
+\contentsline {subsubsection}{Constant error term}{20}{subsubsection*.17}
+\contentsline {subsubsection}{Dynamic error term}{20}{subsubsection*.19}
+\contentsline {subsubsection}{Timing error term}{21}{subsubsection*.21}
+\contentsline {subsubsection}{Diagnostic Polar Plot}{21}{subsubsection*.23}
+\contentsline {subsection}{\numberline {2.4.2}generate\_errors}{22}{subsection.2.4.2}
+\contentsline {subsubsection}{Constant error}{22}{subsubsection*.25}
+\contentsline {subsubsection}{Dynamic error}{22}{subsubsection*.27}
+\contentsline {subsubsection}{Timing error}{23}{subsubsection*.30}
+\contentsline {subsection}{\numberline {2.4.3}kge}{23}{subsection.2.4.3}
+\contentsline {subsubsection}{Kling\sphinxhyphen {}Gupta Efficiency}{23}{subsubsection*.32}
+\contentsline {subsubsection}{Bias term}{24}{subsubsection*.34}
+\contentsline {subsubsection}{Variability term}{25}{subsubsection*.36}
+\contentsline {subsubsection}{Correlation term}{27}{subsubsection*.39}
+\contentsline {subsubsection}{Polar Plot}{27}{subsubsection*.41}
+\contentsline {subsection}{\numberline {2.4.4}nse}{28}{subsection.2.4.4}
+\contentsline {subsubsection}{Nash\sphinxhyphen {}Sutcliffe Efficiency}{28}{subsubsection*.43}
+\contentsline {section}{\numberline {2.5}Changelog}{29}{section.2.5}
+\contentsline {subsection}{\numberline {2.5.1}Version 0.1}{29}{subsection.2.5.1}
+\contentsline {chapter}{Index}{31}{section*.45}

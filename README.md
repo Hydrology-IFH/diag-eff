@@ -74,7 +74,7 @@ obs_arr = df_cam['Qobs'].values
 sim_arr = df_cam['Qsim'].values
 
 # calculate diagnostic efficiency
-sig_de = de.calc_de(obs_arr, sim_arr)
+eff_de = de.calc_de(obs_arr, sim_arr)
 
 # diagnostic polar plot
 de.diag_polar_plot(obs_arr, sim_arr)
@@ -167,7 +167,7 @@ plt.plot(obs_arr)
 plt.show()
 
 # calculate diagnostic efficiency
-sig_de = de.calc_de(obs_arr, sim_arr)
+eff_de = de.calc_de(obs_arr, sim_arr)
 
 # diagnostic polar plot
 de.diag_polar_plot(obs_arr, sim_arr)

@@ -5,26 +5,33 @@
 \let\spxextra \sphinxstyleindexextra
 
   \bigletter C
+  \item \spxentry{calc\_bias\_area()}\spxextra{in module de.de}, \hyperpage{20}
+  \item \spxentry{calc\_brel\_mean()}\spxextra{in module de.de}, \hyperpage{20}
   \item \spxentry{calc\_de()}\spxextra{in module de.de}, \hyperpage{19}
-  \item \spxentry{calc\_kge()}\spxextra{in module de.kge}, \hyperpage{22}
-  \item \spxentry{calc\_nse()}\spxextra{in module de.nse}, \hyperpage{23}
-  \item \spxentry{constant()}\spxextra{in module de.generate\_errors}, \hyperpage{20}
+  \item \spxentry{calc\_kge()}\spxextra{in module de.kge}, \hyperpage{23}
+  \item \spxentry{calc\_kge\_alpha()}\spxextra{in module de.kge}, \hyperpage{25}
+  \item \spxentry{calc\_kge\_beta()}\spxextra{in module de.kge}, \hyperpage{24}
+  \item \spxentry{calc\_kge\_gamma()}\spxextra{in module de.kge}, \hyperpage{26}
+  \item \spxentry{calc\_nse()}\spxextra{in module de.nse}, \hyperpage{28}
+  \item \spxentry{calc\_temp\_cor()}\spxextra{in module de.de}, \hyperpage{21}
+  \item \spxentry{calc\_temp\_cor()}\spxextra{in module de.kge}, \hyperpage{27}
+  \item \spxentry{constant()}\spxextra{in module de.generate\_errors}, \hyperpage{22}
 
   \indexspace
   \bigletter D
-  \item \spxentry{diag\_polar\_plot()}\spxextra{in module de.de}, \hyperpage{20}
-  \item \spxentry{diag\_polar\_plot()}\spxextra{in module de.kge}, \hyperpage{23}
+  \item \spxentry{diag\_polar\_plot()}\spxextra{in module de.de}, \hyperpage{21}
 
   \indexspace
   \bigletter N
-  \item \spxentry{negative\_dynamic()}\spxextra{in module de.generate\_errors}, \hyperpage{21}
+  \item \spxentry{negative\_dynamic()}\spxextra{in module de.generate\_errors}, \hyperpage{23}
 
   \indexspace
   \bigletter P
-  \item \spxentry{positive\_dynamic()}\spxextra{in module de.generate\_errors}, \hyperpage{21}
+  \item \spxentry{polar\_plot()}\spxextra{in module de.kge}, \hyperpage{27}
+  \item \spxentry{positive\_dynamic()}\spxextra{in module de.generate\_errors}, \hyperpage{22}
 
   \indexspace
   \bigletter T
-  \item \spxentry{timing()}\spxextra{in module de.generate\_errors}, \hyperpage{21}
+  \item \spxentry{timing()}\spxextra{in module de.generate\_errors}, \hyperpage{23}
 
 \end{sphinxtheindex}
