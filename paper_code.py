@@ -115,9 +115,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[0, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[0, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[0, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[0, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -168,9 +168,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[1, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[1, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -178,7 +178,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[1, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[1, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -221,9 +221,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[2, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[2, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[2, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[2, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -274,9 +274,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[3, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[3, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -284,7 +284,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[3, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[3, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -327,9 +327,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[4, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[4, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -337,7 +337,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[4, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[4, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -380,9 +380,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[5, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[5, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -390,7 +390,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[5, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[5, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -435,9 +435,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[6, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[6, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -445,7 +445,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[6, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[6, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -490,9 +490,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[7, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[7, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -500,7 +500,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[7, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[7, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -545,9 +545,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[8, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[8, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -555,7 +555,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[8, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[8, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -600,9 +600,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[9, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[9, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -610,7 +610,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[9, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[9, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -655,9 +655,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[10, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[10, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -665,7 +665,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[10, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[10, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -711,9 +711,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[11, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[11, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -721,7 +721,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[11, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[11, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -767,9 +767,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[12, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[12, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -777,7 +777,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[12, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[12, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -823,9 +823,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_es.iloc[13, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_es.iloc[13, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -833,7 +833,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_es.iloc[13, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_es.iloc[13, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -1129,9 +1129,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_eff_cam.iloc[0, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_eff_cam.iloc[0, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -1139,7 +1139,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_eff_cam.iloc[0, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_eff_cam.iloc[0, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -1166,9 +1166,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_eff_cam.iloc[1, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_eff_cam.iloc[1, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -1176,7 +1176,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_eff_cam.iloc[1, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_eff_cam.iloc[1, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
@@ -1203,9 +1203,9 @@ if __name__ == "__main__":
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
     df_eff_cam.iloc[2, 0] = brel_mean
     # residual relative bias
-    brel_rest = de.calc_brel_rest(obs_arr, sim_arr)
+    brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
-    b_area = de.calc_bias_area(brel_rest)
+    b_area = de.calc_bias_area(brel_res)
     df_eff_cam.iloc[2, 1] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
@@ -1213,7 +1213,7 @@ if __name__ == "__main__":
     # diagnostic efficiency
     df_eff_cam.iloc[2, 3] = de.calc_de(obs_arr, sim_arr)
     # direction of bias
-    b_dir = de.calc_bias_dir(brel_rest)
+    b_dir = de.calc_bias_dir(brel_res)
     df_eff_cam.iloc[2, 4] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)

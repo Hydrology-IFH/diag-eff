@@ -6,7 +6,7 @@ de.de
 Diagnosing model performance using an efficiency measure based on flow
 duration curve and temporal correlation. The efficiency measure can be
 visualized by diagnostic polar plots which facilitates decomposing potential
-error origins (dynamic errors vs. constant erros vs. timing errors)
+error contributions (dynamic errors vs. constant erros vs. timing errors)
 :2019 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
@@ -83,7 +83,7 @@ def calc_brel_mean(obs, sim, sort=True):
     return brel_mean
 
 
-def calc_brel_rest(obs, sim, sort=True):
+def calc_brel_res(obs, sim, sort=True):
     r"""
     Subtract arithmetic mean of relative bias from relative bias.
 
@@ -101,7 +101,7 @@ def calc_brel_rest(obs, sim, sort=True):
 
     Returns
     ----------
-    brel_rest : array_like
+    brel_res : array_like
         remaining relative bias
 
     Notes
@@ -118,7 +118,7 @@ def calc_brel_rest(obs, sim, sort=True):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> de.calc_brel_rest(obs, sim)
+    >>> de.calc_brel_res(obs, sim)
     array([ 0.15669935, -0.02663399, -0.22663399,  0.10669935,  0.08316993,
        -0.09330065])
     """
@@ -133,18 +133,18 @@ def calc_brel_rest(obs, sim, sort=True):
     brel[sim_obs_diff == 0] = 0
     brel = brel[np.isfinite(brel)]
     brel_mean = np.mean(brel)
-    brel_rest = brel - brel_mean
+    brel_res = brel - brel_mean
 
-    return brel_rest
+    return brel_res
 
 
-def calc_bias_area(brel_rest):
+def calc_bias_area(brel_res):
     r"""
     Calculate absolute bias area for entire flow duration curve.
 
     Parameters
     ----------
-    brel_rest : (N,)array_like
+    brel_res : (N,)array_like
         remaining relative bias as 1-D array
 
     Returns
@@ -166,24 +166,28 @@ def calc_bias_area(brel_rest):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> b_rest = de.calc_brel_rest(obs, sim)
-    >>> de.calc_bias_area(b_rest)
+    >>> b_res = de.calc_brel_res(obs, sim)
+    >>> de.calc_bias_area(b_res)
     0.1112908496732026
+
+    See Also
+    --------
+    de.calc_brel_res
     """
-    perc = np.linspace(0, 1, len(brel_rest))
+    perc = np.linspace(0, 1, len(brel_res))
     # area of absolute bias
-    b_area = integrate.simps(abs(brel_rest), perc)
+    b_area = integrate.simps(abs(brel_res), perc)
 
     return b_area
 
 
-def calc_bias_dir(brel_rest):
+def calc_bias_dir(brel_res):
     r"""
     Calculate absolute bias area for high flow and low flow.
 
     Parameters
     ----------
-    brel_rest : (N,)array_like
+    brel_res : (N,)array_like
         remaining relative bias as 1-D array
 
     Returns
@@ -205,15 +209,15 @@ def calc_bias_dir(brel_rest):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> b_rest = de.calc_brel_rest(obs, sim)
-    >>> de.calc_bias_dir(b_rest)
+    >>> b_res = de.calc_brel_res(obs, sim)
+    >>> de.calc_bias_dir(b_res)
     -0.014705882352941155
     """
-    mid_idx = int(len(brel_rest) / 2)
+    mid_idx = int(len(brel_res) / 2)
     # integral of relative bias < 50 %
     perc = np.linspace(0, 0.5, mid_idx)
     # direction of bias
-    b_dir = integrate.simps(brel_rest[:mid_idx], perc)
+    b_dir = integrate.simps(brel_res[:mid_idx], perc)
 
     return b_dir
 
@@ -254,9 +258,9 @@ def calc_bias_slope(b_area, b_dir):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> b_rest = de.calc_brel_rest(obs, sim)
-    >>> b_dir = de.calc_bias_dir(b_rest)
-    >>> b_area = de.calc_bias_area(b_rest)
+    >>> b_res = de.calc_brel_res(obs, sim)
+    >>> b_dir = de.calc_bias_dir(b_res)
+    >>> b_area = de.calc_bias_area(b_res)
     >>> de.calc_bias_slope(b_area, b_dir)
     0.1112908496732026
     """
@@ -368,9 +372,9 @@ def calc_de(obs, sim, sort=True):
     # mean relative bias
     brel_mean = calc_brel_mean(obs, sim, sort=sort)
     # remaining relative bias
-    brel_rest = calc_brel_rest(obs, sim, sort=sort)
+    brel_res = calc_brel_res(obs, sim, sort=sort)
     # area of relative remaing bias
-    b_area = calc_bias_area(brel_rest)
+    b_area = calc_bias_area(brel_res)
     # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
     # diagnostic efficiency
@@ -432,16 +436,16 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
     brel_mean = calc_brel_mean(obs, sim, sort=sort)
 
     # remaining relative bias
-    brel_rest = calc_brel_rest(obs, sim, sort=sort)
+    brel_res = calc_brel_res(obs, sim, sort=sort)
     # area of relative remaing bias
-    b_area = calc_bias_area(brel_rest)
+    b_area = calc_bias_area(brel_res)
     # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
     # diagnostic efficiency
     eff = 1 - np.sqrt((brel_mean) ** 2 + (b_area) ** 2 + (temp_cor - 1) ** 2)
 
     # direction of bias
-    b_dir = calc_bias_dir(brel_rest)
+    b_dir = calc_bias_dir(brel_res)
 
     # slope of bias
     b_slope = calc_bias_slope(b_area, b_dir)
@@ -888,12 +892,12 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
 
         # plot B_rest
         # calculate exceedence probability
-        prob = np.linspace(0, 1, len(brel_rest))
+        prob = np.linspace(0, 1, len(brel_res))
         ax1.axhline(y=0, color="slategrey")
         ax1.axvline(x=0.5, color="slategrey")
-        ax1.plot(prob, brel_rest, color="black")
-        ax1.fill_between(prob, brel_rest, where=0 < brel_rest, facecolor="purple")
-        ax1.fill_between(prob, brel_rest, where=0 > brel_rest, facecolor="red")
+        ax1.plot(prob, brel_res, color="black")
+        ax1.fill_between(prob, brel_res, where=0 < brel_res, facecolor="purple")
+        ax1.fill_between(prob, brel_res, where=0 > brel_res, facecolor="red")
         ax1.set(ylabel=r"$B_{rest}$ [-]", xlabel="Exceedence probabilty [-]")
 
         return fig
@@ -905,6 +909,9 @@ def diag_polar_plot_multi(
     r"""
     Diagnostic polar plot of Diagnostic efficiency (DE) for multiple
     evaluations.
+
+    Note that points are used rather than arrows. Displaying multiple
+    arrows would deteriorate visual comprehension.
 
     Parameters
     ----------

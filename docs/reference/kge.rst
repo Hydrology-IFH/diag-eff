@@ -7,6 +7,19 @@ Kling-Gupta Efficiency
 ----------------------
 .. autofunction:: de.kge.calc_kge
 
-Diagnostic Polar Plot
+Bias term
+----------------------
+.. autofunction:: de.kge.calc_kge_beta
+
+Variability term
+----------------------
+.. autofunction:: de.kge.calc_kge_alpha
+.. autofunction:: de.kge.calc_kge_gamma
+
+Correlation term
+----------------------
+.. autofunction:: de.kge.calc_temp_cor
+
+Polar Plot
 ---------------------
-.. autofunction:: de.kge.diag_polar_plot
+.. autofunction:: de.kge.polar_plot

@@ -264,7 +264,8 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="n">PATH</span> <span class="o">=</span> <span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency&#39;</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="n">PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg&#39;</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -288,11 +289,8 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Import a function that deals with paths properly, regardless of OS</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-
-<span class="n">area</span> <span class="o">=</span> <span class="mf">619.11</span>  <span class="c1"># catchment area in km2 to convert runoff to mm/day</span>
-<span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/examples/camels_example_data/13331500_streamflow_qc.txt&#39;</span><span class="p">)</span>
+<span></span><span class="n">area</span> <span class="o">=</span> <span class="mf">619.11</span>  <span class="c1"># catchment area in km2 to convert runoff to mm/day</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/pkg/examples/13331500_streamflow_qc.txt&#39;</span><span class="p">)</span>
 <span class="n">df_ts</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_ts</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="n">catch_area</span><span class="o">=</span><span class="n">area</span><span class="p">)</span> <span class="c1"># import observed time series</span>
 <span class="n">fig_ts</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">plot_ts</span><span class="p">(</span><span class="n">df_ts</span><span class="p">)</span>
 </pre></div>
@@ -435,7 +433,7 @@ div.rendered_html tbody tr:hover {
 <span></span><span class="n">obs_sim</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">df_ts</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Qobs&#39;</span><span class="p">,</span> <span class="s1">&#39;Qsim&#39;</span><span class="p">])</span>
 <span class="n">obs_sim</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Qobs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ts</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Qobs&#39;</span><span class="p">]</span>
 <span class="c1"># generate timing error</span>
-<span class="n">tss</span> <span class="o">=</span> <span class="n">generate_errors</span><span class="o">.</span><span class="n">timing</span><span class="p">(</span><span class="n">df_ts</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">random</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># shuffling</span>
+<span class="n">tss</span> <span class="o">=</span> <span class="n">generate_errors</span><span class="o">.</span><span class="n">timing</span><span class="p">(</span><span class="n">df_ts</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># shuffling</span>
 <span class="n">obs_sim</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Qsim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tss</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
 <span class="c1"># plot time series</span>
@@ -480,6 +478,7 @@ div.rendered_html tbody tr:hover {
 <img alt="../_images/tutorials_01_proof_of_concept_16_0.png" src="../_images/tutorials_01_proof_of_concept_16_0.png" />
 </div>
 </div>
+<p>In this case, dynamic error types cannot be distinguished from each other. Thus, the arrow extends in both directions.</p>
 </div>
 </div>
 <div class="section" id="References">
