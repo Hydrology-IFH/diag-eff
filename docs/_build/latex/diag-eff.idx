@@ -1,0 +1,16 @@
+\indexentry{calc\_de() (in module de.de)@\spxentry{calc\_de()}\spxextra{in module de.de}|hyperpage}{19}
+\indexentry{calc\_brel\_mean() (in module de.de)@\spxentry{calc\_brel\_mean()}\spxextra{in module de.de}|hyperpage}{20}
+\indexentry{calc\_bias\_area() (in module de.de)@\spxentry{calc\_bias\_area()}\spxextra{in module de.de}|hyperpage}{20}
+\indexentry{calc\_temp\_cor() (in module de.de)@\spxentry{calc\_temp\_cor()}\spxextra{in module de.de}|hyperpage}{21}
+\indexentry{diag\_polar\_plot() (in module de.de)@\spxentry{diag\_polar\_plot()}\spxextra{in module de.de}|hyperpage}{21}
+\indexentry{constant() (in module de.generate\_errors)@\spxentry{constant()}\spxextra{in module de.generate\_errors}|hyperpage}{22}
+\indexentry{positive\_dynamic() (in module de.generate\_errors)@\spxentry{positive\_dynamic()}\spxextra{in module de.generate\_errors}|hyperpage}{23}
+\indexentry{negative\_dynamic() (in module de.generate\_errors)@\spxentry{negative\_dynamic()}\spxextra{in module de.generate\_errors}|hyperpage}{23}
+\indexentry{timing() (in module de.generate\_errors)@\spxentry{timing()}\spxextra{in module de.generate\_errors}|hyperpage}{23}
+\indexentry{calc\_kge() (in module de.kge)@\spxentry{calc\_kge()}\spxextra{in module de.kge}|hyperpage}{24}
+\indexentry{calc\_kge\_beta() (in module de.kge)@\spxentry{calc\_kge\_beta()}\spxextra{in module de.kge}|hyperpage}{25}
+\indexentry{calc\_kge\_alpha() (in module de.kge)@\spxentry{calc\_kge\_alpha()}\spxextra{in module de.kge}|hyperpage}{26}
+\indexentry{calc\_kge\_gamma() (in module de.kge)@\spxentry{calc\_kge\_gamma()}\spxextra{in module de.kge}|hyperpage}{26}
+\indexentry{calc\_temp\_cor() (in module de.kge)@\spxentry{calc\_temp\_cor()}\spxextra{in module de.kge}|hyperpage}{27}
+\indexentry{polar\_plot() (in module de.kge)@\spxentry{polar\_plot()}\spxextra{in module de.kge}|hyperpage}{28}
+\indexentry{calc\_nse() (in module de.nse)@\spxentry{calc\_nse()}\spxextra{in module de.nse}|hyperpage}{28}
