@@ -214,7 +214,7 @@
 
 
 \title{de Documentation}
-\date{Apr 01, 2020}
+\date{Apr 02, 2020}
 \release{0.1}
 \author{Robin Schwemmle}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -301,48 +301,52 @@ Load the package \sphinxtitleref{de}. The calculation of the diagnostic efficien
 can be easily demonstrated on the provided example dataset.
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{g+gp}{In [1]: }\PYG{k+kn}{from} \PYG{n+nn}{de} \PYG{k+kn}{import} \PYG{n}{de}
+\PYG{g+gp}{In [1]: }\PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}  \PYG{c+c1}{\PYGZsh{} OS\PYGZhy{}independent path handling}
 
-\PYG{g+gp}{In [2]: }\PYG{k+kn}{from} \PYG{n+nn}{de} \PYG{k+kn}{import} \PYG{n}{util}
+\PYG{g+gp}{In [2]: }\PYG{k+kn}{from} \PYG{n+nn}{de} \PYG{k+kn}{import} \PYG{n}{de}
+
+\PYG{g+gp}{In [3]: }\PYG{k+kn}{from} \PYG{n+nn}{de} \PYG{k+kn}{import} \PYG{n}{util}
 
 \PYG{g+go}{\PYGZsh{} path to example data}
-\PYG{g+gp}{In [3]: }\PYG{n}{path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}05\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}
+\PYG{g+gp}{In [4]: }\PYG{n}{path} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}94\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
 
 \PYG{g+go}{\PYGZsh{} import observed time series}
-\PYG{g+gp}{In [4]: }\PYG{n}{df\PYGZus{}ts} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path}\PYG{p}{)}
+\PYG{g+gp}{In [5]: }\PYG{n}{df\PYGZus{}ts} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path}\PYG{p}{)}
 
 \PYG{g+go}{\PYGZsh{} make numpy arrays}
-\PYG{g+gp}{In [5]: }\PYG{n}{obs\PYGZus{}arr} \PYG{o}{=} \PYG{n}{df\PYGZus{}ts}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Qobs}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
+\PYG{g+gp}{In [6]: }\PYG{n}{obs\PYGZus{}arr} \PYG{o}{=} \PYG{n}{df\PYGZus{}ts}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Qobs}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
 
-\PYG{g+gp}{In [6]: }\PYG{n}{sim\PYGZus{}arr} \PYG{o}{=} \PYG{n}{df\PYGZus{}ts}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Qsim}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
+\PYG{g+gp}{In [7]: }\PYG{n}{sim\PYGZus{}arr} \PYG{o}{=} \PYG{n}{df\PYGZus{}ts}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Qsim}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
 
 \PYG{g+go}{\PYGZsh{} calculate the diagnostic efficiency}
-\PYG{g+gp}{In [7]: }\PYG{n}{de}\PYG{o}{.}\PYG{n}{calc\PYGZus{}de}\PYG{p}{(}\PYG{n}{obs\PYGZus{}arr}\PYG{p}{,} \PYG{n}{sim\PYGZus{}arr}\PYG{p}{)}
-\PYG{g+gh}{Out[7]: }\PYG{g+go}{0.6194156833437321}
+\PYG{g+gp}{In [8]: }\PYG{n}{de}\PYG{o}{.}\PYG{n}{calc\PYGZus{}de}\PYG{p}{(}\PYG{n}{obs\PYGZus{}arr}\PYG{p}{,} \PYG{n}{sim\PYGZus{}arr}\PYG{p}{)}
+\PYG{g+gh}{Out[8]: }\PYG{g+go}{0.6804705642526816}
 \end{sphinxVerbatim}
 
 
 \subsection{Diagnostic polar plot}
 \label{\detokenize{getting_started:diagnostic-polar-plot}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{g+gp}{In [8]: }\PYG{k+kn}{from} \PYG{n+nn}{de} \PYG{k+kn}{import} \PYG{n}{de}
+\PYG{g+gp}{In [9]: }\PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}  \PYG{c+c1}{\PYGZsh{} OS\PYGZhy{}independent path handling}
 
-\PYG{g+gp}{In [9]: }\PYG{k+kn}{from} \PYG{n+nn}{de} \PYG{k+kn}{import} \PYG{n}{util}
+\PYG{g+gp}{In [10]: }\PYG{k+kn}{from} \PYG{n+nn}{de} \PYG{k+kn}{import} \PYG{n}{de}
+
+\PYG{g+gp}{In [11]: }\PYG{k+kn}{from} \PYG{n+nn}{de} \PYG{k+kn}{import} \PYG{n}{util}
 
 \PYG{g+go}{\PYGZsh{} path to example data}
-\PYG{g+gp}{In [10]: }\PYG{n}{path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}05\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}
+\PYG{g+gp}{In [12]: }\PYG{n}{path} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}94\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
 
 \PYG{g+go}{\PYGZsh{} import observed time series}
-\PYG{g+gp}{In [11]: }\PYG{n}{df\PYGZus{}ts} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path}\PYG{p}{)}
+\PYG{g+gp}{In [13]: }\PYG{n}{df\PYGZus{}ts} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path}\PYG{p}{)}
 
 \PYG{g+go}{\PYGZsh{} make numpy arrays}
-\PYG{g+gp}{In [12]: }\PYG{n}{obs\PYGZus{}arr} \PYG{o}{=} \PYG{n}{df\PYGZus{}ts}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Qobs}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
+\PYG{g+gp}{In [14]: }\PYG{n}{obs\PYGZus{}arr} \PYG{o}{=} \PYG{n}{df\PYGZus{}ts}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Qobs}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
 
-\PYG{g+gp}{In [13]: }\PYG{n}{sim\PYGZus{}arr} \PYG{o}{=} \PYG{n}{df\PYGZus{}ts}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Qsim}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
+\PYG{g+gp}{In [15]: }\PYG{n}{sim\PYGZus{}arr} \PYG{o}{=} \PYG{n}{df\PYGZus{}ts}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Qsim}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
 
 \PYG{g+go}{\PYGZsh{} display diagnostic polar plots}
-\PYG{g+gp}{In [14]: }\PYG{n}{de}\PYG{o}{.}\PYG{n}{diag\PYGZus{}polar\PYGZus{}plot}\PYG{p}{(}\PYG{n}{obs\PYGZus{}arr}\PYG{p}{,} \PYG{n}{sim\PYGZus{}arr}\PYG{p}{)}
-\PYG{g+gh}{Out[14]: }\PYG{g+go}{\PYGZlt{}Figure size 600x600 with 2 Axes\PYGZgt{}}
+\PYG{g+gp}{In [16]: }\PYG{n}{de}\PYG{o}{.}\PYG{n}{diag\PYGZus{}polar\PYGZus{}plot}\PYG{p}{(}\PYG{n}{obs\PYGZus{}arr}\PYG{p}{,} \PYG{n}{sim\PYGZus{}arr}\PYG{p}{)}
+\PYG{g+gh}{Out[16]: }\PYG{g+go}{\PYGZlt{}Figure size 600x600 with 2 Axes\PYGZgt{}}
 \end{sphinxVerbatim}
 
 \noindent\sphinxincludegraphics[width=7in]{{default_diagnostic_plot}.png}
@@ -361,9 +365,11 @@ This notebook provides a proof of concept for Diagnostic Efficiency.
 \sphinxsetup{VerbatimColor={named}{nbsphinx-code-bg}}
 \sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\llap{\color{nbsphinxin}[1]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{k+kn}{import} \PYG{n+nn}{sys}
-\PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}
-\PYG{n}{PATH} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\llap{\color{nbsphinxin}[4]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{k+kn}{import} \PYG{n+nn}{os}
+\PYG{k+kn}{import} \PYG{n+nn}{sys}
+\PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}  \PYG{c+c1}{\PYGZsh{} OS\PYGZhy{}independent path handling}
+\PYG{n}{os}\PYG{o}{.}\PYG{n}{chdir}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{../..}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{PATH} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{getcwd}\PYG{p}{(}\PYG{p}{)}
 \PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{insert}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{PATH}\PYG{p}{)}
 
 \PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k}{as} \PYG{n+nn}{pd}
@@ -388,8 +394,8 @@ The observed and simulated streamflow time series are part of the open\sphinxhyp
 \sphinxsetup{VerbatimColor={named}{nbsphinx-code-bg}}
 \sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\llap{\color{nbsphinxin}[2]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{n}{area} \PYG{o}{=} \PYG{l+m+mf}{619.11}  \PYG{c+c1}{\PYGZsh{} catchment area in km2 to convert runoff to mm/day}
-\PYG{n}{path} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}streamflow\PYGZus{}qc.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\llap{\color{nbsphinxin}[5]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{n}{area} \PYG{o}{=} \PYG{l+m+mf}{619.11}  \PYG{c+c1}{\PYGZsh{} catchment area in km2 to convert runoff to mm/day}
+\PYG{n}{path} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{PATH}\PYG{p}{,} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{examples/13331500\PYGZus{}streamflow\PYGZus{}qc.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}
 \PYG{n}{df\PYGZus{}ts} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}ts}\PYG{p}{(}\PYG{n}{path}\PYG{p}{,} \PYG{n}{sep}\PYG{o}{=}\PYG{l+s+sa}{r}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZbs{}}\PYG{l+s+s2}{s+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{catch\PYGZus{}area}\PYG{o}{=}\PYG{n}{area}\PYG{p}{)} \PYG{c+c1}{\PYGZsh{} import observed time series}
 \PYG{n}{fig\PYGZus{}ts} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{plot\PYGZus{}ts}\PYG{p}{(}\PYG{n}{df\PYGZus{}ts}\PYG{p}{)}
 \end{sphinxVerbatim}
@@ -634,9 +640,11 @@ This notebook demonstrates the applicability of Diagnostic Efficiency to a real 
 \sphinxsetup{VerbatimColor={named}{nbsphinx-code-bg}}
 \sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\llap{\color{nbsphinxin}[17]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{k+kn}{import} \PYG{n+nn}{sys}
-\PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}
-\PYG{n}{PATH} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\llap{\color{nbsphinxin}[17]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{k+kn}{import} \PYG{n+nn}{os}
+\PYG{k+kn}{import} \PYG{n+nn}{sys}
+\PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}  \PYG{c+c1}{\PYGZsh{} OS\PYGZhy{}independent path handling}
+\PYG{n}{os}\PYG{o}{.}\PYG{n}{chdir}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{../..}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{PATH} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{getcwd}\PYG{p}{(}\PYG{p}{)}
 \PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{insert}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{PATH}\PYG{p}{)}
 
 \PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k}{as} \PYG{n+nn}{pd}
@@ -663,10 +671,9 @@ that includes representation of physical processes such as evapotranspiration, p
 \sphinxsetup{VerbatimColor={named}{nbsphinx-code-bg}}
 \sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\llap{\color{nbsphinxin}[4]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{n}{path\PYGZus{}cam1} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}05\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{n}{path\PYGZus{}cam2} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}48\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{n}{path\PYGZus{}cam3} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{/Users/robinschwemmle/Desktop/PhD/diagnostic\PYGZus{}efficiency/diag\PYGZhy{}eff/examples/13331500\PYGZus{}94\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-
+\llap{\color{nbsphinxin}[4]:\,\hspace{\fboxrule}\hspace{\fboxsep}}\PYG{n}{path\PYGZus{}cam1} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{PATH}\PYG{p}{,} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{examples/13331500\PYGZus{}05\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{path\PYGZus{}cam2} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{PATH}\PYG{p}{,} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{examples/13331500\PYGZus{}48\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{path\PYGZus{}cam3} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{PATH}\PYG{p}{,} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{examples/13331500\PYGZus{}94\PYGZus{}model\PYGZus{}output.txt}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}
 \PYG{n}{df\PYGZus{}cam1} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path\PYGZus{}cam1}\PYG{p}{)}
 \PYG{n}{df\PYGZus{}cam2} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path\PYGZus{}cam2}\PYG{p}{)}
 \PYG{n}{df\PYGZus{}cam3} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{import\PYGZus{}camels\PYGZus{}obs\PYGZus{}sim}\PYG{p}{(}\PYG{n}{path\PYGZus{}cam3}\PYG{p}{)}

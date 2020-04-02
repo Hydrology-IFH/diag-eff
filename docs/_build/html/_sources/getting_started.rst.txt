@@ -11,11 +11,12 @@ can be easily demonstrated on the provided example dataset.
 .. ipython:: python
     :okwarning:
 
+    from pathlib import Path  # OS-independent path handling
     from de import de
     from de import util
 
     # path to example data
-    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_05_model_output.txt'
+    path = Path('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_94_model_output.txt')
     # import observed time series
     df_ts = util.import_camels_obs_sim(path)
 
@@ -33,11 +34,12 @@ Diagnostic polar plot
 .. ipython:: python
     :okwarning:
 
+    from pathlib import Path  # OS-independent path handling
     from de import de
     from de import util
 
     # path to example data
-    path = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_05_model_output.txt'
+    path = Path('/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_94_model_output.txt')
     # import observed time series
     df_ts = util.import_camels_obs_sim(path)
 

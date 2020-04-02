@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import os  # load modules first before importing .spydata
+from pathlib import Path
 
-PATH = "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff"
-PATH_FIG = "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/technical_note/figures"
+PATH = Path("./Desktop/PhD/diagnostic_efficiency/diag-eff")
 os.chdir(PATH)
+PATH_FIG = Path("../technical_note/figures")
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -27,9 +28,7 @@ if __name__ == "__main__":
     # ==========================================================
     # 619.11 km2; AI: 0.82
     area = 619.11
-    path = os.path.join(
-        os.getcwd(), "examples/13331500_streamflow_qc.txt"
-    )
+    path = os.path.join(os.getcwd(), "examples/13331500_streamflow_qc.txt")
     ## 191.55 km2; AI: 2.04
     # area = 191.55
     # path = os.path.join(os.getcwd(),

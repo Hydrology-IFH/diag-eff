@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Getting started &#8212; de 0.1 documentation</title>
+    <title>Getting started &#8212; diag-eff 0.1 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -41,47 +41,51 @@
 <h2>Diagnostic Efficiency<a class="headerlink" href="#diagnostic-efficiency" title="Permalink to this headline">¶</a></h2>
 <p>Load the package <cite>de</cite>. The calculation of the diagnostic efficiency
 can be easily demonstrated on the provided example dataset.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>  <span class="c1"># OS-independent path handling</span>
 
-<span class="gp">In [2]: </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="gp">In [2]: </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
+
+<span class="gp">In [3]: </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">util</span>
 
 <span class="go"># path to example data</span>
-<span class="gp">In [3]: </span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_05_model_output.txt&#39;</span>
+<span class="gp">In [4]: </span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_94_model_output.txt&#39;</span><span class="p">)</span>
 
 <span class="go"># import observed time series</span>
-<span class="gp">In [4]: </span><span class="n">df_ts</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_obs_sim</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">In [5]: </span><span class="n">df_ts</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_obs_sim</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
 <span class="go"># make numpy arrays</span>
-<span class="gp">In [5]: </span><span class="n">obs_arr</span> <span class="o">=</span> <span class="n">df_ts</span><span class="p">[</span><span class="s1">&#39;Qobs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="gp">In [6]: </span><span class="n">obs_arr</span> <span class="o">=</span> <span class="n">df_ts</span><span class="p">[</span><span class="s1">&#39;Qobs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
-<span class="gp">In [6]: </span><span class="n">sim_arr</span> <span class="o">=</span> <span class="n">df_ts</span><span class="p">[</span><span class="s1">&#39;Qsim&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="gp">In [7]: </span><span class="n">sim_arr</span> <span class="o">=</span> <span class="n">df_ts</span><span class="p">[</span><span class="s1">&#39;Qsim&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
 <span class="go"># calculate the diagnostic efficiency</span>
-<span class="gp">In [7]: </span><span class="n">de</span><span class="o">.</span><span class="n">calc_de</span><span class="p">(</span><span class="n">obs_arr</span><span class="p">,</span> <span class="n">sim_arr</span><span class="p">)</span>
-<span class="gh">Out[7]: </span><span class="go">0.6194156833437321</span>
+<span class="gp">In [8]: </span><span class="n">de</span><span class="o">.</span><span class="n">calc_de</span><span class="p">(</span><span class="n">obs_arr</span><span class="p">,</span> <span class="n">sim_arr</span><span class="p">)</span>
+<span class="gh">Out[8]: </span><span class="go">0.6804705642526816</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="diagnostic-polar-plot">
 <h2>Diagnostic polar plot<a class="headerlink" href="#diagnostic-polar-plot" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [8]: </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [9]: </span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>  <span class="c1"># OS-independent path handling</span>
 
-<span class="gp">In [9]: </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="gp">In [10]: </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">de</span>
+
+<span class="gp">In [11]: </span><span class="kn">from</span> <span class="nn">de</span> <span class="kn">import</span> <span class="n">util</span>
 
 <span class="go"># path to example data</span>
-<span class="gp">In [10]: </span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_05_model_output.txt&#39;</span>
+<span class="gp">In [12]: </span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_94_model_output.txt&#39;</span><span class="p">)</span>
 
 <span class="go"># import observed time series</span>
-<span class="gp">In [11]: </span><span class="n">df_ts</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_obs_sim</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">In [13]: </span><span class="n">df_ts</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_obs_sim</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
 <span class="go"># make numpy arrays</span>
-<span class="gp">In [12]: </span><span class="n">obs_arr</span> <span class="o">=</span> <span class="n">df_ts</span><span class="p">[</span><span class="s1">&#39;Qobs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="gp">In [14]: </span><span class="n">obs_arr</span> <span class="o">=</span> <span class="n">df_ts</span><span class="p">[</span><span class="s1">&#39;Qobs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
-<span class="gp">In [13]: </span><span class="n">sim_arr</span> <span class="o">=</span> <span class="n">df_ts</span><span class="p">[</span><span class="s1">&#39;Qsim&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="gp">In [15]: </span><span class="n">sim_arr</span> <span class="o">=</span> <span class="n">df_ts</span><span class="p">[</span><span class="s1">&#39;Qsim&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
 <span class="go"># display diagnostic polar plots</span>
-<span class="gp">In [14]: </span><span class="n">de</span><span class="o">.</span><span class="n">diag_polar_plot</span><span class="p">(</span><span class="n">obs_arr</span><span class="p">,</span> <span class="n">sim_arr</span><span class="p">)</span>
-<span class="gh">Out[14]: </span><span class="go">&lt;Figure size 600x600 with 2 Axes&gt;</span>
+<span class="gp">In [16]: </span><span class="n">de</span><span class="o">.</span><span class="n">diag_polar_plot</span><span class="p">(</span><span class="n">obs_arr</span><span class="p">,</span> <span class="n">sim_arr</span><span class="p">)</span>
+<span class="gh">Out[16]: </span><span class="go">&lt;Figure size 600x600 with 2 Axes&gt;</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="_images/default_diagnostic_plot.png"><img alt="_images/default_diagnostic_plot.png" src="_images/default_diagnostic_plot.png" style="width: 7in;" /></a>
@@ -95,7 +99,7 @@ can be easily demonstrated on the provided example dataset.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">de</a></h1>
+<h1 class="logo"><a href="index.html">diag-eff</a></h1>
 
 
 
@@ -103,7 +107,7 @@ can be easily demonstrated on the provided example dataset.</p>
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=schwemro&repo=de&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=schwemro&repo=diag-eff&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -129,7 +133,7 @@ can be easily demonstrated on the provided example dataset.</p>
 <hr />
 <ul>
     
-    <li class="toctree-l1"><a href="de.pdf">Download PDF</a></li>
+    <li class="toctree-l1"><a href="https://github.com/schwemro/diag-eff/blob/master/docs/_build/latex/diag-eff.pdf">Download PDF</a></li>
     
 </ul>
 <div class="relations">

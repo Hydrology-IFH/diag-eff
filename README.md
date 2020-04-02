@@ -60,12 +60,15 @@ pip install -e .
 ## Usage
 
 ```python
+import os
 from pathlib import Path  # OS-independent path handling
 from de import de
 from de import util
 
 # set path to example data
-path_cam = Path('/examples/13331500_94_model_output.txt')
+os.chdir(Path('./Desktop/PhD/diagnostic_efficiency/diag-eff'))
+path_cam = os.path.join(os.getcwd(),
+                        Path('examples/13331500_94_model_output.txt'))
 
 # import example data as dataframe
 df_cam = util.import_camels_obs_sim(path_cam)
@@ -110,8 +113,8 @@ sns <- import("seaborn")
 de <- import("de")
 
 # set path to example data
-path_cam <- file.path(path_wd,
-                    'examples/13331500_94_model_output.txt')
+setwd('./Desktop/PhD/diagnostic_efficiency/diag-eff')
+path_cam <- file.path(getwd(), 'examples/13331500_94_model_output.txt')
 
 # import example data as dataframe
 df_cam <- import_camels_obs_sim(path_cam)
@@ -146,8 +149,7 @@ repl_python()
 ```python
 # copy+paste the lines below to the interpreter
 import os
-PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff'
-os.chdir(PATH)
+from pathlib import Path  # OS-independent path handling
 from de import de
 from de import util
 import matplotlib
@@ -155,7 +157,9 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 # set path to example data
-path = os.path.join(os.getcwd(), 'examples/13331500_94_model_output.txt')
+os.chdir(Path('./Desktop/PhD/diagnostic_efficiency/diag-eff'))
+path = os.path.join(os.getcwd(),
+                    Path('examples/13331500_94_model_output.txt'))
 
 # import example data as dataframe
 df_cam = util.import_camels_obs_sim(path)

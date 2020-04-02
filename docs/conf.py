@@ -11,13 +11,13 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import sys
-PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency'
+PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff'
 sys.path.insert(0, PATH)
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'de'
+project = 'diag-eff'
 copyright = '2019, Robin Schwemmle'
 author = 'Robin Schwemmle'
 
@@ -91,13 +91,13 @@ html_theme = 'alabaster'
 #
 html_theme_options = {
     'github_user': 'schwemro',
-    'github_repo': 'de',
+    'github_repo': 'diag-eff',
     'github_button': 'true',
     'show_related': True,
     'sidebar_collapse': True,
     'body_text_align': 'justify',
     'extra_nav_links': {
-        'Download PDF': 'de.pdf'
+        'Download PDF': 'https://github.com/schwemro/diag-eff/blob/master/docs/_build/latex/diag-eff.pdf'
     }
 }
 
@@ -130,7 +130,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'dedoc'
+htmlhelp_basename = 'diageffdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -157,7 +157,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'de.tex', 'de Documentation',
+    (master_doc, 'diag-eff.tex', 'diag-eff Documentation',
      'Robin Schwemmle', 'manual'),
 ]
 
@@ -167,45 +167,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'de', 'de Documentation',
-     [author], 1)
-]
-
-
-# -- Options for LaTeX output ------------------------------------------------
-
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
-}
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'de.tex', 'de Documentation',
-     'Robin Schwemmle', 'manual'),
-]
-
-# -- Options for manual page output ------------------------------------------
-
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'de', 'de Documentation',
+    (master_doc, 'diag-eff', 'diag-eff Documentation',
      [author], 1)
 ]
 
@@ -215,13 +177,18 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'de', 'de Documentation',
-     author, 'de', 'One line description of project.',
+    (master_doc, 'diag-eff', 'diag-eff Documentation',
+     author, 'diag-eff', 'One line description of project.',
      'Miscellaneous'),
 ]
 
 
 # -- Extension configuration -------------------------------------------------
+
+# -- Options for intersphinx extension ---------------------------------------
+
+# Example configuration for intersphinx: refer to the Python standard library.
+# intersphinx_mapping = {'https://docs.python.org/': None}
 
 # -- Intersphinx mapping -----------------------------------------------------
 intersphinx_mapping = {

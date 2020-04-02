@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Proof of concept &#8212; de 0.1 documentation</title>
+    <title>Proof of concept &#8212; diag-eff 0.1 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -259,13 +259,15 @@ div.rendered_html tbody tr:hover {
 <h1>Proof of concept<a class="headerlink" href="#Proof-of-concept" title="Permalink to this headline">¶</a></h1>
 <p>This notebook provides a proof of concept for Diagnostic Efficiency.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="n">PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff&#39;</span><span class="p">)</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>  <span class="c1"># OS-independent path handling</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;../..&#39;</span><span class="p">))</span>
+<span class="n">PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -285,12 +287,12 @@ div.rendered_html tbody tr:hover {
 <h2>Observed streamflow time series from CAMELS dataset<a class="headerlink" href="#Observed-streamflow-time-series-from-CAMELS-dataset" title="Permalink to this headline">¶</a></h2>
 <p>The observed and simulated streamflow time series are part of the open-source CAMELS dataset (Addor et al., 2017). The data can be downloaded from <a class="reference external" href="https://ncar.github.io/hydrology/datasets/CAMELS_timeseries">https://ncar.github.io/hydrology/datasets/CAMELS_timeseries</a>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">area</span> <span class="o">=</span> <span class="mf">619.11</span>  <span class="c1"># catchment area in km2 to convert runoff to mm/day</span>
-<span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_streamflow_qc.txt&#39;</span><span class="p">)</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;examples/13331500_streamflow_qc.txt&#39;</span><span class="p">))</span>
 <span class="n">df_ts</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_ts</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="n">catch_area</span><span class="o">=</span><span class="n">area</span><span class="p">)</span> <span class="c1"># import observed time series</span>
 <span class="n">fig_ts</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">plot_ts</span><span class="p">(</span><span class="n">df_ts</span><span class="p">)</span>
 </pre></div>
@@ -494,7 +496,7 @@ div.rendered_html tbody tr:hover {
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">de</a></h1>
+<h1 class="logo"><a href="../index.html">diag-eff</a></h1>
 
 
 
@@ -502,7 +504,7 @@ div.rendered_html tbody tr:hover {
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=schwemro&repo=de&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=schwemro&repo=diag-eff&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -533,7 +535,7 @@ div.rendered_html tbody tr:hover {
 <hr />
 <ul>
     
-    <li class="toctree-l1"><a href="de.pdf">Download PDF</a></li>
+    <li class="toctree-l1"><a href="https://github.com/schwemro/diag-eff/blob/master/docs/_build/latex/diag-eff.pdf">Download PDF</a></li>
     
 </ul>
 <div class="relations">

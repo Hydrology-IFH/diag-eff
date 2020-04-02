@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Real case example &#8212; de 0.1 documentation</title>
+    <title>Real case example &#8212; diag-eff 0.1 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -263,9 +263,11 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="n">PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff&#39;</span><span class="p">)</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>  <span class="c1"># OS-independent path handling</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;../..&#39;</span><span class="p">))</span>
+<span class="n">PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -291,10 +293,9 @@ that includes representation of physical processes such as evapotranspiration, p
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">path_cam1</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_05_model_output.txt&#39;</span><span class="p">)</span>
-<span class="n">path_cam2</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_48_model_output.txt&#39;</span><span class="p">)</span>
-<span class="n">path_cam3</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff/examples/13331500_94_model_output.txt&#39;</span><span class="p">)</span>
-
+<span></span><span class="n">path_cam1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;examples/13331500_05_model_output.txt&#39;</span><span class="p">))</span>
+<span class="n">path_cam2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;examples/13331500_48_model_output.txt&#39;</span><span class="p">))</span>
+<span class="n">path_cam3</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;examples/13331500_94_model_output.txt&#39;</span><span class="p">))</span>
 <span class="n">df_cam1</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_obs_sim</span><span class="p">(</span><span class="n">path_cam1</span><span class="p">)</span>
 <span class="n">df_cam2</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_obs_sim</span><span class="p">(</span><span class="n">path_cam2</span><span class="p">)</span>
 <span class="n">df_cam3</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">import_camels_obs_sim</span><span class="p">(</span><span class="n">path_cam3</span><span class="p">)</span>
@@ -565,7 +566,7 @@ follow-up measure could be to alter the model structure (e.g. adjusting the mod
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">de</a></h1>
+<h1 class="logo"><a href="../index.html">diag-eff</a></h1>
 
 
 
@@ -573,7 +574,7 @@ follow-up measure could be to alter the model structure (e.g. adjusting the mod
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=schwemro&repo=de&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=schwemro&repo=diag-eff&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -606,7 +607,7 @@ follow-up measure could be to alter the model structure (e.g. adjusting the mod
 <hr />
 <ul>
     
-    <li class="toctree-l1"><a href="de.pdf">Download PDF</a></li>
+    <li class="toctree-l1"><a href="https://github.com/schwemro/diag-eff/blob/master/docs/_build/latex/diag-eff.pdf">Download PDF</a></li>
     
 </ul>
 <div class="relations">

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>de.de &#8212; de 0.1 documentation</title>
+    <title>de.de &#8212; diag-eff 0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -119,7 +119,7 @@
     <span class="k">return</span> <span class="n">brel_mean</span></div>
 
 
-<span class="k">def</span> <span class="nf">calc_brel_rest</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calc_brel_res</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Subtract arithmetic mean of relative bias from relative bias.</span>
 
@@ -137,7 +137,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    ----------</span>
-<span class="sd">    brel_rest : array_like</span>
+<span class="sd">    brel_res : array_like</span>
 <span class="sd">        remaining relative bias</span>
 
 <span class="sd">    Notes</span>
@@ -154,7 +154,7 @@
 <span class="sd">    &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">    &gt;&gt;&gt; obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])</span>
 <span class="sd">    &gt;&gt;&gt; sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])</span>
-<span class="sd">    &gt;&gt;&gt; de.calc_brel_rest(obs, sim)</span>
+<span class="sd">    &gt;&gt;&gt; de.calc_brel_res(obs, sim)</span>
 <span class="sd">    array([ 0.15669935, -0.02663399, -0.22663399,  0.10669935,  0.08316993,</span>
 <span class="sd">       -0.09330065])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -169,18 +169,18 @@
     <span class="n">brel</span><span class="p">[</span><span class="n">sim_obs_diff</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">brel</span> <span class="o">=</span> <span class="n">brel</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">brel</span><span class="p">)]</span>
     <span class="n">brel_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">brel</span><span class="p">)</span>
-    <span class="n">brel_rest</span> <span class="o">=</span> <span class="n">brel</span> <span class="o">-</span> <span class="n">brel_mean</span>
+    <span class="n">brel_res</span> <span class="o">=</span> <span class="n">brel</span> <span class="o">-</span> <span class="n">brel_mean</span>
 
-    <span class="k">return</span> <span class="n">brel_rest</span>
+    <span class="k">return</span> <span class="n">brel_res</span>
 
 
-<div class="viewcode-block" id="calc_bias_area"><a class="viewcode-back" href="../../reference/de.html#de.de.calc_bias_area">[docs]</a><span class="k">def</span> <span class="nf">calc_bias_area</span><span class="p">(</span><span class="n">brel_rest</span><span class="p">):</span>
+<div class="viewcode-block" id="calc_bias_area"><a class="viewcode-back" href="../../reference/de.html#de.de.calc_bias_area">[docs]</a><span class="k">def</span> <span class="nf">calc_bias_area</span><span class="p">(</span><span class="n">brel_res</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate absolute bias area for entire flow duration curve.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    brel_rest : (N,)array_like</span>
+<span class="sd">    brel_res : (N,)array_like</span>
 <span class="sd">        remaining relative bias as 1-D array</span>
 
 <span class="sd">    Returns</span>
@@ -202,24 +202,28 @@
 <span class="sd">    &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">    &gt;&gt;&gt; obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])</span>
 <span class="sd">    &gt;&gt;&gt; sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])</span>
-<span class="sd">    &gt;&gt;&gt; b_rest = de.calc_brel_rest(obs, sim)</span>
-<span class="sd">    &gt;&gt;&gt; de.calc_bias_area(b_rest)</span>
+<span class="sd">    &gt;&gt;&gt; b_res = de.calc_brel_res(obs, sim)</span>
+<span class="sd">    &gt;&gt;&gt; de.calc_bias_area(b_res)</span>
 <span class="sd">    0.1112908496732026</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    de.calc_brel_res</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">perc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">brel_rest</span><span class="p">))</span>
+    <span class="n">perc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">brel_res</span><span class="p">))</span>
     <span class="c1"># area of absolute bias</span>
-    <span class="n">b_area</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">brel_rest</span><span class="p">),</span> <span class="n">perc</span><span class="p">)</span>
+    <span class="n">b_area</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">brel_res</span><span class="p">),</span> <span class="n">perc</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">b_area</span></div>
 
 
-<span class="k">def</span> <span class="nf">calc_bias_dir</span><span class="p">(</span><span class="n">brel_rest</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calc_bias_dir</span><span class="p">(</span><span class="n">brel_res</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate absolute bias area for high flow and low flow.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    brel_rest : (N,)array_like</span>
+<span class="sd">    brel_res : (N,)array_like</span>
 <span class="sd">        remaining relative bias as 1-D array</span>
 
 <span class="sd">    Returns</span>
@@ -241,15 +245,15 @@
 <span class="sd">    &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">    &gt;&gt;&gt; obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])</span>
 <span class="sd">    &gt;&gt;&gt; sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])</span>
-<span class="sd">    &gt;&gt;&gt; b_rest = de.calc_brel_rest(obs, sim)</span>
-<span class="sd">    &gt;&gt;&gt; de.calc_bias_dir(b_rest)</span>
+<span class="sd">    &gt;&gt;&gt; b_res = de.calc_brel_res(obs, sim)</span>
+<span class="sd">    &gt;&gt;&gt; de.calc_bias_dir(b_res)</span>
 <span class="sd">    -0.014705882352941155</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">mid_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">brel_rest</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">mid_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">brel_res</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
     <span class="c1"># integral of relative bias &lt; 50 %</span>
     <span class="n">perc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">mid_idx</span><span class="p">)</span>
     <span class="c1"># direction of bias</span>
-    <span class="n">b_dir</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="n">brel_rest</span><span class="p">[:</span><span class="n">mid_idx</span><span class="p">],</span> <span class="n">perc</span><span class="p">)</span>
+    <span class="n">b_dir</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="n">brel_res</span><span class="p">[:</span><span class="n">mid_idx</span><span class="p">],</span> <span class="n">perc</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">b_dir</span>
 
@@ -290,9 +294,9 @@
 <span class="sd">    &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">    &gt;&gt;&gt; obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])</span>
 <span class="sd">    &gt;&gt;&gt; sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])</span>
-<span class="sd">    &gt;&gt;&gt; b_rest = de.calc_brel_rest(obs, sim)</span>
-<span class="sd">    &gt;&gt;&gt; b_dir = de.calc_bias_dir(b_rest)</span>
-<span class="sd">    &gt;&gt;&gt; b_area = de.calc_bias_area(b_rest)</span>
+<span class="sd">    &gt;&gt;&gt; b_res = de.calc_brel_res(obs, sim)</span>
+<span class="sd">    &gt;&gt;&gt; b_dir = de.calc_bias_dir(b_res)</span>
+<span class="sd">    &gt;&gt;&gt; b_area = de.calc_bias_area(b_res)</span>
 <span class="sd">    &gt;&gt;&gt; de.calc_bias_slope(b_area, b_dir)</span>
 <span class="sd">    0.1112908496732026</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -404,9 +408,9 @@
     <span class="c1"># mean relative bias</span>
     <span class="n">brel_mean</span> <span class="o">=</span> <span class="n">calc_brel_mean</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="n">sort</span><span class="p">)</span>
     <span class="c1"># remaining relative bias</span>
-    <span class="n">brel_rest</span> <span class="o">=</span> <span class="n">calc_brel_rest</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="n">sort</span><span class="p">)</span>
+    <span class="n">brel_res</span> <span class="o">=</span> <span class="n">calc_brel_res</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="n">sort</span><span class="p">)</span>
     <span class="c1"># area of relative remaing bias</span>
-    <span class="n">b_area</span> <span class="o">=</span> <span class="n">calc_bias_area</span><span class="p">(</span><span class="n">brel_rest</span><span class="p">)</span>
+    <span class="n">b_area</span> <span class="o">=</span> <span class="n">calc_bias_area</span><span class="p">(</span><span class="n">brel_res</span><span class="p">)</span>
     <span class="c1"># temporal correlation</span>
     <span class="n">temp_cor</span> <span class="o">=</span> <span class="n">calc_temp_cor</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
     <span class="c1"># diagnostic efficiency</span>
@@ -468,16 +472,16 @@
     <span class="n">brel_mean</span> <span class="o">=</span> <span class="n">calc_brel_mean</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="n">sort</span><span class="p">)</span>
 
     <span class="c1"># remaining relative bias</span>
-    <span class="n">brel_rest</span> <span class="o">=</span> <span class="n">calc_brel_rest</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="n">sort</span><span class="p">)</span>
+    <span class="n">brel_res</span> <span class="o">=</span> <span class="n">calc_brel_res</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="n">sort</span><span class="p">)</span>
     <span class="c1"># area of relative remaing bias</span>
-    <span class="n">b_area</span> <span class="o">=</span> <span class="n">calc_bias_area</span><span class="p">(</span><span class="n">brel_rest</span><span class="p">)</span>
+    <span class="n">b_area</span> <span class="o">=</span> <span class="n">calc_bias_area</span><span class="p">(</span><span class="n">brel_res</span><span class="p">)</span>
     <span class="c1"># temporal correlation</span>
     <span class="n">temp_cor</span> <span class="o">=</span> <span class="n">calc_temp_cor</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span>
     <span class="c1"># diagnostic efficiency</span>
     <span class="n">eff</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">brel_mean</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">b_area</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">temp_cor</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="c1"># direction of bias</span>
-    <span class="n">b_dir</span> <span class="o">=</span> <span class="n">calc_bias_dir</span><span class="p">(</span><span class="n">brel_rest</span><span class="p">)</span>
+    <span class="n">b_dir</span> <span class="o">=</span> <span class="n">calc_bias_dir</span><span class="p">(</span><span class="n">brel_res</span><span class="p">)</span>
 
     <span class="c1"># slope of bias</span>
     <span class="n">b_slope</span> <span class="o">=</span> <span class="n">calc_bias_slope</span><span class="p">(</span><span class="n">b_area</span><span class="p">,</span> <span class="n">b_dir</span><span class="p">)</span>
@@ -924,12 +928,12 @@
 
         <span class="c1"># plot B_rest</span>
         <span class="c1"># calculate exceedence probability</span>
-        <span class="n">prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">brel_rest</span><span class="p">))</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">brel_res</span><span class="p">))</span>
         <span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;slategrey&quot;</span><span class="p">)</span>
         <span class="n">ax1</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;slategrey&quot;</span><span class="p">)</span>
-        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">brel_rest</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-        <span class="n">ax1</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">brel_rest</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="n">brel_rest</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
-        <span class="n">ax1</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">brel_rest</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="mi">0</span> <span class="o">&gt;</span> <span class="n">brel_rest</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">brel_res</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">brel_res</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="n">brel_res</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">brel_res</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="mi">0</span> <span class="o">&gt;</span> <span class="n">brel_res</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
         <span class="n">ax1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$B_</span><span class="si">{rest}</span><span class="s2">$ [-]&quot;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Exceedence probabilty [-]&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">fig</span></div>
@@ -2124,7 +2128,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">de</a></h1>
+<h1 class="logo"><a href="../../index.html">diag-eff</a></h1>
 
 
 
@@ -2132,7 +2136,7 @@
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=schwemro&repo=de&type=watch&count=true&size=large&v=2"
+<iframe src="https://ghbtns.com/github-btn.html?user=schwemro&repo=diag-eff&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
@@ -2154,7 +2158,7 @@
 <hr />
 <ul>
     
-    <li class="toctree-l1"><a href="de.pdf">Download PDF</a></li>
+    <li class="toctree-l1"><a href="https://github.com/schwemro/diag-eff/blob/master/docs/_build/latex/diag-eff.pdf">Download PDF</a></li>
     
 </ul>
 <div class="relations">
