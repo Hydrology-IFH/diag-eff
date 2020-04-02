@@ -1,10 +1,10 @@
 # Fdb version 3
-["makeindex diag-eff.idx"] 1585822931 "diag-eff.idx" "diag-eff.ind" "diag-eff" 1585822935
+["makeindex diag-eff.idx"] 1585822931 "diag-eff.idx" "diag-eff.ind" "diag-eff" 1585823963
   "diag-eff.idx" 1585822935 1956 e6c6cac5bed16dff9fbe7fd6b7dac651 ""
   (generated)
   "diag-eff.ind"
   "diag-eff.ilg"
-["pdflatex"] 1585822933 "diag-eff.tex" "diag-eff.pdf" "diag-eff" 1585822935
+["pdflatex"] 1585822933 "diag-eff.tex" "diag-eff.pdf" "diag-eff" 1585823963
   "/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/base/8r.enc" 1480098666 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2018/texmf-dist/fonts/map/fontname/texfonts.map" 1511824771 3332 103109f5612ad95229751940c61aada0 ""
   "/usr/local/texlive/2018/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm" 1480098688 1292 3059476c50a24578715759f22652f3d0 ""
@@ -169,9 +169,9 @@
   "diag-eff.toc" 1585822935 3623 7c8af7d400ea04de46c6b4293d9719e2 ""
   "footnotehyper-sphinx.sty" 1581352711 8888 1bbd7bdeae8c8bed1d10d551bddb1cc9 ""
   "sphinx.sty" 1581352711 81878 44d14f90f8cb22a202794c148df60b64 ""
-  "sphinxhighlight.sty" 1585822928 8137 38a433148fcb7611515a989ff1750dd5 ""
+  "sphinxhighlight.sty" 1585823962 8137 38a433148fcb7611515a989ff1750dd5 ""
   "sphinxmanual.cls" 1581352711 4236 124cd90deb92742b5d3922bfc2cd70c0 ""
-  "sphinxmessages.sty" 1585822929 745 3f5fcd6cdd7964ed608767954a8ced6f ""
+  "sphinxmessages.sty" 1585823963 745 3f5fcd6cdd7964ed608767954a8ced6f ""
   "sphinxmulticell.sty" 1581352711 14606 0b6edc2b1a83546ed92026d1f6a311b5 ""
   "tutorials_01_proof_of_concept_10_0.png" 1585734570 55312 3a0025f4f7bb65f44ce26ea1e4b93543 ""
   "tutorials_01_proof_of_concept_12_0.png" 1585734570 44948 cf419d0c7b0557590af24b54d7b833ee ""
@@ -186,9 +186,9 @@
   "tutorials_02_real_case_application_13_0.png" 1585734571 57424 2507a61fd52296133896a8ed6343182c ""
   "tutorials_02_real_case_application_7_1.png" 1585734571 125234 9cb0b13f23b06c1ed8f09845eb00c8b3 ""
   (generated)
+  "diag-eff.pdf"
+  "diag-eff.aux"
+  "diag-eff.idx"
   "diag-eff.toc"
   "diag-eff.out"
-  "diag-eff.idx"
-  "diag-eff.pdf"
   "diag-eff.log"
-  "diag-eff.aux"
