@@ -2,6 +2,7 @@ name: de-env
 channels:
   - conda-forge
 dependencies:
+  - python
   - numpy
   - pandas
   - scipy

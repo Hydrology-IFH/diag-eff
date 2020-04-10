@@ -14,7 +14,7 @@ Info: `diag-eff` needs Python >= 3.6!
 ## How to cite
 
 In case you use `diag-eff` in other software or scientific publications,
-please reference this module. It is published and has a DOI. It can be cited
+please reference this package. It is published and has a DOI. It can be cited
 as:
 
     Schwemmle, R., Demand, D., and Weiler, M.: Diagnostic efficiency – specific

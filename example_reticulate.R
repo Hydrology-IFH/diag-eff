@@ -42,7 +42,7 @@ plt <- import("matplotlib.pyplot")
 sns <- import("seaborn")
 de <- import("de")
 
-path_wd <- "/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency"
+path_wd <- "./Desktop/PhD/diagnostic_efficiency"
 setwd(path_wd)
 source_python('de/de.py')
 source_python('de/util.py')
@@ -65,7 +65,7 @@ fig$savefig('diagnostic_polar_plot.png')
 repl_python()
 # copy+paste the lines below to the interpreter
 import os
-PATH = '/Users/robinschwemmle/Desktop/PhD/diagnostic_efficiency/diag-eff'
+PATH = './Desktop/PhD/diagnostic_efficiency/diag-eff'
 os.chdir(PATH)
 from de import de
 from de import util

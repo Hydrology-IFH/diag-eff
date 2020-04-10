@@ -1,7 +1,3 @@
-====
-Home
-====
-
 Welcome to diag-eff's documentation!
 ========================================
 
@@ -14,7 +10,7 @@ How to cite
 ===========
 
 In case you use de in other software or scientific publications,
-please reference this module. It is published and has a DOI. It can be cited
+please reference this package. It is published and has a DOI. It can be cited
 as:
 
     Robin Schwemmle, Dominic Demand & Markus Weiler (2020). diag-eff 0.1:
