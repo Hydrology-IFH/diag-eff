@@ -20,7 +20,7 @@ as:
     Schwemmle, R., Demand, D., and Weiler, M.: Diagnostic efficiency – specific
     evaluation of model performance, Hydrol. Earth Syst. Sci. Discuss.,
     DOI: [https://doi.org/10.5194/hess-2020-xxx](https://doi.org/10.5194/hess-2020-xxx),
-    2020.
+    2020. (in submission)
 
 ## Full Documentation
 
@@ -60,15 +60,12 @@ pip install -e .
 ## Usage
 
 ```python
-import os
 from pathlib import Path  # OS-independent path handling
 from de import de
 from de import util
 
 # set path to example data
-os.chdir(Path('./Desktop/PhD/diagnostic_efficiency/diag-eff'))
-path_cam = os.path.join(os.getcwd(),
-                        Path('examples/13331500_94_model_output.txt'))
+path_cam = Path('./examples/13331500_94_model_output.txt')
 
 # import example data as dataframe
 df_cam = util.import_camels_obs_sim(path_cam)
@@ -103,7 +100,6 @@ py_install("seaborn")
 py_install("diag-eff")
 
 # import Python modules
-os <- import("os")
 np <- import("numpy")
 pd <- import("pandas")
 sp <- import("scipy")
@@ -113,8 +109,7 @@ sns <- import("seaborn")
 de <- import("de")
 
 # set path to example data
-setwd('./Desktop/PhD/diagnostic_efficiency/diag-eff')
-path_cam <- file.path(getwd(), 'examples/13331500_94_model_output.txt')
+path_cam <- file.path('./examples/13331500_94_model_output.txt')
 
 # import example data as dataframe
 df_cam <- import_camels_obs_sim(path_cam)
@@ -148,7 +143,6 @@ repl_python()
 ```
 ```python
 # copy+paste the lines below to the interpreter
-import os
 from pathlib import Path  # OS-independent path handling
 from de import de
 from de import util
@@ -157,9 +151,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 # set path to example data
-os.chdir(Path('./Desktop/PhD/diagnostic_efficiency/diag-eff'))
-path = os.path.join(os.getcwd(),
-                    Path('examples/13331500_94_model_output.txt'))
+path = Path('./examples/13331500_94_model_output.txt')
 
 # import example data as dataframe
 df_cam = util.import_camels_obs_sim(path)
