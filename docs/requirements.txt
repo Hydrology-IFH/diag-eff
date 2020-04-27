@@ -5,9 +5,3 @@ autoapi
 numpydoc
 sphinx_rtd_theme
 nbsphinx
-scipy
-numpy
-pandas
-seaborn
-matplotlib
-diag-eff

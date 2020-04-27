@@ -10,9 +10,11 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+
+import de
 
 
 # -- Project information -----------------------------------------------------
@@ -90,9 +92,11 @@ html_theme = 'alabaster'
 # documentation.
 #
 html_theme_options = {
+    'logo': 'diageff_logo.png',
     'github_user': 'schwemro',
     'github_repo': 'diag-eff',
     'github_button': 'true',
+    'travis_button': True,
     'show_related': True,
     'sidebar_collapse': True,
     'body_text_align': 'justify',
