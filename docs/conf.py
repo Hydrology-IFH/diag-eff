@@ -46,8 +46,8 @@ extensions = [
     'sphinx.ext.napoleon',
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
-    'numpydoc',
     'nbsphinx',
+#    'numpydoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -97,7 +97,7 @@ html_theme_options = {
     'sidebar_collapse': True,
     'body_text_align': 'justify',
     'extra_nav_links': {
-        'Download PDF': 'https://github.com/schwemro/diag-eff/blob/master/docs/_build/latex/diag-eff.pdf'
+        'Download PDF': 'https://github.com/schwemro/diag-eff/diag-eff.pdf'
     }
 }
 

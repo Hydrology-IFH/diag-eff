@@ -1,4 +1,6 @@
 ipython>=6
+sphinx
+recommonmark
 autoapi
 numpydoc
 sphinx_rtd_theme
@@ -8,3 +10,4 @@ numpy
 pandas
 seaborn
 matplotlib
+diag-eff
