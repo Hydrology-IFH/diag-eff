@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>Proof of concept &#8212; diag-eff 0.1 documentation</title>
@@ -259,7 +259,7 @@ div.rendered_html tbody tr:hover {
 <h1>Proof of concept<a class="headerlink" href="#Proof-of-concept" title="Permalink to this headline">¶</a></h1>
 <p>This notebook provides a proof of concept for Diagnostic Efficiency.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -287,7 +287,7 @@ div.rendered_html tbody tr:hover {
 <h2>Observed streamflow time series from CAMELS dataset<a class="headerlink" href="#Observed-streamflow-time-series-from-CAMELS-dataset" title="Permalink to this headline">¶</a></h2>
 <p>The observed and simulated streamflow time series are part of the open-source CAMELS dataset (Addor et al., 2017). The data can be downloaded from <a class="reference external" href="https://ncar.github.io/hydrology/datasets/CAMELS_timeseries">https://ncar.github.io/hydrology/datasets/CAMELS_timeseries</a>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -305,14 +305,11 @@ div.rendered_html tbody tr:hover {
 <img alt="../_images/tutorials_01_proof_of_concept_5_0.png" src="../_images/tutorials_01_proof_of_concept_5_0.png" />
 </div>
 </div>
+<p>Observed streamflow time series from CAMELS dataset (gauge_id: 13331500; gauge_name: Minam 160 River near Minam, OR, U.S.)</p>
 </div>
 <div class="section" id="Mimicking-errors">
 <h2>Mimicking errors<a class="headerlink" href="#Mimicking-errors" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>constant error (e.g. caused by consistently overestimated precipitation)</p></li>
-<li><p>dynamic error (e.g. caused by storage routine)</p></li>
-<li><p>timing error (e.g. caused by model parameters)</p></li>
-</ul>
+<p>Mimicking errors by systematic manipulation of an observed streamflow time series: - constant error - dynamic error - timing error</p>
 <div class="section" id="Positive-constant-error">
 <h3>Positive constant error<a class="headerlink" href="#Positive-constant-error" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
@@ -337,14 +334,14 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01_proof_of_concept_9_0.png" src="../_images/tutorials_01_proof_of_concept_9_0.png" />
+<img alt="../_images/tutorials_01_proof_of_concept_10_0.png" src="../_images/tutorials_01_proof_of_concept_10_0.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01_proof_of_concept_9_1.png" src="../_images/tutorials_01_proof_of_concept_9_1.png" />
+<img alt="../_images/tutorials_01_proof_of_concept_10_1.png" src="../_images/tutorials_01_proof_of_concept_10_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -365,7 +362,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01_proof_of_concept_10_0.png" src="../_images/tutorials_01_proof_of_concept_10_0.png" />
+<img alt="../_images/tutorials_01_proof_of_concept_11_0.png" src="../_images/tutorials_01_proof_of_concept_11_0.png" />
 </div>
 </div>
 </div>
@@ -393,14 +390,14 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01_proof_of_concept_12_0.png" src="../_images/tutorials_01_proof_of_concept_12_0.png" />
+<img alt="../_images/tutorials_01_proof_of_concept_13_0.png" src="../_images/tutorials_01_proof_of_concept_13_0.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01_proof_of_concept_12_1.png" src="../_images/tutorials_01_proof_of_concept_12_1.png" />
+<img alt="../_images/tutorials_01_proof_of_concept_13_1.png" src="../_images/tutorials_01_proof_of_concept_13_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -421,7 +418,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01_proof_of_concept_13_0.png" src="../_images/tutorials_01_proof_of_concept_13_0.png" />
+<img alt="../_images/tutorials_01_proof_of_concept_14_0.png" src="../_images/tutorials_01_proof_of_concept_14_0.png" />
 </div>
 </div>
 </div>
@@ -449,14 +446,14 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01_proof_of_concept_15_0.png" src="../_images/tutorials_01_proof_of_concept_15_0.png" />
+<img alt="../_images/tutorials_01_proof_of_concept_16_0.png" src="../_images/tutorials_01_proof_of_concept_16_0.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01_proof_of_concept_15_1.png" src="../_images/tutorials_01_proof_of_concept_15_1.png" />
+<img alt="../_images/tutorials_01_proof_of_concept_16_1.png" src="../_images/tutorials_01_proof_of_concept_16_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -477,10 +474,10 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01_proof_of_concept_16_0.png" src="../_images/tutorials_01_proof_of_concept_16_0.png" />
+<img alt="../_images/tutorials_01_proof_of_concept_17_0.png" src="../_images/tutorials_01_proof_of_concept_17_0.png" />
 </div>
 </div>
-<p>In this case, dynamic error types cannot be distinguished from each other. Thus, the arrow extends in both directions.</p>
+<p>In this case, the two dynamic error types cannot be distinguished from each other. Thus, the arrow extends in both directions.</p>
 </div>
 </div>
 <div class="section" id="References">
@@ -575,7 +572,7 @@ div.rendered_html tbody tr:hover {
       &copy;2019, Robin Schwemmle.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

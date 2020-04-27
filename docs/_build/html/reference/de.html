@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>de &#8212; diag-eff 0.1 documentation</title>
@@ -39,9 +39,9 @@
 <h1>de<a class="headerlink" href="#de" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="diagnostic-efficiency">
 <h2>Diagnostic Efficiency<a class="headerlink" href="#diagnostic-efficiency" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="de.de.calc_de">
-<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">calc_de</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">sort=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#calc_de"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.calc_de" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">calc_de</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obs</span></em>, <em class="sig-param"><span class="n">sim</span></em>, <em class="sig-param"><span class="n">sort</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#calc_de"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.calc_de" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate Diagnostic-Efficiency (DE).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -77,9 +77,9 @@ series are not sorted. The default is to sort.</p></li>
 </div>
 <div class="section" id="constant-error-term">
 <h2>Constant error term<a class="headerlink" href="#constant-error-term" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="de.de.calc_brel_mean">
-<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">calc_brel_mean</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">sort=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#calc_brel_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.calc_brel_mean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">calc_brel_mean</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obs</span></em>, <em class="sig-param"><span class="n">sim</span></em>, <em class="sig-param"><span class="n">sort</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#calc_brel_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.calc_brel_mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate arithmetic mean of relative bias.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -115,9 +115,9 @@ series are not sorted. The default is to sort.</p></li>
 </div>
 <div class="section" id="dynamic-error-term">
 <h2>Dynamic error term<a class="headerlink" href="#dynamic-error-term" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="de.de.calc_bias_area">
-<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">calc_bias_area</code><span class="sig-paren">(</span><em class="sig-param">brel_res</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#calc_bias_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.calc_bias_area" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">calc_bias_area</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">brel_res</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#calc_bias_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.calc_bias_area" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate absolute bias area for entire flow duration curve.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -153,9 +153,9 @@ series are not sorted. The default is to sort.</p></li>
 </div>
 <div class="section" id="timing-error-term">
 <h2>Timing error term<a class="headerlink" href="#timing-error-term" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="de.de.calc_temp_cor">
-<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">calc_temp_cor</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">r='pearson'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#calc_temp_cor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.calc_temp_cor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">calc_temp_cor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obs</span></em>, <em class="sig-param"><span class="n">sim</span></em>, <em class="sig-param"><span class="n">r</span><span class="o">=</span><span class="default_value">'pearson'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#calc_temp_cor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.calc_temp_cor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate temporal correlation between observed and simulated
 time series.</p>
 <dl class="field-list simple">
@@ -190,9 +190,9 @@ correlation. The default is to calculate the Pearson correlation.</p></li>
 </div>
 <div class="section" id="diagnostic-polar-plot">
 <h2>Diagnostic Polar Plot<a class="headerlink" href="#diagnostic-polar-plot" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="de.de.diag_polar_plot">
-<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">diag_polar_plot</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">sim</em>, <em class="sig-param">sort=True</em>, <em class="sig-param">l=0.05</em>, <em class="sig-param">extended=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#diag_polar_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.diag_polar_plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">de.de.</code><code class="sig-name descname">diag_polar_plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obs</span></em>, <em class="sig-param"><span class="n">sim</span></em>, <em class="sig-param"><span class="n">sort</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">l</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">extended</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/de/de.html#diag_polar_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#de.de.diag_polar_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Diagnostic polar plot of Diagnostic efficiency (DE) for a single
 evaluation.</p>
 <dl class="field-list simple">
@@ -323,7 +323,7 @@ extended=True.</p>
       &copy;2019, Robin Schwemmle.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
