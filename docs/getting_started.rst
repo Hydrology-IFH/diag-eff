@@ -16,7 +16,7 @@ can be easily demonstrated on the provided example dataset.
     from de import util
 
     # path to example data
-    path = Path('./examples/13331500_94_model_output.txt')
+    path = Path('./data/13331500_94_model_output.txt')
     # import observed time series
     df_ts = util.import_camels_obs_sim(path)
 
@@ -39,7 +39,7 @@ Diagnostic polar plot
     from de import util
 
     # path to example data
-    path = Path('./examples/13331500_94_model_output.txt')
+    path = Path('./data/13331500_94_model_output.txt')
     # import observed time series
     df_ts = util.import_camels_obs_sim(path)
 

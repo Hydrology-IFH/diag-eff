@@ -8,4 +8,3 @@ numpy
 pandas
 seaborn
 matplotlib
-diag-eff
