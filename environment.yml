@@ -2,9 +2,11 @@ name: de-env
 channels:
   - conda-forge
 dependencies:
-  - python
+  - python=3.7
   - numpy
   - pandas
   - scipy
   - matplotlib
   - seaborn
+  - pip:
+    - diag-eff>=0.1

@@ -26,6 +26,7 @@ wheels/
 docs/_build/
 docs/_static/
 docs/_templates/
+docs/.DS_Store
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -38,11 +39,10 @@ examples.ipynb
 de/misc.py
 signatures.py
 glob_eval.py
+paper_code.py
 
 # R
-#example_reticulate.R
 .Rhistory
-*.R
 *.Rmd
 
 # cache
@@ -61,6 +61,5 @@ docs/make.sh
 run_tests.sh
 
 # images
-figures/*
 logo.graffle
 test.png
