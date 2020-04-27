@@ -24,9 +24,9 @@ copyright = '2019, Robin Schwemmle'
 author = 'Robin Schwemmle'
 
 # The short X.Y version
-version = '0.1'
+version = de.__version__
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = de.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -142,7 +142,7 @@ htmlhelp_basename = 'diageffdoc'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
-    # 'papersize': 'letterpaper',
+    "papersize": "a4paper",
 
     # The font size ('10pt', '11pt' or '12pt').
     #
@@ -170,10 +170,10 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-# man_pages = [
-#     (master_doc, 'diag-eff', 'diag-eff Documentation',
-#      [author], 1)
-# ]
+man_pages = [
+    (master_doc, 'diag-eff', 'diag-eff Documentation',
+     [author], 1)
+]
 
 # -- Options for Texinfo output ----------------------------------------------
 
