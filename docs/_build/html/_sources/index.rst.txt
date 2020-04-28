@@ -15,7 +15,7 @@ as:
 
     Robin Schwemmle, Dominic Demand & Markus Weiler (2020). diag-eff 0.1:
     Diagnostic efficiency – specific evaluation of model performance.
-    (Version v0.1). Zenodo. http://doi.org/10.5281/zenodo...
+    (Version v0.1). Zenodo. https://doi.org/10.5281/zenodo.3769562
 
 .. toctree::
     :maxdepth: 3
