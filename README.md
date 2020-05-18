@@ -19,8 +19,7 @@ as:
 
     Schwemmle, R., Demand, D., and Weiler, M.: Diagnostic efficiency – specific
     evaluation of model performance, Hydrol. Earth Syst. Sci. Discuss.,
-    https://doi.org/10.5194/hess-2020-237, in review,
-    2020.
+    https://doi.org/10.5194/hess-2020-237, in review, 2020.
 
 ## Full Documentation
 
