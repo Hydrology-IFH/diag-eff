@@ -20,7 +20,7 @@ import de
 # -- Project information -----------------------------------------------------
 
 project = 'diag-eff'
-copyright = '2019, Robin Schwemmle'
+copyright = '2020, Robin Schwemmle'
 author = 'Robin Schwemmle'
 
 # The short X.Y version

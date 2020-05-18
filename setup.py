@@ -7,7 +7,7 @@ import versioneer
 
 long_description = """diag-eff is an open-source toolbox written in Python for
 specific evaluation of model performance. The toolbox provides functions to
-calculate the Diagnostic Efficiency metric and and fucntions to visualize
+calculate the Diagnostic Efficiency metric and and functions to visualize
 contribution of metric terms by diagnostic polar plots. Note that the data
 management of time series is handled using pandas data frame objects.
 """
