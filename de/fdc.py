@@ -123,3 +123,54 @@ def fdc_obs_sim(obs, sim):
     fig.subplots_adjust(left=0.2)
 
     return fig
+
+def fdc_sort_obs(obs, sim):
+    """
+    Plotting the flow duration curves of two hydrologic time series (e.g.
+    observed streamflow and simulated streamflow) sorted by observations.
+
+    Parameters
+    ----------
+    obs : series
+        observed time series
+    sim : series
+        simulated time series
+
+    Returns
+    ----------
+    fig : Figure
+        Returns a single figure containing two flow duration curves.
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import fdc
+    >>> import pandas as pd
+    >>> date_rng = pd.date_range(start='1/1/2018', periods=11)
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2, 2.5, 3.5, 1.8, 1.5, 1.2])
+    >>> ts_obs = pd.Series(data=obs, index=date_rng)
+    >>> sim = np.array([1.4, .9, 1, 0.95, 1.4, 2.1, 2.6, 3.6, 1.9, 1.4, 1.1])
+    >>> ts_sim = pd.Series(data=sim, index=date_rng)
+    >>> fdc.fdc_obs_sim(ts_obs, ts_sim)
+    """
+    obs_sim = pd.DataFrame(index=obs.index, columns=["obs", "sim"])
+    obs_sim.loc[:, "obs"] = obs.values
+    obs_sim.loc[:, "sim"] = sim.values
+    obs_sim.sort_values(by=['obs'], ascending=True)
+
+    # calculate exceedence probability
+    ranks_obs = sp.stats.rankdata(obs_sim["obs"], method="ordinal")
+    ranks_obs = ranks_obs[::-1]
+    prob_obs = [(ranks_obs[i] / (len(obs_sim["obs"]) + 1)) for i in range(len(obs_sim["obs"]))]
+
+    fig, ax = plt.subplots()
+    ax.plot(prob_obs, obs_sim["obs"], color="blue", lw=2, label="Observed")
+    ax.plot(prob_obs, obs_sim["sim"], color="red", lw=1, ls="-.", label=_sim_lab, alpha=0.8)
+    ax.set(ylabel=_q_lab, xlabel="Exceedence probabilty [-]", yscale="log")
+    ax.legend(loc=1)
+    ax.set_xlim(0, 1)
+
+    fig.subplots_adjust(left=0.2)
+
+    return fig

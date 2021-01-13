@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # ==========================================================
     # 619.11 km2; AI: 0.82
     area = 619.11
-    path = os.path.join(os.getcwd(), "examples/13331500_streamflow_qc.txt")
+    path = Path(os.path.join(os.getcwd(), "examples/13331500_streamflow_qc.txt"))
     ## 191.55 km2; AI: 2.04
     # area = 191.55
     # path = os.path.join(os.getcwd(),
@@ -44,7 +44,9 @@ if __name__ == "__main__":
 
     # import observed time series
     df_ts = util.import_camels_ts(path, sep=r"\s+", catch_area=area)
-    util.plot_ts(df_ts)
+    fig_ts_obs = util.plot_ts(df_ts)
+    path = Path(os.path.join(PATH_FIG, "original_ts.pdf"))
+    fig_ts_obs.savefig(path, dpi=250)
 
     # ==========================================================
     # proof of concept
@@ -54,7 +56,7 @@ if __name__ == "__main__":
     fig_fdc, axes_fdc = plt.subplots(2, 5, sharey=True, sharex=True, figsize=(14, 6))
     fig_fdc.text(0.5, 0.02, "Exceedence probabilty [-]", ha="center", va="center")
     fig_fdc.text(
-        0.08, 0.5, r"[mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
+        0.08, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
     )
     axes_fdc[1, 4].remove()
 
@@ -77,13 +79,25 @@ if __name__ == "__main__":
                                    figsize=(14, 9))
     fig_ts.text(0.5, 0.05, "Time [Years]", ha="center", va="center")
     fig_ts.text(
-        0.08, 0.5, r"[mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
+        0.08, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
     )
     axes_ts[2, 3].remove()
     axes_ts[2, 4].remove()
 
+    # extract a single year from the time series
+    yy_str_1 = '2000-1-1 00:00:00'  # start date
+    yy_str_2 = '2000-12-31 00:00:00'  # end date
+    fig_ts_yy, axes_ts_yy = plt.subplots(3, 5, sharey=True, sharex=True,
+                                         figsize=(14, 9))
+    fig_ts_yy.text(0.5, 0.05, "Time [Years]", ha="center", va="center")
+    fig_ts_yy.text(
+        0.08, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
+    )
+    axes_ts_yy[2, 3].remove()
+    axes_ts_yy[2, 4].remove()
+
     # dataframe to compare DE, KGE and NSE
-    idx = ["1", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
+    idx = ["0", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
     cols = [
         "brel_mean",
         "b_area",
@@ -159,6 +173,10 @@ if __name__ == "__main__":
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 0],
                          fig_num_ts[0])
 
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[0, 0], fig_num_ts[0])
+
     # make arrays
     obs_arr = obs_sim["Qobs"].values
     sim_arr = obs_sim["Qsim"].values
@@ -211,6 +229,10 @@ if __name__ == "__main__":
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 1],
                          fig_num_ts[1])
+
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[0, 1], fig_num_ts[1])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -265,6 +287,10 @@ if __name__ == "__main__":
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 2],
                          fig_num_ts[2])
 
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[0, 2], fig_num_ts[2])
+
     # make arrays
     obs_arr = obs_sim["Qobs"].values
     sim_arr = obs_sim["Qsim"].values
@@ -318,6 +344,10 @@ if __name__ == "__main__":
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 3],
                          fig_num_ts[3])
 
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[0, 3], fig_num_ts[3])
+
     # make arrays
     obs_arr = obs_sim["Qobs"].values
     sim_arr = obs_sim["Qsim"].values
@@ -370,6 +400,10 @@ if __name__ == "__main__":
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 4],
                          fig_num_ts[4])
+
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[0, 4], fig_num_ts[4])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -426,6 +460,10 @@ if __name__ == "__main__":
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 0],
                          fig_num_ts[5])
 
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[1, 0], fig_num_ts[5])
+
     # make arrays
     obs_arr = obs_sim["Qobs"].values
     sim_arr = obs_sim["Qsim"].values
@@ -480,6 +518,10 @@ if __name__ == "__main__":
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 1],
                          fig_num_ts[6])
+
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[1, 1], fig_num_ts[6])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -536,6 +578,10 @@ if __name__ == "__main__":
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 2],
                          fig_num_ts[7])
 
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[1, 2], fig_num_ts[7])
+
     # make arrays
     obs_arr = obs_sim["Qobs"].values
     sim_arr = obs_sim["Qsim"].values
@@ -591,6 +637,10 @@ if __name__ == "__main__":
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 3],
                          fig_num_ts[8])
 
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[1, 3], fig_num_ts[8])
+
     # make arrays
     obs_arr = obs_sim["Qobs"].values
     sim_arr = obs_sim["Qsim"].values
@@ -645,6 +695,10 @@ if __name__ == "__main__":
     obs_sim.loc[:, "Qsim"] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 4],
                          fig_num_ts[9])
+
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[1, 4], fig_num_ts[9])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -702,6 +756,10 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[2, 0], fig_num_ts[10]
     )
 
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[2, 0], fig_num_ts[10])
+
     # make arrays
     obs_arr = obs_sim["Qobs"].values
     sim_arr = obs_sim["Qsim"].values
@@ -757,6 +815,10 @@ if __name__ == "__main__":
     util.plot_obs_sim_ax(
         obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[2, 1], fig_num_ts[11]
     )
+
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[2, 1], fig_num_ts[11])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -814,6 +876,10 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[2, 2], fig_num_ts[12]
     )
 
+    obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
+    util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
+                         axes_ts_yy[2, 2], fig_num_ts[12])
+
     # make arrays
     obs_arr = obs_sim["Qobs"].values
     sim_arr = obs_sim["Qsim"].values
@@ -856,17 +922,19 @@ if __name__ == "__main__":
     axes_fdc[1, 3].legend(loc=6, bbox_to_anchor=(1.18, 0.85))
     axes_ts[2, 2].legend(loc=6, bbox_to_anchor=(1.18, 0.85))
 
-    path_png = os.path.join(PATH_FIG, "fdc_errors.png")
+    path_png = Path(os.path.join(PATH_FIG, "fdc_errors.png"))
     fig_fdc.savefig(path_png, dpi=250)
-    path_png = os.path.join(PATH_FIG, "ts_errors.png")
+    path_png = Path(os.path.join(PATH_FIG, "ts_errors.png"))
     fig_ts.savefig(path_png, dpi=250)
+    path_png = Path(os.path.join(PATH_FIG, "ts_errors_yy.png"))
+    fig_ts_yy.savefig(path_png, dpi=250)
 
     # -----------------------------------------------------------------
     # diagnostic plolar plot
     # -----------------------------------------------------------------
     ### multi DE plot ###
     # make arrays
-    idx = ["1", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
+    idx = ["0", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
     ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     brel_mean_arr = df_es["brel_mean"].values[ids]
     b_area_arr = df_es["b_area"].values[ids]
@@ -879,12 +947,12 @@ if __name__ == "__main__":
     fig_de = util.diag_polar_plot_multi_fc(
         brel_mean_arr, b_area_arr, temp_cor_arr, de_arr, b_dir_arr, phi_arr, idx
     )
-    path = os.path.join(PATH_FIG, "de_diag.pdf")
+    path = Path(os.path.join(PATH_FIG, "de_diag.pdf"))
     fig_de.savefig(path, dpi=250)
 
     ### multi KGE plot ###
     # make arrays
-    idx = ["1", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
+    idx = ["0", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
     beta_arr = df_es["beta"].values
     alpha_arr = df_es["alpha"].values
     # gamma_arr = df_es['gamma'].values
@@ -894,7 +962,7 @@ if __name__ == "__main__":
     fig_kge = util.polar_plot_multi_fc(
         beta_arr, alpha_arr, temp_cor_arr, kge_arr, idx
     )
-    path = os.path.join(PATH_FIG, "kge_diag.pdf")
+    path = Path(os.path.join(PATH_FIG, "kge_diag.pdf"))
     fig_kge.savefig(path, dpi=250)
 
     ### scatterplots DE, KGE and NSE ###
@@ -908,9 +976,9 @@ if __name__ == "__main__":
     sc = sns.scatterplot(kge_arr, de_arr, color="black", s=60, ax=ax1)
     sc1 = sns.scatterplot(nse_arr, de_arr, color="red", s=30, marker="X",
                           ax=ax1)
-    ax1.plot([-2.05, 1.05], [-2.05, 1.05], ls="--", c=".3")
-    ax1.set_ylim(-2.05, 1.05)
-    ax1.set_xlim(-2.05, 1.05)
+    ax1.plot([-2.05, 1.55], [-2.05, 1.55], ls="--", c=".3")
+    ax1.set_ylim(-2.05, 1.55)
+    ax1.set_xlim(-2.05, 1.55)
     ax1.set(ylabel="DE [-]", xlabel="KGE [-]")
     ax1.text(0.40, -0.22, "NSE [-]", color="red", transform=ax1.transAxes)
     ax1.text(0.025, 0.93, "(a)", transform=ax1.transAxes)
@@ -966,7 +1034,7 @@ if __name__ == "__main__":
     ax3.text(0.05, 0.1, "1:1", rotation=45, transform=ax3.transAxes)
 
     fig.subplots_adjust(wspace=0.45, bottom=0.2)
-    path_png = os.path.join(PATH_FIG, "scatter_eff_comp.png")
+    path_png = Path(os.path.join(PATH_FIG, "scatter_eff_comp.png"))
     fig.savefig(path_png, dpi=250)
     # for i, txt in enumerate(df_es.index):
     #     ax.annotate(txt, (alpha_arr[i] - 1, brel_mean_arr[i]), color='black',
@@ -977,12 +1045,12 @@ if __name__ == "__main__":
     # export table
     df_es = df_es.round(2)
     df_es_t = df_es.T
-    path_csv = os.path.join(PATH_FIG, "table_eff_comp.csv")
+    path_csv = Path(os.path.join(PATH_FIG, "table_eff_comp.csv"))
     df_es_t = df_es_t.round(2)
     df_es_t.to_csv(path_csv, header=True, index=True, sep=";")
     df_es_t = df_es_t.loc[["de", "kge", "nse"], :]
     df_es_t = df_es_t.round(2)
-    path_csv = os.path.join(PATH_FIG, "table_eff_eff.csv")
+    path_csv = Path(os.path.join(PATH_FIG, "table_eff_eff.csv"))
     df_es_t.to_csv(path_csv, header=True, index=True, sep=";")
 
     # ==========================================================
@@ -1005,26 +1073,31 @@ if __name__ == "__main__":
     ]
     df_eff_cam = pd.DataFrame(index=idx, columns=cols, dtype=np.float64)
 
-    path_cam1 = os.path.join(
-        os.getcwd(), "examples/13331500_05_model_output.txt"
+    path_cam1 = Path(os.path.join(
+        os.getcwd(), "examples/13331500_05_model_output.txt")
     )
-    path_cam2 = os.path.join(
-        os.getcwd(), "examples/13331500_48_model_output.txt"
+    path_cam2 = Path(os.path.join(
+        os.getcwd(), "examples/13331500_48_model_output.txt")
     )
-    path_cam3 = os.path.join(
-        os.getcwd(), "examples/13331500_94_model_output.txt"
+    path_cam3 = Path(os.path.join(
+        os.getcwd(), "examples/13331500_94_model_output.txt")
     )
+    # entire time series
     df_cam1 = util.import_camels_obs_sim(path_cam1)
     df_cam2 = util.import_camels_obs_sim(path_cam2)
     df_cam3 = util.import_camels_obs_sim(path_cam3)
 
     fig, axes = plt.subplots(3, 2, figsize=(10, 10), sharex="col")
-    fig.text(0.06, 0.5, r"[mm $d^{-1}$]", ha="center", va="center",
+    fig.text(0.06, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
              rotation="vertical")
-    fig.text(0.5, 0.5, r"[mm $d^{-1}$]", ha="center", va="center",
+    fig.text(0.5, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
              rotation="vertical")
     fig.text(0.25, 0.05, "Time [Years]", ha="center", va="center")
     fig.text(0.75, 0.05, "Exceedence probabilty [-]", ha="center", va="center")
+    # format the ticks
+    years_10 = mdates.YearLocator(10)
+    years_5 = mdates.YearLocator(5)
+    yearsFmt = mdates.DateFormatter("%Y")
 
     util.plot_obs_sim_ax(df_cam1["Qobs"], df_cam1["Qsim"], axes[0, 0], "")
     axes[0, 0].text(
@@ -1035,13 +1108,10 @@ if __name__ == "__main__":
         ha="right",
         va="top",
     )
-    # format the ticks
-    years_10 = mdates.YearLocator(10)
-    years_5 = mdates.YearLocator(5)
-    yearsFmt = mdates.DateFormatter("%Y")
     axes[0, 0].xaxis.set_major_locator(years_10)
-    axes[0, 0].xaxis.set_major_formatter(yearsFmt)
     axes[0, 0].xaxis.set_minor_locator(years_5)
+    axes[0, 0].xaxis.set_major_formatter(yearsFmt)
+
     util.fdc_obs_sim_ax(df_cam1["Qobs"], df_cam1["Qsim"], axes[0, 1], "")
     axes[0, 1].text(
         0.95,
@@ -1069,13 +1139,10 @@ if __name__ == "__main__":
         ha="right",
         va="top",
     )
-    # format the ticks
-    years_10 = mdates.YearLocator(10)
-    years_5 = mdates.YearLocator(5)
-    yearsFmt = mdates.DateFormatter("%Y")
     axes[1, 0].xaxis.set_major_locator(years_10)
-    axes[1, 0].xaxis.set_major_formatter(yearsFmt)
     axes[1, 0].xaxis.set_minor_locator(years_5)
+    axes[1, 0].xaxis.set_major_formatter(yearsFmt)
+
     util.fdc_obs_sim_ax(df_cam1["Qobs"], df_cam1["Qsim"], axes[1, 1], "")
     axes[1, 1].text(
         0.95,
@@ -1095,13 +1162,10 @@ if __name__ == "__main__":
         ha="right",
         va="top",
     )
-    # format the ticks
-    years_10 = mdates.YearLocator(10)
-    years_5 = mdates.YearLocator(5)
-    yearsFmt = mdates.DateFormatter("%Y")
     axes[2, 0].xaxis.set_major_locator(years_10)
-    axes[2, 0].xaxis.set_major_formatter(yearsFmt)
     axes[2, 0].xaxis.set_minor_locator(years_5)
+    axes[2, 0].xaxis.set_major_formatter(yearsFmt)
+
     util.fdc_obs_sim_ax(df_cam1["Qobs"], df_cam1["Qsim"], axes[2, 1], "")
     axes[2, 1].text(
         0.95,
@@ -1113,9 +1177,109 @@ if __name__ == "__main__":
     )
 
     fig.subplots_adjust(wspace=0.3)
-    path_png = os.path.join(PATH_FIG, "ts_fdc_real_case.png")
+    path_png = Path(os.path.join(PATH_FIG, "ts_fdc_real_case.png"))
     fig.savefig(path_png, dpi=250)
-    path_pdf = os.path.join(PATH_FIG, "ts_fdc_real_case.pdf")
+    path_pdf = Path(os.path.join(PATH_FIG, "ts_fdc_real_case.pdf"))
+    fig.savefig(path_pdf, dpi=250)
+
+    # time series of a single year
+    df_cam1_yy = df_cam1.loc[yy_str_1:yy_str_2, :]
+    df_cam2_yy = df_cam2.loc[yy_str_1:yy_str_2, :]
+    df_cam3_yy = df_cam3.loc[yy_str_1:yy_str_2, :]
+
+    fig, axes = plt.subplots(3, 2, figsize=(10, 10), sharex="col")
+    fig.text(0.06, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
+             rotation="vertical")
+    fig.text(0.5, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
+             rotation="vertical")
+    fig.text(0.25, 0.05, "2000", ha="center", va="center")
+    fig.text(0.75, 0.05, "Exceedence probabilty [-]", ha="center", va="center")
+    # format the ticks
+    months_1 = mdates.MonthLocator()
+    days_15 = mdates.MonthLocator(bymonthday=15)
+    fmt = mdates.DateFormatter("%m")
+
+    util.plot_obs_sim_ax(df_cam1_yy["Qobs"], df_cam1_yy["Qsim"], axes[0, 0], "")
+    axes[0, 0].text(
+        0.95,
+        0.95,
+        "(a; set_id: {})".format(idx[0]),
+        transform=axes[0, 0].transAxes,
+        ha="right",
+        va="top",
+    )
+    axes[0, 0].xaxis.set_major_locator(months_1)
+    axes[0, 0].xaxis.set_minor_locator(days_15)
+    axes[0, 0].xaxis.set_major_formatter(fmt)
+
+    util.fdc_obs_sim_ax(df_cam1["Qobs"], df_cam1["Qsim"], axes[0, 1], "")
+    axes[0, 1].text(
+        0.95,
+        0.95,
+        "(b; set_id: {})".format(idx[0]),
+        transform=axes[0, 1].transAxes,
+        ha="right",
+        va="top",
+    )
+    # legend above plot
+    axes[0, 1].legend(
+        loc=2,
+        labels=["Observed", "Simulated"],
+        ncol=2,
+        frameon=False,
+        bbox_to_anchor=(-0.6, 1.2),
+    )
+
+    util.plot_obs_sim_ax(df_cam2_yy["Qobs"], df_cam2_yy["Qsim"], axes[1, 0], "")
+    axes[1, 0].text(
+        0.95,
+        0.95,
+        "(c; set_id: {})".format(idx[1]),
+        transform=axes[1, 0].transAxes,
+        ha="right",
+        va="top",
+    )
+    axes[1, 0].xaxis.set_major_locator(months_1)
+    axes[1, 0].xaxis.set_minor_locator(days_15)
+    axes[1, 0].xaxis.set_major_formatter(fmt)
+
+    util.fdc_obs_sim_ax(df_cam1["Qobs"], df_cam1["Qsim"], axes[1, 1], "")
+    axes[1, 1].text(
+        0.95,
+        0.95,
+        "(d; set_id: {})".format(idx[1]),
+        transform=axes[1, 1].transAxes,
+        ha="right",
+        va="top",
+    )
+
+    util.plot_obs_sim_ax(df_cam1_yy["Qobs"], df_cam1_yy["Qsim"], axes[2, 0], "")
+    axes[2, 0].text(
+        0.95,
+        0.95,
+        "(e; set_id: {})".format(idx[2]),
+        transform=axes[2, 0].transAxes,
+        ha="right",
+        va="top",
+    )
+    axes[2, 0].xaxis.set_major_locator(months_1)
+    axes[2, 0].xaxis.set_minor_locator(days_15)
+    axes[2, 0].xaxis.set_major_formatter(fmt)
+
+    util.fdc_obs_sim_ax(df_cam1["Qobs"], df_cam1["Qsim"], axes[2, 1], "")
+    axes[2, 1].text(
+        0.95,
+        0.95,
+        "(f; set_id: {})".format(idx[2]),
+        transform=axes[2, 1].transAxes,
+        ha="right",
+        va="top",
+    )
+
+    fig.subplots_adjust(wspace=0.3)
+    path_png = Path(os.path.join(PATH_FIG, "ts_fdc_real_case_yy.png"))
+    fig.savefig(path_png, dpi=250)
+    path_pdf = Path(os.path.join(PATH_FIG, "ts_fdc_real_case_yy.pdf"))
     fig.savefig(path_pdf, dpi=250)
 
     # make arrays
@@ -1229,12 +1393,12 @@ if __name__ == "__main__":
     # NSE
     df_eff_cam.iloc[2, 10] = nse.calc_nse(obs_arr, sim_arr)
 
-    path_csv = os.path.join(
+    path_csv = Path(os.path.join(
         PATH_FIG, "table_eff_real_case.csv"
-    )
+    ))
     df_eff_cam.to_csv(path_csv, header=True, index=True, sep=";")
 
-    ### multi diagnostic plot ###
+    ### multi diagnostic polar plot ###
     # make arrays
     brel_mean_arr = df_eff_cam["brel_mean"].values
     b_area_arr = df_eff_cam["b_area"].values
@@ -1252,10 +1416,10 @@ if __name__ == "__main__":
         b_dir_arr,
         phi_arr,
         idx,
-        ax_lim=0,
+        ax_lim=0.6,
     )
 
-    path_pdf = os.path.join(PATH_FIG, "de_diag_real_case.pdf")
+    path_pdf = Path(os.path.join(PATH_FIG, "de_diag_real_case.pdf"))
     fig_de.savefig(path_pdf, dpi=250)
 
     ### multi KGE plot ###
@@ -1265,9 +1429,9 @@ if __name__ == "__main__":
     kge_arr = df_eff_cam["kge"].values
 
     fig_kge = util.polar_plot_multi_fc(
-        beta_arr, alpha_arr, temp_cor_arr, kge_arr, idx, ax_lim=0
+        beta_arr, alpha_arr, temp_cor_arr, kge_arr, idx, ax_lim=0.4
     )
-    path_pdf = os.path.join(
+    path_pdf = Path(os.path.join(
         PATH_FIG, "kge_diag_real_case.pdf"
-    )
+    ))
     fig_kge.savefig(path_pdf, dpi=250)

@@ -26,7 +26,7 @@ def test_de_for_arrays():
         obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
         sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
     )
-    assert eff == pytest.approx(0.8202204384691575, rel=1e-4)
+    assert eff == pytest.approx(0.1797795615308425, rel=1e-4)
 
 
 def test_lin_cor_for_arrays():

@@ -168,7 +168,7 @@ def calc_bias_area(brel_res):
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
     >>> b_res = de.calc_brel_res(obs, sim)
     >>> de.calc_bias_area(b_res)
-    0.1112908496732026
+    0.11
 
     See Also
     --------
@@ -211,7 +211,7 @@ def calc_bias_dir(brel_res):
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
     >>> b_res = de.calc_brel_res(obs, sim)
     >>> de.calc_bias_dir(b_res)
-    -0.014705882352941155
+    -0.015
     """
     mid_idx = int(len(brel_res) / 2)
     # integral of relative bias < 50 %
@@ -262,7 +262,7 @@ def calc_bias_slope(b_area, b_dir):
     >>> b_dir = de.calc_bias_dir(b_res)
     >>> b_area = de.calc_bias_area(b_res)
     >>> de.calc_bias_slope(b_area, b_dir)
-    0.1112908496732026
+    0.11
     """
     if b_dir > 0:
         b_slope = b_area * (-1)
@@ -308,7 +308,7 @@ def calc_temp_cor(obs, sim, r="pearson"):
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
     >>> de.calc_temp_cor(obs, sim)
-    0.8940281850583509
+    0.89
     """
     if len(obs) != len(sim):
         raise AssertionError("Arrays are not of equal length!")
@@ -365,7 +365,7 @@ def calc_de(obs, sim, sort=True):
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
     >>> de.calc_de(obs, sim)
-    0.8202204384691575
+    0.18
     """
     if len(obs) != len(sim):
         raise AssertionError("Arrays are not of equal length!")
@@ -378,7 +378,7 @@ def calc_de(obs, sim, sort=True):
     # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
     # diagnostic efficiency
-    eff = 1 - np.sqrt((brel_mean) ** 2 + (b_area) ** 2 + (temp_cor - 1) ** 2)
+    eff = np.sqrt((brel_mean) ** 2 + (b_area) ** 2 + (temp_cor - 1) ** 2)
 
     return eff
 
@@ -442,7 +442,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
     # temporal correlation
     temp_cor = calc_temp_cor(obs, sim)
     # diagnostic efficiency
-    eff = 1 - np.sqrt((brel_mean) ** 2 + (b_area) ** 2 + (temp_cor - 1) ** 2)
+    eff = np.sqrt((brel_mean) ** 2 + (b_area) ** 2 + (temp_cor - 1) ** 2)
 
     # direction of bias
     b_dir = calc_bias_dir(brel_res)
@@ -461,19 +461,19 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if eff >= 0:
-        ax_lim = 0.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(0, 1, 0.2)
-    elif eff < 0 and eff >= -1:
+    if eff <= 1:
         ax_lim = 1.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-1, 1, 0.2)
-    elif eff >= -2 and eff < -1:
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 1, 0.2)
+    elif eff > 1 and eff <= 2:
         ax_lim = 2.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-2, 1, 0.2)
-    elif eff <= -2:
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 2, 0.2)
+    elif eff > 2 and eff <= 3:
+        ax_lim = 3.2
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 3, 0.2)
+    elif eff >= 3:
         raise AssertionError("Value of 'DE' is out of bounds for visualization!", eff)
 
     len_yy = len(yy)
@@ -494,32 +494,32 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         ax.cla()
         # plot regions
         ax.plot(
-            (1, np.deg2rad(45)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(45)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(135)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(135)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(225)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(225)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(315)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(315)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
@@ -529,27 +529,27 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = 1 - np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
         # relation of b_dir which explains the error
         if abs(b_area) > 0:
             exp_err = (abs(b_dir) * 2) / abs(b_area)
         elif abs(b_area) == 0:
             exp_err = 0
         # diagnose the error
-        if abs(brel_mean) <= l and exp_err > l and eff <= eff_l:
+        if abs(brel_mean) <= l and exp_err > l and eff > eff_l:
             ax.annotate(
                 "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
-        elif abs(brel_mean) > l and exp_err <= l and eff <= eff_l:
+        elif abs(brel_mean) > l and exp_err <= l and eff > eff_l:
             ax.annotate(
                 "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
-        elif abs(brel_mean) > l and exp_err > l and eff <= eff_l:
+        elif abs(brel_mean) > l and exp_err > l and eff > eff_l:
             ax.annotate(
                 "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
         # FBM
-        elif abs(brel_mean) <= l and exp_err <= l and eff <= eff_l:
+        elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
                 "", xytext=(0, 1), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
             )
@@ -560,14 +560,14 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
                 arrowprops=dict(facecolor=rgba_color),
             )
         # FGM
-        elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
+        elif abs(brel_mean) <= l and exp_err <= l and eff <= eff_l:
             c = ax.scatter(phi, eff, color=rgba_color)
         ax.set_rticks([])  # turn default ticks off
-        ax.set_rmin(1)
-        if eff >= 0:
-            ax.set_rmax(0)
-        elif eff < 0:
-            ax.set_rmax(-ax_lim + 0.2)
+        ax.set_rmin(0)
+        if eff <= 1:
+            ax.set_rmax(1)
+        elif eff > 1:
+            ax.set_rmax(ax_lim + 0.2)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -699,32 +699,32 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         ax.cla()
         # plot regions
         ax.plot(
-            (1, np.deg2rad(45)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(45)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(135)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(135)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(225)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(225)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(315)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(315)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
@@ -734,27 +734,27 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = 1 - np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
         # relation of b_dir which explains the error
         if abs(b_area) > 0:
             exp_err = (abs(b_dir) * 2) / abs(b_area)
         elif abs(b_area) == 0:
             exp_err = 0
         # diagnose the error
-        if abs(brel_mean) <= l and exp_err > l and eff <= eff_l:
+        if abs(brel_mean) <= l and exp_err > l and eff > eff_l:
             ax.annotate(
                 "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
-        elif abs(brel_mean) > l and exp_err <= l and eff <= eff_l:
+        elif abs(brel_mean) > l and exp_err <= l and eff > eff_l:
             ax.annotate(
                 "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
-        elif abs(brel_mean) > l and exp_err > l and eff <= eff_l:
+        elif abs(brel_mean) > l and exp_err > l and eff > eff_l:
             ax.annotate(
                 "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
         # FBM
-        elif abs(brel_mean) <= l and exp_err <= l and eff <= eff_l:
+        elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
                 "", xytext=(0, 1), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
             )
@@ -765,14 +765,14 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
                 arrowprops=dict(facecolor=rgba_color),
             )
         # FGM
-        elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
+        elif abs(brel_mean) <= l and exp_err <= l and eff <= eff_l:
             c = ax.scatter(phi, eff, color=rgba_color)
         ax.set_rticks([])  # turn default ticks off
-        ax.set_rmin(1)
-        if eff >= 0:
+        ax.set_rmin(0)
+        if eff <= 1:
             ax.set_rmax(0)
-        elif eff < 0:
-            ax.set_rmax(-ax_lim + 0.2)
+        elif eff > 1:
+            ax.set_rmax(ax_lim + 0.2)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -968,7 +968,7 @@ def diag_polar_plot_multi(
     >>> de.diag_polar_plot_multi(brel_mean, b_area, temp_cor, eff_de, b_dir,
                                  phi)
     """
-    eff_min = np.min(eff_de)
+    eff_max = np.max(eff_de)
 
     ll_brel_mean = brel_mean.tolist()
     ll_b_dir = b_dir.tolist()
@@ -983,20 +983,20 @@ def diag_polar_plot_multi(
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if eff_min >= 0:
-        ax_lim = 0.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(0, 1, 0.2)
-    elif eff_min < 0 and eff_min >= -1:
+    if eff_max <= 1:
         ax_lim = 1.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-1, 1, 0.2)
-    elif eff_min >= -2 and eff_min < -1:
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 1, 0.2)
+    elif eff_max > 1 and eff_max <= 2:
         ax_lim = 2.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-2, 1, 0.2)
-    elif eff_min <= -2:
-        raise ValueError("Some values of 'DE' are too low for visualization!", eff_min)
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 2, 0.2)
+    elif eff_max > 2 and eff_max <= 3:
+        ax_lim = 3.2
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 3, 0.2)
+    elif eff_max > 3:
+        raise ValueError("Some values of 'DE' are too large for visualization!", eff_max)
 
     len_yy = len(yy)
 
@@ -1016,32 +1016,32 @@ def diag_polar_plot_multi(
         ax.cla()
         # plot regions
         ax.plot(
-            (1, np.deg2rad(45)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(45)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(135)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(135)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(225)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(225)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(315)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(315)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
@@ -1051,7 +1051,7 @@ def diag_polar_plot_multi(
         cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = 1 - np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
         # loop over each data point
         zz = zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_eff, ll_phi)
         for (bm, bd, ba, r, eff, ang) in zz:
@@ -1065,14 +1065,14 @@ def diag_polar_plot_multi(
             elif abs(ba) == 0:
                 exp_err = 0
             # diagnose the error
-            if abs(bm) <= l and exp_err > l and eff <= eff_l:
+            if abs(bm) <= l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(bm) > l and exp_err <= l and eff <= eff_l:
+            elif abs(bm) > l and exp_err <= l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(bm) > l and exp_err > l and eff <= eff_l:
+            elif abs(bm) > l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
             # FBM
-            elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
+            elif abs(bm) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
                     "",
                     xytext=(0, 1),
@@ -1086,14 +1086,14 @@ def diag_polar_plot_multi(
                     arrowprops=dict(facecolor=rgba_color),
                 )
             # FGM
-            elif abs(bm) <= l and exp_err <= l and eff > eff_l:
+            elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
         ax.set_rticks([])  # turn default ticks off
-        ax.set_rmin(1)
-        if eff_min >= 0:
-            ax.set_rmax(0)
-        elif eff_min <= 0:
-            ax.set_rmax(-ax_lim + 0.2)
+        ax.set_rmin(0)
+        if eff_max <= 1:
+            ax.set_rmax(1)
+        elif eff_max > 1:
+            ax.set_rmax(ax_lim + 0.2)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -1225,32 +1225,32 @@ def diag_polar_plot_multi(
         ax.cla()
         # plot regions
         ax.plot(
-            (1, np.deg2rad(45)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(45)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(135)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(135)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(225)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(225)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(315)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(315)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
@@ -1260,7 +1260,7 @@ def diag_polar_plot_multi(
         cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = 1 - np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
         # loop over each data point
         zz = zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_eff, ll_phi)
         for (bm, bd, ba, r, eff, ang) in zz:
@@ -1274,14 +1274,14 @@ def diag_polar_plot_multi(
             elif abs(ba) == 0:
                 exp_err = 0
             # diagnose the error
-            if abs(bm) <= l and exp_err > l and eff <= eff_l:
+            if abs(bm) <= l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(bm) > l and exp_err <= l and eff <= eff_l:
+            elif abs(bm) > l and exp_err <= l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(bm) > l and exp_err > l and eff <= eff_l:
+            elif abs(bm) > l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
             # FBM
-            elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
+            elif abs(bm) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
                     "",
                     xytext=(0, 1),
@@ -1295,14 +1295,14 @@ def diag_polar_plot_multi(
                     arrowprops=dict(facecolor=rgba_color),
                 )
             # FGM
-            elif abs(bm) <= l and exp_err <= l and eff > eff_l:
+            elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
         ax.set_rticks([])  # turn default ticks off
-        ax.set_rmin(1)
-        if eff_min >= 0:
-            ax.set_rmax(0)
-        elif eff_min <= 0:
-            ax.set_rmax(-ax_lim + 0.2)
+        ax.set_rmin(0)
+        if eff_max <= 1:
+            ax.set_rmax(1)
+        elif eff_max > 1:
+            ax.set_rmax(ax_lim + 0.2)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -1446,7 +1446,7 @@ def diag_polar_plot_multi(
         g.set_axis_labels(r"[$^\circ$]", "DE [-]")
         g.ax_joint.set_xticks([0, 90, 180, 270, 360])
         g.ax_joint.set_xlim(0, 360)
-        g.ax_joint.set_ylim(-ax_lim, 1)
+        g.ax_joint.set_ylim(0, ax_lim)
         g.ax_marg_x.set_xticks([0, 90, 180, 270, 360])
         kde_data = g.ax_marg_x.get_lines()[0].get_data()
         kde_xx = kde_data[0]
@@ -1454,7 +1454,7 @@ def diag_polar_plot_multi(
         kde_data = g.ax_marg_y.get_lines()[0].get_data()
         kde_xx = kde_data[0]
         kde_yy = kde_data[1]
-        norm = matplotlib.colors.Normalize(vmin=-ax_lim, vmax=1.0)
+        norm = matplotlib.colors.Normalize(vmin=0, vmax=ax_lim)
         colors = cm.Reds_r(norm(kde_yy))
         npts = len(kde_xx)
         for i in range(npts - 1):
@@ -1510,19 +1510,19 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if eff >= 0:
-        ax_lim = 0.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(0, 1, 0.2)
-    elif eff < 0 and eff >= -1:
+    if eff <= 1:
         ax_lim = 1.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-1, 1, 0.2)
-    elif eff >= -2 and eff < -1:
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 1, 0.2)
+    elif eff < 1 and eff <= 2:
         ax_lim = 2.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-2, 1, 0.2)
-    elif eff <= -2:
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 2, 0.2)
+    elif eff < 2 and eff <= 3:
+        ax_lim = 3.2
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 3, 0.2)
+    elif eff > 3:
         raise AssertionError("Value of eff is out of bounds for visualization!", eff)
 
     len_yy = len(yy)
@@ -1542,32 +1542,32 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
     ax.cla()
     # plot regions
     ax.plot(
-        (1, np.deg2rad(45)),
-        (1, np.min(yy)),
+        (0, np.deg2rad(45)),
+        (0, np.max(yy)),
         color="lightgray",
         linewidth=1.5,
         ls="--",
         zorder=0,
     )
     ax.plot(
-        (1, np.deg2rad(135)),
-        (1, np.min(yy)),
+        (0, np.deg2rad(135)),
+        (0, np.max(yy)),
         color="lightgray",
         linewidth=1.5,
         ls="--",
         zorder=0,
     )
     ax.plot(
-        (1, np.deg2rad(225)),
-        (1, np.min(yy)),
+        (0, np.deg2rad(225)),
+        (0, np.max(yy)),
         color="lightgray",
         linewidth=1.5,
         ls="--",
         zorder=0,
     )
     ax.plot(
-        (1, np.deg2rad(315)),
-        (1, np.min(yy)),
+        (0, np.deg2rad(315)),
+        (0, np.max(yy)),
         color="lightgray",
         linewidth=1.5,
         ls="--",
@@ -1577,27 +1577,27 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
     cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
     cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
     # threshold efficiency for FBM
-    eff_l = 1 - np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+    eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
     # relation of b_dir which explains the error
     if abs(comp2) > 0:
         exp_err = comp2
     elif abs(comp2) == 0:
         exp_err = 0
     # diagnose the error
-    if abs(comp1) <= l and exp_err > l and eff <= eff_l:
+    if abs(comp1) <= l and exp_err > l and eff > eff_l:
         ax.annotate(
             "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
         )
-    elif abs(comp1) > l and exp_err <= l and eff <= eff_l:
+    elif abs(comp1) > l and exp_err <= l and eff > eff_l:
         ax.annotate(
             "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
         )
-    elif abs(comp1) > l and exp_err > l and eff <= eff_l:
+    elif abs(comp1) > l and exp_err > l and eff > eff_l:
         ax.annotate(
             "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
         )
     # FBM
-    elif abs(comp1) <= l and exp_err <= l and eff <= eff_l:
+    elif abs(comp1) <= l and exp_err <= l and eff > eff_l:
         ax.annotate(
             "", xytext=(0, 1), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
         )
@@ -1605,14 +1605,14 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
             "", xytext=(0, 1), xy=(np.pi, eff), arrowprops=dict(facecolor=rgba_color)
         )
     # FGM
-    elif abs(comp1) <= l and exp_err <= l and eff > eff_l:
+    elif abs(comp1) <= l and exp_err <= l and eff <= eff_l:
         c = ax.scatter(phi, eff, color=rgba_color)
     ax.set_rticks([])  # turn default ticks off
-    ax.set_rmin(1)
-    if eff >= 0:
-        ax.set_rmax(0)
-    elif eff <= 0:
-        ax.set_rmax(-ax_lim + 0.2)
+    ax.set_rmin(0)
+    if eff <= 1:
+        ax.set_rmax(1)
+    elif eff > 1:
+        ax.set_rmax(ax_lim + 0.2)
     # turn labels and grid off
     ax.tick_params(
         labelleft=False,
@@ -1713,7 +1713,7 @@ def gdiag_polar_plot_multi(
 
         \varphi = arctan2(comp1, comp2)
     """
-    eff_min = np.min(eff)
+    eff_max = np.max(eff)
 
     ll_comp1 = comp1.tolist()
     ll_comp2 = comp2.tolist()
@@ -1726,21 +1726,21 @@ def gdiag_polar_plot_multi(
     delta = 0.01  # for spacing
 
     # determine axis limits
-    if eff_min >= 0:
-        ax_lim = 0.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(0, 1, 0.2)
-    elif eff_min < 0 and eff_min >= -1:
+    if eff_max <= 1:
         ax_lim = 1.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-1, 1, 0.2)
-    elif eff_min >= -2 and eff_min < -1:
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 1, 0.2)
+    elif eff_max > 1 and eff_max <= 2:
         ax_lim = 2.2
-        yy = np.arange(-ax_lim, 1.01, delta)[::-1]
-        c_levels = np.arange(-2, 1, 0.2)
-    elif eff_min <= -2:
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 2, 0.2)
+    elif eff_max > 2 and eff_max <= 3:
+        ax_lim = 3.2
+        yy = np.arange(0.01, ax_lim, delta)
+        c_levels = np.arange(0, 3, 0.2)
+    elif eff_max > 3:
         raise ValueError(
-            "Some values of eff are out of bounds for visualization!", eff_min
+            "Some values of eff are out of bounds for visualization!", eff_max
         )
 
     len_yy = len(yy)
@@ -1761,32 +1761,32 @@ def gdiag_polar_plot_multi(
         ax.cla()
         # plot regions
         ax.plot(
-            (1, np.deg2rad(45)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(45)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(135)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(135)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(225)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(225)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(315)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(315)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
@@ -1796,7 +1796,7 @@ def gdiag_polar_plot_multi(
         cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = 1 - np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
         # loop over each data point
         for (c1, c2, c3, eff) in zip(ll_comp1, ll_comp2, ll_comp3, ll_eff):
             ang = np.arctan2(c1, c2)
@@ -1808,14 +1808,14 @@ def gdiag_polar_plot_multi(
             elif abs(c2) == 0:
                 exp_err = 0
             # diagnose the error
-            if abs(c1) <= l and exp_err > l and eff <= eff_l:
+            if abs(c1) <= l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(c1) > l and exp_err <= l and eff <= eff_l:
+            elif abs(c1) > l and exp_err <= l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(c1) > l and exp_err > l and eff <= eff_l:
+            elif abs(c1) > l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
             # FBM
-            elif abs(c1) <= l and exp_err <= l and eff <= eff_l:
+            elif abs(c1) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
                     "",
                     xytext=(0, 1),
@@ -1829,14 +1829,14 @@ def gdiag_polar_plot_multi(
                     arrowprops=dict(facecolor=rgba_color),
                 )
             # FGM
-            elif abs(c1) <= l and exp_err <= l and eff > eff_l:
+            elif abs(c1) <= l and exp_err <= l and eff <= eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
         ax.set_rticks([])  # turn default ticks off
-        ax.set_rmin(1)
-        if eff_min >= 0:
-            ax.set_rmax(0)
-        elif eff_min <= 0:
-            ax.set_rmax(-ax_lim + 0.2)
+        ax.set_rmin(0)
+        if eff_max <= 1:
+            ax.set_rmax(1)
+        elif eff_max > 1:
+            ax.set_rmax(ax_lim + 0.2)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -1908,32 +1908,32 @@ def gdiag_polar_plot_multi(
         ax.cla()
         # plot regions
         ax.plot(
-            (1, np.deg2rad(45)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(45)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(135)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(135)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(225)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(225)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
             zorder=0,
         )
         ax.plot(
-            (1, np.deg2rad(315)),
-            (1, np.min(yy)),
+            (0, np.deg2rad(315)),
+            (0, np.max(yy)),
             color="lightgray",
             linewidth=1.5,
             ls="--",
@@ -1943,7 +1943,7 @@ def gdiag_polar_plot_multi(
         cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = 1 - np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
         # loop over each data point
         for (c1, c2, c3, eff) in zip(ll_comp1, ll_comp2, ll_comp3, ll_eff):
             # normalize threshold with mean flow becnhmark
@@ -1956,14 +1956,14 @@ def gdiag_polar_plot_multi(
             elif abs(c2) == 0:
                 exp_err = 0
             # diagnose the error
-            if abs(c1) <= l and exp_err > l and eff <= eff_l:
+            if abs(c1) <= l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(c1) > l and exp_err <= l and eff <= eff_l:
+            elif abs(c1) > l and exp_err <= l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(c1) > l and exp_err > l and eff <= eff_l:
+            elif abs(c1) > l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
             # FBM
-            elif abs(c1) <= l and exp_err <= l and eff <= eff_l:
+            elif abs(c1) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
                     "",
                     xytext=(0, 1),
@@ -1977,14 +1977,14 @@ def gdiag_polar_plot_multi(
                     arrowprops=dict(facecolor=rgba_color),
                 )
             # FGM
-            elif abs(c1) <= l and exp_err <= l and eff > eff_l:
+            elif abs(c1) <= l and exp_err <= l and eff <= eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
         ax.set_rticks([])  # turn default ticks off
-        ax.set_rmin(1)
-        if eff_min >= 0:
-            ax.set_rmax(0)
-        elif eff_min < 0:
-            ax.set_rmax(-ax_lim + 0.2)
+        ax.set_rmin(0)
+        if eff_max <= 1:
+            ax.set_rmax(1)
+        elif eff_max > 1:
+            ax.set_rmax(ax_lim + 0.2)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -2069,12 +2069,12 @@ def gdiag_polar_plot_multi(
         g.set_axis_labels(r"[$^\circ$]", r"Eff [-]")
         g.ax_joint.set_xticks([0, 90, 180, 270, 360])
         g.ax_joint.set_xlim(0, 360)
-        g.ax_joint.set_ylim(-ax_lim, 1)
+        g.ax_joint.set_ylim(0, ax_lim)
         g.ax_marg_x.set_xticks([0, 90, 180, 270, 360])
         kde_data = g.ax_marg_y.get_lines()[0].get_data()
         kde_xx = kde_data[0]
         kde_yy = kde_data[1]
-        norm = matplotlib.colors.Normalize(vmin=-ax_lim, vmax=1.0)
+        norm = matplotlib.colors.Normalize(vmin=0, vmax=ax_lim)
         colors = cm.Reds_r(norm(kde_yy))
         npts = len(kde_xx)
         for i in range(npts - 1):

@@ -22,8 +22,8 @@ from de import de
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
 
 
-_mmd = r"[mm $d^{-1}$]"
-_m3s = r"[$m^{3}$ $s^{-1}$]"
+_mmd = r"Q [mm $d^{-1}$]"
+_m3s = r"Q [$m^{3}$ $s^{-1}$]"
 _q_lab = _mmd
 _sim_lab = "Simulated"
 
@@ -52,7 +52,6 @@ def import_ts(path, sep=","):
     df_ts = df_ts.dropna()
 
     return df_ts
-
 
 def import_camels_ts(path, sep=r"\s+", catch_area=None):
     r"""
@@ -278,7 +277,7 @@ def plot_obs_sim_ax(obs, sim, ax, fig_num):  # pragma: no cover
 
 
 def diag_polar_plot_multi_fc(
-    brel_mean, b_area, temp_cor, sig_de, b_dir, diag, fc, l=0.05, ax_lim=-0.6
+    brel_mean, b_area, temp_cor, eff_de, b_dir, diag, fc, l=0.05, ax_lim=1.2
 ):  # pragma: no cover
     r"""Multiple polar plot of Diagnostic-Efficiency (DE)
 
@@ -293,7 +292,7 @@ def diag_polar_plot_multi_fc(
     temp_cor : (N,)array_like
         temporal correlation as 1-D array
 
-    sig_de : (N,)array_like
+    eff_de : (N,)array_like
         diagnostic efficiency as 1-D array
 
     b_dir : (N,)array_like
@@ -319,12 +318,12 @@ def diag_polar_plot_multi_fc(
 
         \varphi = arctan2(\overline{B_{rel}}, B_{slope})
     """
-    sig_min = np.min(sig_de)
+    de_max = np.min(eff_de)
 
     ll_brel_mean = brel_mean.tolist()
     ll_b_dir = b_dir.tolist()
     ll_b_area = b_area.tolist()
-    ll_sig = sig_de.tolist()
+    ll_eff = eff_de.tolist()
     ll_diag = diag.tolist()
     ll_temp_cor = temp_cor.tolist()
 
@@ -334,8 +333,8 @@ def diag_polar_plot_multi_fc(
     delta = 0.01  # for spacing
 
     # determine axis limits
-    yy = np.arange(ax_lim, 1.01, delta)[::-1]
-    c_levels = np.arange(ax_lim, 1, 0.2)
+    yy = np.arange(0.01, ax_lim, delta)
+    c_levels = np.arange(0, ax_lim, 0.2)
 
     len_yy = 360
     # len_yy1 = 90
@@ -355,32 +354,32 @@ def diag_polar_plot_multi_fc(
     ax.cla()
     # plot regions
     ax.plot(
-        (1, np.deg2rad(45)),
-        (1, np.min(yy)),
+        (0, np.deg2rad(45)),
+        (0, np.max(yy)),
         color="lightgray",
         linewidth=1.5,
         ls="--",
         zorder=0,
     )
     ax.plot(
-        (1, np.deg2rad(135)),
-        (1, np.min(yy)),
+        (0, np.deg2rad(135)),
+        (0, np.max(yy)),
         color="lightgray",
         linewidth=1.5,
         ls="--",
         zorder=0,
     )
     ax.plot(
-        (1, np.deg2rad(225)),
-        (1, np.min(yy)),
+        (0, np.deg2rad(225)),
+        (0, np.max(yy)),
         color="lightgray",
         linewidth=1.5,
         ls="--",
         zorder=0,
     )
     ax.plot(
-        (1, np.deg2rad(315)),
-        (1, np.min(yy)),
+        (0, np.deg2rad(315)),
+        (0, np.max(yy)),
         color="lightgray",
         linewidth=1.5,
         ls="--",
@@ -390,10 +389,10 @@ def diag_polar_plot_multi_fc(
     cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
     cl = ax.clabel(cp, inline=False, fontsize=10, fmt="%1.1f", colors="dimgrey")
     # threshold efficiency for FBM
-    sig_l = 1 - np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+    eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
     # loop over each data point
-    for (bm, bd, ba, r, sig, ang, txt) in zip(
-        ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_sig, ll_diag, fc
+    for (bm, bd, ba, r, eff, ang, txt) in zip(
+        ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_eff, ll_diag, fc
     ):
         # slope of bias
         b_slope = de.calc_bias_slope(ba, bd)
@@ -406,12 +405,12 @@ def diag_polar_plot_multi_fc(
             exp_err = 0
 
         # diagnose the error
-        if abs(bm) <= l and exp_err > l and sig <= sig_l:
-            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color="grey", marker=".", zorder=4)
+        if abs(bm) <= l and exp_err > l and eff > eff_l:
+            c = ax.scatter(ang, eff, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
             ax.annotate(
                 txt,
-                xy=(ang, sig),
+                xy=(ang, eff),
                 color="black",
                 fontsize=13,
                 xytext=(-8, 0),
@@ -419,12 +418,12 @@ def diag_polar_plot_multi_fc(
                 ha="center",
                 va="center",
             )
-        elif abs(bm) > l and exp_err <= l and sig <= sig_l:
-            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color="grey", marker=".", zorder=4)
+        elif abs(bm) > l and exp_err <= l and eff > eff_l:
+            c = ax.scatter(ang, eff, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
             ax.annotate(
                 txt,
-                xy=(ang, sig),
+                xy=(ang, eff),
                 color="black",
                 fontsize=13,
                 xytext=(-8, 0),
@@ -432,12 +431,12 @@ def diag_polar_plot_multi_fc(
                 ha="center",
                 va="center",
             )
-        elif abs(bm) > l and exp_err > l and sig <= sig_l:
-            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color="grey", marker=".", zorder=4)
+        elif abs(bm) > l and exp_err > l and eff > eff_l:
+            c = ax.scatter(ang, eff, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
             ax.annotate(
                 txt,
-                xy=(ang, sig),
+                xy=(ang, eff),
                 color="black",
                 fontsize=13,
                 xytext=(-8, 0),
@@ -446,24 +445,24 @@ def diag_polar_plot_multi_fc(
                 va="center",
             )
         # FBM
-        elif abs(bm) <= l and exp_err <= l and sig <= sig_l:
+        elif abs(bm) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
                 "",
                 xytext=(0, 1),
-                xy=(0, sig),
+                xy=(0, eff),
                 arrowprops=dict(edgecolor=rgba_color, facecolor="black", lw=3),
                 zorder=2,
             )
             ax.annotate(
                 "",
                 xytext=(0, 1),
-                xy=(np.pi, sig),
+                xy=(np.pi, eff),
                 arrowprops=dict(edgecolor=rgba_color, facecolor="black", lw=3),
                 zorder=2,
             )
             ax.annotate(
                 txt,
-                xy=(ang, sig),
+                xy=(ang, eff),
                 color="black",
                 fontsize=13,
                 xytext=(-8, 0),
@@ -472,12 +471,12 @@ def diag_polar_plot_multi_fc(
                 va="center",
             )
         # FGM
-        elif abs(bm) <= l and exp_err <= l and sig > sig_l:
-            c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, sig, color="grey", marker=".", zorder=4)
+        elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
+            c = ax.scatter(ang, eff, s=75, color=rgba_color, zorder=3)
+            d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
             ax.annotate(
                 txt,
-                xy=(ang, sig),
+                xy=(ang, eff),
                 color="black",
                 fontsize=13,
                 xytext=(-6, 0),
@@ -486,7 +485,7 @@ def diag_polar_plot_multi_fc(
                 va="center",
             )
     ax.set_rticks([])  # turn default ticks off
-    ax.set_rmin(1)
+    ax.set_rmin(0)
     ax.set_rmax(ax_lim)
     ax.tick_params(
         labelleft=False,
@@ -495,7 +494,7 @@ def diag_polar_plot_multi_fc(
         labelbottom=True,
         grid_alpha=0.01,
     )  # turn labels and grid off
-    ax.set_xticklabels(["", "", "", "", "", "", "", ""])
+    ax.set(xticklabels=[])
     ax.text(
         -0.14,
         0.5,
@@ -635,12 +634,12 @@ def polar_plot_multi_fc(
     fig : Figure
         diagnostic polar plot
     """
-    sig_min = np.min(sig_kge)
+    de_max = np.min(sig_kge)
 
     ll_kge_beta = kge_beta.tolist()
     ll_ag = alpha_or_gamma.tolist()
     ll_kge_r = kge_r.tolist()
-    ll_sig = sig_kge.tolist()
+    ll_eff = sig_kge.tolist()
 
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
@@ -704,15 +703,15 @@ def polar_plot_multi_fc(
     cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
     cl = ax.clabel(cp, inline=False, fontsize=10, fmt="%1.1f", colors="dimgrey")
     # loop over each data point
-    for (b, ag, r, sig, txt) in zip(ll_kge_beta, ll_ag, ll_kge_r, ll_sig, fc):
+    for (b, ag, r, eff, txt) in zip(ll_kge_beta, ll_ag, ll_kge_r, ll_eff, fc):
         ang = np.arctan2(b - 1, ag - 1)
         # convert temporal correlation to color
         rgba_color = cm.plasma_r(norm(r))
-        c = ax.scatter(ang, sig, s=75, color=rgba_color, zorder=2)
-        d = ax.scatter(ang, sig, color="grey", marker=".", zorder=4)
+        c = ax.scatter(ang, eff, s=75, color=rgba_color, zorder=2)
+        d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
         ax.annotate(
             txt,
-            xy=(ang, sig),
+            xy=(ang, eff),
             color="black",
             fontsize=13,
             xytext=(8, 0),
@@ -807,7 +806,7 @@ def polar_plot_multi_fc(
         rotation_mode="anchor",
         transform=ax.transAxes,
     )
-    ax.set_xticklabels(["", "", "", "", "", "", "", ""])
+    ax.set(xticklabels=[])
     ax.set_rticks([])  # turn default ticks off
     ax.set_rmin(1)
     ax.set_rmax(ax_lim)
