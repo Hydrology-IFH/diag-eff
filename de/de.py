@@ -355,7 +355,7 @@ def calc_de(obs, sim, sort=True):
     ----------
     .. math::
 
-        DE = 1 - \sqrt{\overline{B_{rel}}^2 + \vert B_{area}\vert^2 + (r - 1)^2}
+        DE = \sqrt{\overline{B_{rel}}^2 + \vert B_{area}\vert^2 + (r - 1)^2}
     Examples
     --------
     Provide arrays with equal length
@@ -962,7 +962,7 @@ def diag_polar_plot_multi(
     >>> brel_mean = np.array([0.1, 0.15, 0.2, 0.1, 0.05, 0.15])
     >>> b_area = np.array([0.15, 0.1, 0.2, 0.1, 0.1, 0.2])
     >>> temp_cor = np.array([0.9, 0.85, 0.8, 0.9, 0.85, 0.9])
-    >>> eff_de = np.array([0.79, 0.76, 0.65, 0.82, 0.81, 0.73])
+    >>> eff_de = np.array([0.21, 0.24, 0.35, 0.18, 0.19, 0.27])
     >>> b_dir = np.array([0.08, 0.05, 0.1, 0.05, 0.05, 0.1])
     >>> phi = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
     >>> de.diag_polar_plot_multi(brel_mean, b_area, temp_cor, eff_de, b_dir,
