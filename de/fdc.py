@@ -4,7 +4,7 @@
 de.fdc
 ~~~~~~~~~~~
 Flow duration curve
-:2019 by Robin Schwemmle.
+:2021 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
 

@@ -4,7 +4,7 @@
 de.util
 ~~~~~~~~~~~
 
-:2019 by Robin Schwemmle.
+:2021 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
 
@@ -448,14 +448,14 @@ def diag_polar_plot_multi_fc(
         elif abs(bm) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
                 "",
-                xytext=(0, 1),
+                xytext=(0, 0),
                 xy=(0, eff),
                 arrowprops=dict(edgecolor=rgba_color, facecolor="black", lw=3),
                 zorder=2,
             )
             ax.annotate(
                 "",
-                xytext=(0, 1),
+                xytext=(0, 0),
                 xy=(np.pi, eff),
                 arrowprops=dict(edgecolor=rgba_color, facecolor="black", lw=3),
                 zorder=2,

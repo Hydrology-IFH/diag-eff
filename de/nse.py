@@ -4,7 +4,7 @@
 de.nse
 ~~~~~~~~~~~
 Nash-Sutcliffe efficiency measure.
-:2019 by Robin Schwemmle.
+:2021 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
 
@@ -13,7 +13,6 @@ import numpy as np
 
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
 np.seterr(divide="ignore", invalid="ignore")
-
 
 def calc_nse(obs, sim):
     r"""
@@ -30,7 +29,7 @@ def calc_nse(obs, sim):
     Returns
     ----------
     sig : float
-        Nash-Sutcliffe-Efficiency measure
+        Nash-Sutcliffe-Efficiency
 
     Examples
     --------

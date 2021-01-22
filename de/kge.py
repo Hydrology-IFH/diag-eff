@@ -4,22 +4,22 @@
 de.kge
 ~~~~~~~~~~~
 Kling-Gupta efficiency measure. The efficiency measure can be
-visualized in 2D-Plot which facilitates decomposing the metric terms (bias
+visualized in a polar plot which facilitates decomposing the metric terms (bias
 error vs. variability error vs. timing error)
-:2019 by Robin Schwemmle.
+:2021 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
 
 import numpy as np
-
-# RunTimeWarning will not be displayed (division by zeros or NaN values)
-np.seterr(divide="ignore", invalid="ignore")
 import matplotlib
 from matplotlib import cm
 import matplotlib.pyplot as plt
-import pandas as pd
+import matplotlib.ticker as mticker
 import scipy as sp
 import seaborn as sns
+
+# RunTimeWarning will not be displayed (division by zeros or NaN values)
+np.seterr(divide="ignore", invalid="ignore")
 
 # controlling figure aesthetics
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
@@ -289,7 +289,7 @@ def calc_kge(obs, sim, r="pearson", var="std"):
     Returns
     ----------
     eff : float
-        Kling-Gupta-Efficiency measure
+        Kling-Gupta-Efficiency
 
     Examples
     --------
@@ -661,6 +661,8 @@ def polar_plot(obs, sim, r="pearson", var="std"):
             rotation_mode="anchor",
             transform=ax.transAxes,
         )
+        ticks_loc = ax.get_xticks().tolist()
+        ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         # add colorbar for temporal correlation
         cbar = fig.colorbar(
@@ -857,6 +859,8 @@ def polar_plot(obs, sim, r="pearson", var="std"):
             rotation_mode="anchor",
             transform=ax.transAxes,
         )
+        ticks_loc = ax.get_xticks().tolist()
+        ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         # add colorbar for temporal correlation
         cbar = fig.colorbar(
@@ -1099,6 +1103,8 @@ def polar_plot_multi(
             rotation_mode="anchor",
             transform=ax.transAxes,
         )
+        ticks_loc = ax.get_xticks().tolist()
+        ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)
@@ -1256,6 +1262,8 @@ def polar_plot_multi(
             rotation_mode="anchor",
             transform=ax.transAxes,
         )
+        ticks_loc = ax.get_xticks().tolist()
+        ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", r"0$^{\circ}$ (360$^{\circ}$)", "", ""])
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(1)

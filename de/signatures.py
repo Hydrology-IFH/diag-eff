@@ -5,7 +5,7 @@ de.signatures
 ~~~~~~~~~~~
 Alternative signatures which can be used for a more specific diagnosis
 (e.g. low flow behaviour)
-:2019 by Robin Schwemmle.
+:2021 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
 

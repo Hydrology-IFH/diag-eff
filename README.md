@@ -29,7 +29,7 @@ The full documentation can be found at: https://diag-eff.readthedocs.io
 This software can be distributed freely under the GPL v3 license. Please read
 the LICENSE for further information.
 
-© 2019, Robin Schwemmle (<robin.schwemmle@hydrology.uni-freiburg.de>)
+© 2021, Robin Schwemmle (<robin.schwemmle@hydrology.uni-freiburg.de>)
 
 ## Description
 

@@ -7,7 +7,7 @@ Generate three different error types:
 - constant erros
 - dynamic errors
 - timing errors
-:2019 by Robin Schwemmle.
+:2021 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
 

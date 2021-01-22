@@ -3,25 +3,26 @@
 """
 de.de
 ~~~~~~~~~~~
-Diagnosing model performance using an efficiency measure based on flow
+Diagnosing model errors using an efficiency measure based on flow
 duration curve and temporal correlation. The efficiency measure can be
 visualized by diagnostic polar plots which facilitates decomposing potential
 error contributions (dynamic errors vs. constant erros vs. timing errors)
-:2019 by Robin Schwemmle.
+:2021 by Robin Schwemmle.
 :license: GNU GPLv3, see LICENSE for more details.
 """
 
 import numpy as np
-
-# RunTimeWarning will not be displayed (division by zeros or NaN values)
-np.seterr(divide="ignore", invalid="ignore")
 import matplotlib
 from matplotlib import cm
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 import pandas as pd
 import scipy as sp
 import scipy.integrate as integrate
 import seaborn as sns
+
+# RunTimeWarning will not be displayed (division by zeros or NaN values)
+np.seterr(divide="ignore", invalid="ignore")
 
 # controlling figure aesthetics
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
@@ -349,7 +350,7 @@ def calc_de(obs, sim, sort=True):
     Returns
     ----------
     eff : float
-        non-normalized Diagnostic efficiency
+        Diagnostic efficiency
 
     Notes
     ----------
@@ -538,24 +539,24 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         # diagnose the error
         if abs(brel_mean) <= l and exp_err > l and eff > eff_l:
             ax.annotate(
-                "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
+                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
         elif abs(brel_mean) > l and exp_err <= l and eff > eff_l:
             ax.annotate(
-                "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
+                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
         elif abs(brel_mean) > l and exp_err > l and eff > eff_l:
             ax.annotate(
-                "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
+                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
         # FBM
         elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
-                "", xytext=(0, 1), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
+                "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
             )
             ax.annotate(
                 "",
-                xytext=(0, 1),
+                xytext=(0, 0),
                 xy=(np.pi, eff),
                 arrowprops=dict(facecolor=rgba_color),
             )
@@ -576,6 +577,8 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             labelbottom=True,
             grid_alpha=0.01,
         )
+        ticks_loc = ax.get_xticks().tolist()
+        ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         ax.text(
             -0.14,
@@ -781,6 +784,8 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             labelbottom=True,
             grid_alpha=0.01,
         )
+        ticks_loc = ax.get_xticks().tolist()
+        ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         ax.text(
             -0.14,
@@ -1102,6 +1107,8 @@ def diag_polar_plot_multi(
             labelbottom=True,
             grid_alpha=0.01,
         )
+        ticks_loc = ax.get_xticks().tolist()
+        ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         ax.text(
             -0.14,
@@ -1311,6 +1318,8 @@ def diag_polar_plot_multi(
             labelbottom=True,
             grid_alpha=0.01,
         )
+        ticks_loc = ax.get_xticks().tolist()
+        ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", r"0$^{\circ}$ (360$^{\circ}$)", "", ""])
         ax.text(
             -0.14,
@@ -1621,6 +1630,8 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
         labelbottom=True,
         grid_alpha=0.01,
     )
+    ticks_loc = ax.get_xticks().tolist()
+    ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
     ax.set_xticklabels(["", "", "", "", "", "", "", ""])
     ax.text(
         -0.04,
@@ -1845,6 +1856,8 @@ def gdiag_polar_plot_multi(
             labelbottom=True,
             grid_alpha=0.01,
         )
+        ticks_loc = ax.get_xticks().tolist()
+        ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         ax.text(
             -0.04,
@@ -1993,6 +2006,8 @@ def gdiag_polar_plot_multi(
             labelbottom=True,
             grid_alpha=0.01,
         )
+        ticks_loc = ax.get_xticks().tolist()
+        ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         ax.text(
             -0.04,

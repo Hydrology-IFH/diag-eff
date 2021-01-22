@@ -20,7 +20,7 @@ import de
 # -- Project information -----------------------------------------------------
 
 project = 'diag-eff'
-copyright = '2020, Robin Schwemmle'
+copyright = '2021, Robin Schwemmle'
 author = 'Robin Schwemmle'
 
 # The short X.Y version
@@ -49,7 +49,7 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
     'nbsphinx',
-#    'numpydoc',
+    'numpydoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
