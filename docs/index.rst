@@ -13,9 +13,9 @@ In case you use de in other software or scientific publications,
 please reference this package. It is published and has a DOI. It can be cited
 as:
 
-    Robin Schwemmle, Dominic Demand & Markus Weiler (2020). diag-eff 0.1:
+    Robin Schwemmle, Dominic Demand & Markus Weiler (2020). diag-eff 1.0:
     Diagnostic efficiency – specific evaluation of model performance.
-    (Version v0.1). Zenodo. https://doi.org/10.5281/zenodo.3769562
+    (Version v1.0). Zenodo. https://doi.org/10.5281/zenodo.4457898
 
 .. toctree::
     :maxdepth: 3
