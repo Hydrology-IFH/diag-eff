@@ -1,6 +1,6 @@
-==
+===
 de
-==
+===
 
 Diagnostic Efficiency
 ---------------------
@@ -23,5 +23,5 @@ Diagnostic Polar Plot
 .. autofunction:: de.de.diag_polar_plot
 
 Diagnostic Polar Plot for multiple simulations
----------------------
+----------------------------------------------
 .. autofunction:: de.de.diag_polar_plot_multi

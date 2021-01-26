@@ -1,7 +1,12 @@
-ipython>=6
 sphinx
-recommonmark
+sphinx-rtd-theme
+nbsphinx
 autoapi
 numpydoc
-sphinx_rtd_theme
-nbsphinx
+numpy
+scipy
+numpy
+pandas
+matplotlib
+seaborn
+ipython

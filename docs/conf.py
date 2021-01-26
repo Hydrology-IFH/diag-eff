@@ -84,7 +84,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -128,9 +128,6 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
-
-# -- Napoleon autodoc options -------------------------------------------------
-napoleon_numpy_docstring = True
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -187,7 +184,6 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-
 # -- Extension configuration -------------------------------------------------
 
 # -- Options for intersphinx extension ---------------------------------------
@@ -197,26 +193,10 @@ texinfo_documents = [
 
 # -- Intersphinx mapping -----------------------------------------------------
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.7', None),
+    'python': ('https://docs.python.org/3.8', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-    'numpy':  ('https://docs.scipy.org/doc/numpy', None),
+    'numpy':  ('https://numpy.org/doc/stable/', None),
     'scipy':  ('https://docs.scipy.org/doc/scipy/reference', None),
     'matplotlib': ('https://matplotlib.org/', None),
     'seaborn': ('https://seaborn.pydata.org/', None),
 }
-
-# -- Other settings -----------------------------------------------------------
-
-# Path to logo image file
-html_logo = '_static/img/neural-hyd-logo-white.png'
-
-# Allows to build the docs with a minimal environment without warnings about
-# missing packages
-autodoc_mock_imports = [
-    'matplotlib',
-    'numpy',
-    'pandas',
-    'scipy',
-    'tqdm',
-    'seaborn',
-]

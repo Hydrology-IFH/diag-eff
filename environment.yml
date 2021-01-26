@@ -9,4 +9,4 @@ dependencies:
   - matplotlib
   - seaborn
   - pip:
-    - diag-eff>=0.1
+    - diag-eff>=1.0

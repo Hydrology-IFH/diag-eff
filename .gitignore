@@ -24,10 +24,11 @@ wheels/
 /conda
 
 # Sphinx documentation
+readthedocs.yml
 docs/_build/
-docs/_static/
-docs/_templates/
-docs/.DS_Store
+#docs/_static/
+#docs/_templates/
+#docs/.DS_Store
 
 # Jupyter Notebook
 .ipynb_checkpoints
