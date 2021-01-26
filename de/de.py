@@ -465,15 +465,15 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
     if eff <= 1:
         ax_lim = 1.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 1, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff > 1 and eff <= 2:
         ax_lim = 2.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 2, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff > 2 and eff <= 3:
         ax_lim = 3.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 3, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff >= 3:
         raise AssertionError("Value of 'DE' is out of bounds for visualization!", eff)
 
@@ -568,7 +568,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         if eff <= 1:
             ax.set_rmax(1)
         elif eff > 1:
-            ax.set_rmax(ax_lim + 0.2)
+            ax.set_rmax(ax_lim)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -746,24 +746,24 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         # diagnose the error
         if abs(brel_mean) <= l and exp_err > l and eff > eff_l:
             ax.annotate(
-                "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
+                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
         elif abs(brel_mean) > l and exp_err <= l and eff > eff_l:
             ax.annotate(
-                "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
+                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
         elif abs(brel_mean) > l and exp_err > l and eff > eff_l:
             ax.annotate(
-                "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
+                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
             )
         # FBM
         elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
-                "", xytext=(0, 1), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
+                "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
             )
             ax.annotate(
                 "",
-                xytext=(0, 1),
+                xytext=(0, 0),
                 xy=(np.pi, eff),
                 arrowprops=dict(facecolor=rgba_color),
             )
@@ -775,7 +775,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         if eff <= 1:
             ax.set_rmax(0)
         elif eff > 1:
-            ax.set_rmax(ax_lim + 0.2)
+            ax.set_rmax(ax_lim)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -991,15 +991,15 @@ def diag_polar_plot_multi(
     if eff_max <= 1:
         ax_lim = 1.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 1, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff_max > 1 and eff_max <= 2:
         ax_lim = 2.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 2, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff_max > 2 and eff_max <= 3:
         ax_lim = 3.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 3, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff_max > 3:
         raise ValueError("Some values of 'DE' are too large for visualization!", eff_max)
 
@@ -1080,13 +1080,13 @@ def diag_polar_plot_multi(
             elif abs(bm) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
                     "",
-                    xytext=(0, 1),
+                    xytext=(0, 0),
                     xy=(0, eff),
                     arrowprops=dict(facecolor=rgba_color),
                 )
                 ax.annotate(
                     "",
-                    xytext=(0, 1),
+                    xytext=(0, 0),
                     xy=(np.pi, eff),
                     arrowprops=dict(facecolor=rgba_color),
                 )
@@ -1098,7 +1098,7 @@ def diag_polar_plot_multi(
         if eff_max <= 1:
             ax.set_rmax(1)
         elif eff_max > 1:
-            ax.set_rmax(ax_lim + 0.2)
+            ax.set_rmax(ax_lim)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -1291,13 +1291,13 @@ def diag_polar_plot_multi(
             elif abs(bm) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
                     "",
-                    xytext=(0, 1),
+                    xytext=(0, 0),
                     xy=(0, eff),
                     arrowprops=dict(facecolor=rgba_color),
                 )
                 ax.annotate(
                     "",
-                    xytext=(0, 1),
+                    xytext=(0, 0),
                     xy=(np.pi, eff),
                     arrowprops=dict(facecolor=rgba_color),
                 )
@@ -1309,7 +1309,7 @@ def diag_polar_plot_multi(
         if eff_max <= 1:
             ax.set_rmax(1)
         elif eff_max > 1:
-            ax.set_rmax(ax_lim + 0.2)
+            ax.set_rmax(ax_lim)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -1434,7 +1434,7 @@ def diag_polar_plot_multi(
         diag_deg[diag_deg < 0] = 360 - diag_deg[diag_deg < 0]
 
         # 1-D density plot
-        g = sns.kdeplot(diag_deg, color="k", ax=ax1)
+        g = sns.kdeplot(x=diag_deg, color="k", ax=ax1)
         ax1.set_xticks([0, 90, 180, 270, 360])
         ax1.set_xlim(0, 360)
         ax1.set_ylim(0,)
@@ -1443,13 +1443,13 @@ def diag_polar_plot_multi(
         # 2-D density plot
         r_colors = cm.plasma_r(norm(temp_cor))
         g = sns.jointplot(
-            diag_deg,
-            eff_de,
+            x=diag_deg,
+            y=eff_de,
             kind="kde",
             zorder=1,
             n_levels=20,
             cmap="Greys",
-            shade_lowest=False,
+            thresh=0.05,
             marginal_kws={"color": "k", "shade": False},
         ).plot_joint(plt.scatter, c=r_colors, alpha=0.4, zorder=2)
         g.set_axis_labels(r"[$^\circ$]", "DE [-]")
@@ -1522,15 +1522,15 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
     if eff <= 1:
         ax_lim = 1.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 1, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff < 1 and eff <= 2:
         ax_lim = 2.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 2, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff < 2 and eff <= 3:
         ax_lim = 3.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 3, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff > 3:
         raise AssertionError("Value of eff is out of bounds for visualization!", eff)
 
@@ -1595,23 +1595,23 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
     # diagnose the error
     if abs(comp1) <= l and exp_err > l and eff > eff_l:
         ax.annotate(
-            "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
+            "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
         )
     elif abs(comp1) > l and exp_err <= l and eff > eff_l:
         ax.annotate(
-            "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
+            "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
         )
     elif abs(comp1) > l and exp_err > l and eff > eff_l:
         ax.annotate(
-            "", xytext=(0, 1), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
+            "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
         )
     # FBM
     elif abs(comp1) <= l and exp_err <= l and eff > eff_l:
         ax.annotate(
-            "", xytext=(0, 1), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
+            "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
         )
         ax.annotate(
-            "", xytext=(0, 1), xy=(np.pi, eff), arrowprops=dict(facecolor=rgba_color)
+            "", xytext=(0, 0), xy=(np.pi, eff), arrowprops=dict(facecolor=rgba_color)
         )
     # FGM
     elif abs(comp1) <= l and exp_err <= l and eff <= eff_l:
@@ -1621,7 +1621,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
     if eff <= 1:
         ax.set_rmax(1)
     elif eff > 1:
-        ax.set_rmax(ax_lim + 0.2)
+        ax.set_rmax(ax_lim)
     # turn labels and grid off
     ax.tick_params(
         labelleft=False,
@@ -1740,15 +1740,15 @@ def gdiag_polar_plot_multi(
     if eff_max <= 1:
         ax_lim = 1.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 1, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff_max > 1 and eff_max <= 2:
         ax_lim = 2.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 2, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff_max > 2 and eff_max <= 3:
         ax_lim = 3.2
         yy = np.arange(0.01, ax_lim, delta)
-        c_levels = np.arange(0, 3, 0.2)
+        c_levels = np.arange(0, ax_lim, 0.2)
     elif eff_max > 3:
         raise ValueError(
             "Some values of eff are out of bounds for visualization!", eff_max
@@ -1829,13 +1829,13 @@ def gdiag_polar_plot_multi(
             elif abs(c1) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
                     "",
-                    xytext=(0, 1),
+                    xytext=(0, 0),
                     xy=(0, eff),
                     arrowprops=dict(facecolor=rgba_color),
                 )
                 ax.annotate(
                     "",
-                    xytext=(0, 1),
+                    xytext=(0, 0),
                     xy=(np.pi, eff),
                     arrowprops=dict(facecolor=rgba_color),
                 )
@@ -1847,7 +1847,7 @@ def gdiag_polar_plot_multi(
         if eff_max <= 1:
             ax.set_rmax(1)
         elif eff_max > 1:
-            ax.set_rmax(ax_lim + 0.2)
+            ax.set_rmax(ax_lim)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -1979,13 +1979,13 @@ def gdiag_polar_plot_multi(
             elif abs(c1) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
                     "",
-                    xytext=(0, 1),
+                    xytext=(0, 0),
                     xy=(0, eff),
                     arrowprops=dict(facecolor=rgba_color),
                 )
                 ax.annotate(
                     "",
-                    xytext=(0, 1),
+                    xytext=(0, 0),
                     xy=(np.pi, eff),
                     arrowprops=dict(facecolor=rgba_color),
                 )
@@ -1997,7 +1997,7 @@ def gdiag_polar_plot_multi(
         if eff_max <= 1:
             ax.set_rmax(1)
         elif eff_max > 1:
-            ax.set_rmax(ax_lim + 0.2)
+            ax.set_rmax(ax_lim)
         # turn labels and grid off
         ax.tick_params(
             labelleft=False,
@@ -2063,7 +2063,7 @@ def gdiag_polar_plot_multi(
         diag_deg[diag_deg < 0] = 360 - diag_deg[diag_deg < 0]
 
         # 1-D density plot
-        g = sns.kdeplot(diag_deg, color="k", ax=ax1)
+        g = sns.kdeplot(x=diag_deg, color="k", ax=ax1)
         ax1.set_xticks([0, 90, 180, 270, 360])
         ax1.set_xlim(0, 360)
         ax1.set_ylim(0,)
@@ -2072,13 +2072,13 @@ def gdiag_polar_plot_multi(
         # 2-D density plot
         c3_colors = cm.plasma_r(norm(comp3))
         g = sns.jointplot(
-            diag_deg,
-            eff,
+            x=diag_deg,
+            y=eff,
             kind="kde",
             zorder=1,
             n_levels=20,
             cmap="Greys",
-            shade_lowest=False,
+            thresh=0.05,
             marginal_kws={"color": "k", "shade": False},
         ).plot_joint(plt.scatter, c=c3_colors, alpha=0.4, zorder=2)
         g.set_axis_labels(r"[$^\circ$]", r"Eff [-]")

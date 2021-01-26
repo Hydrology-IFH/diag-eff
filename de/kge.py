@@ -1285,7 +1285,7 @@ def polar_plot_multi(
         diag_deg[diag_deg < 0] = 360 - diag_deg[diag_deg < 0]
 
         # 1-D density plot
-        g = sns.kdeplot(diag_deg, color="k", ax=ax1)
+        g = sns.kdeplot(y=diag_deg, color="k", ax=ax1)
         ax1.set_xticks([0, 90, 180, 270, 360])
         ax1.set_xlim(0, 360)
         ax1.set_ylim(0,)
@@ -1294,8 +1294,8 @@ def polar_plot_multi(
         # 2-D density plot
         r_colors = cm.plasma_r(norm(kge_r))
         g = sns.jointplot(
-            diag_deg,
-            eff_kge,
+            x=diag_deg,
+            y=eff_kge,
             kind="kde",
             zorder=1,
             n_levels=20,
