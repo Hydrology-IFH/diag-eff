@@ -21,6 +21,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+/conda
 
 # Sphinx documentation
 docs/_build/

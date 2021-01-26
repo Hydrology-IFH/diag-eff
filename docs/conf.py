@@ -10,6 +10,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import datetime
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
@@ -20,7 +21,7 @@ import de
 # -- Project information -----------------------------------------------------
 
 project = 'diag-eff'
-copyright = '2021, Robin Schwemmle'
+copyright = f'{datetime.datetime.now().year}, Robin Schwemmle'
 author = 'Robin Schwemmle'
 
 # The short X.Y version
@@ -35,7 +36,6 @@ release = de.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'recommonmark',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -49,7 +49,6 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
     'nbsphinx',
-    'numpydoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -85,7 +84,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -130,6 +129,8 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
+# -- Napoleon autodoc options -------------------------------------------------
+napoleon_numpy_docstring = True
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -203,3 +204,19 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org/', None),
     'seaborn': ('https://seaborn.pydata.org/', None),
 }
+
+# -- Other settings -----------------------------------------------------------
+
+# Path to logo image file
+html_logo = '_static/img/neural-hyd-logo-white.png'
+
+# Allows to build the docs with a minimal environment without warnings about
+# missing packages
+autodoc_mock_imports = [
+    'matplotlib',
+    'numpy',
+    'pandas',
+    'scipy',
+    'tqdm',
+    'seaborn',
+]
