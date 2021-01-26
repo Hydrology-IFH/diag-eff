@@ -1,4 +1,4 @@
-# diag-eff <img src="logo.png" align="right" width="120" />
+# diag-eff <img src="diageff_logo.png" align="right" width="120" />
 
 Info: `diag-eff` needs Python >= 3.6!
 
