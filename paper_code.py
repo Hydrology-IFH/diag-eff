@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
 import os  # load modules first before importing .spydata
 from pathlib import Path
 
-PATH = Path("./Desktop/PhD/diagnostic_efficiency/diag-eff")
-os.chdir(PATH)
-PATH_FIG = Path("../technical_note/figures")
+PATH = Path(__file__).parent
+sys.path.append(str(PATH))
+PATH_FIG = PATH.parent / "technical_note" / "figures"
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -106,6 +107,11 @@ if __name__ == "__main__":
         "b_dir",
         "b_slope",
         "phi",
+        "b_hf",
+        "b_lf",
+        "b_tot",
+        "err_hf",
+        "err_lf",
         "beta",
         "alpha",
         "kge",
@@ -126,38 +132,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[0, 0] = brel_mean
+    df_es.loc["0", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[0, 1] = b_area
+    df_es.loc["0", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[0, 2] = temp_cor
+    df_es.loc["0", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[0, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["0", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["0", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["0", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["0", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["0", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["0", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[0, 4] = b_dir
+    df_es.loc["0", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[0, 5] = b_slope
+    df_es.loc["0", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[0, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["0", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[0, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["0", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[0, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["0", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[0, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["0", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[0, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["0", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # ----------------------------------------------------------
     # positive constant error
@@ -183,38 +206,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[1, 0] = brel_mean
+    df_es.loc["a", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[1, 1] = b_area
+    df_es.loc["a", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[1, 2] = temp_cor
+    df_es.loc["a", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[1, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["a", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["a", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["a", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["a", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["a", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["a", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[1, 4] = b_dir
+    df_es.loc["a", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[1, 5] = b_slope
+    df_es.loc["a", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[1, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["a", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[1, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["a", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[1, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["a", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[1, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["a", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[1, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["a", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # ----------------------------------------------------------
     # negative constant error
@@ -240,38 +280,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[2, 0] = brel_mean
+    df_es.loc["b", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[2, 1] = b_area
+    df_es.loc["b", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[2, 2] = temp_cor
+    df_es.loc["b", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[2, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["b", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["b", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["b", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["b", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["b", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["b", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[2, 4] = b_dir
+    df_es.loc["b", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[2, 5] = b_slope
+    df_es.loc["b", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[2, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["b", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[2, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["b", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[2, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["b", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[2, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["b", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[2, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["b", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # ----------------------------------------------------------
     # positive dynamic error
@@ -297,38 +354,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[3, 0] = brel_mean
+    df_es.loc["c", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[3, 1] = b_area
+    df_es.loc["c", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[3, 2] = temp_cor
+    df_es.loc["c", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[3, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["c", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["c", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["c", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["c", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["c", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["c", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[3, 4] = b_dir
+    df_es.loc["c", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[3, 5] = b_slope
+    df_es.loc["c", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[3, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["c", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[3, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["c", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[3, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["c", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[3, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["c", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[3, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["c", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # ----------------------------------------------------------
     # negative dynamic error
@@ -354,38 +428,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[4, 0] = brel_mean
+    df_es.loc["d", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[4, 1] = b_area
+    df_es.loc["d", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[4, 2] = temp_cor
+    df_es.loc["d", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[4, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["d", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["d", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["d", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["d", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["d", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["d", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[4, 4] = b_dir
+    df_es.loc["d", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[4, 5] = b_slope
+    df_es.loc["d", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[4, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["d", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[4, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["d", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[4, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["d", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[4, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["d", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[4, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["d", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # ----------------------------------------------------------
     # timing error
@@ -411,38 +502,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[5, 0] = brel_mean
+    df_es.loc["e", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[5, 1] = b_area
+    df_es.loc["e", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[5, 2] = temp_cor
+    df_es.loc["e", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[5, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["e", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["e", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["e", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["e", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["e", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["e", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[5, 4] = b_dir
+    df_es.loc["e", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[5, 5] = b_slope
+    df_es.loc["e", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[5, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["e", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[5, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["e", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[5, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["e", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[5, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["e", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[5, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["e", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # ----------------------------------------------------------
     # negative dynamic error and negative constant error
@@ -470,38 +578,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[6, 0] = brel_mean
+    df_es.loc["f", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[6, 1] = b_area
+    df_es.loc["f", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[6, 2] = temp_cor
+    df_es.loc["f", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[6, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["f", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["f", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["f", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["f", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["f", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["f", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[6, 4] = b_dir
+    df_es.loc["f", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[6, 5] = b_slope
+    df_es.loc["f", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[6, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["f", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[6, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["f", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[6, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["f", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[6, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["f", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[6, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["f", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # ----------------------------------------------------------
     # negative dynamic error and positive constant error
@@ -529,38 +654,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[7, 0] = brel_mean
+    df_es.loc["g", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[7, 1] = b_area
+    df_es.loc["g", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[7, 2] = temp_cor
+    df_es.loc["g", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[7, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["g", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["g", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["g", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["g", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["g", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["g", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[7, 4] = b_dir
+    df_es.loc["g", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[7, 5] = b_slope
+    df_es.loc["g", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[7, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["g", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[7, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["g", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[7, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["g", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[7, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["g", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[7, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["g", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # ----------------------------------------------------------
     # postive dynamic error and negative constant error
@@ -588,38 +730,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[8, 0] = brel_mean
+    df_es.loc["h", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[8, 1] = b_area
+    df_es.loc["h", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[8, 2] = temp_cor
+    df_es.loc["h", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[8, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["h", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["h", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["h", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["h", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["h", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["h", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[8, 4] = b_dir
+    df_es.loc["h", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[8, 5] = b_slope
+    df_es.loc["h", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[8, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["h", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[8, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["h", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[8, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["h", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[8, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["h", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[8, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["h", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # ----------------------------------------------------------
     # positive dynamic error and positive constant error
@@ -647,38 +806,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[9, 0] = brel_mean
+    df_es.loc["i", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[9, 1] = b_area
+    df_es.loc["i", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[9, 2] = temp_cor
+    df_es.loc["i", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[9, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["i", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["i", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["i", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["i", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["i", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["i", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[9, 4] = b_dir
+    df_es.loc["i", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[9, 5] = b_slope
+    df_es.loc["i", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[9, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["i", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[9, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["i", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[9, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["i", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[9, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["i", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[9, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["i", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # -----------------------------------------------------------------
     # negative dynamic error, negative constant error and timing error
@@ -706,38 +882,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[10, 0] = brel_mean
+    df_es.loc["j", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[10, 1] = b_area
+    df_es.loc["j", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[10, 2] = temp_cor
+    df_es.loc["j", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[10, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["j", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["j", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["j", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["j", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["j", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["j", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[10, 4] = b_dir
+    df_es.loc["j", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[10, 5] = b_slope
+    df_es.loc["j", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[10, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["j", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[10, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["j", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[10, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["j", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[10, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["j", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[10, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["j", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # -----------------------------------------------------------------
     # negative dynamic error, positive constant error and timing error
@@ -766,38 +959,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[11, 0] = brel_mean
+    df_es.loc["k", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[11, 1] = b_area
+    df_es.loc["k", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[11, 2] = temp_cor
+    df_es.loc["k", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[11, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["k", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["k", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["k", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["k", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["k", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["k", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[11, 4] = b_dir
+    df_es.loc["k", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[11, 5] = b_slope
+    df_es.loc["k", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[11, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["k", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[11, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["k", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[11, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["k", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[11, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["k", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[11, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["k", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # -----------------------------------------------------------------
     # positive dynamic error, negative constant error and timing error
@@ -826,38 +1036,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[12, 0] = brel_mean
+    df_es.loc["l", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[12, 1] = b_area
+    df_es.loc["l", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[12, 2] = temp_cor
+    df_es.loc["l", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[12, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["l", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["l", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["l", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["l", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["l", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["l", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[12, 4] = b_dir
+    df_es.loc["l", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[12, 5] = b_slope
+    df_es.loc["l", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[12, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["l", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[12, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["l", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[12, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["l", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[12, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["l", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[12, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["l", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # -----------------------------------------------------------------
     # positive dynamic error, positive constant error and timing error
@@ -886,38 +1113,55 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_es.iloc[13, 0] = brel_mean
+    df_es.loc["m", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_es.iloc[13, 1] = b_area
+    df_es.loc["m", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_es.iloc[13, 2] = temp_cor
+    df_es.loc["m", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_es.iloc[13, 3] = de.calc_de(obs_arr, sim_arr)
+    df_es.loc["m", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    b_tot = de.calc_bias_tot(brel)
+    df_es.loc["m", "b_tot"] = b_tot
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_es.loc["m", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_es.loc["m", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_es.loc["m", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_es.loc["m", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_es.iloc[13, 4] = b_dir
+    df_es.loc["m", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_es.iloc[13, 5] = b_slope
+    df_es.loc["m", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_es.iloc[13, 6] = np.arctan2(brel_mean, b_slope)
+    df_es.loc["m", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_es.iloc[13, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_es.loc["m", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_es.iloc[13, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_es.loc["m", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # # KGE gamma
     # df_es.iloc[0, 8] = kge.calc_kge_gamma(obs_arr, sim_arr)
     # KGE
-    df_es.iloc[13, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_es.loc["m", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_es.iloc[13, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_es.loc["m", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     axes_fdc[1, 3].legend(loc=6, bbox_to_anchor=(1.18, 0.85))
     axes_ts[2, 2].legend(loc=6, bbox_to_anchor=(1.18, 0.85))
@@ -943,9 +1187,15 @@ if __name__ == "__main__":
     de_arr = df_es["de"].values[ids]
     phi_arr = df_es["phi"].values[ids]
     b_slope_arr = df_es["b_slope"].values[ids]
+    b_hf_arr = df_es["b_hf"].values[ids]
+    b_lf_arr = df_es["b_lf"].values[ids]
+    b_tot_arr = df_es["b_tot"].values[ids]
+    err_hf_arr = df_es["err_hf"].values[ids]
+    err_lf_arr = df_es["err_lf"].values[ids]
 
     fig_de = util.diag_polar_plot_multi_fc(
-        brel_mean_arr, b_area_arr, temp_cor_arr, de_arr, b_dir_arr, phi_arr, idx
+        brel_mean_arr, b_area_arr, temp_cor_arr, de_arr, b_dir_arr, phi_arr,
+        b_hf_arr, b_lf_arr, b_tot_arr, err_hf_arr, err_lf_arr, idx
     )
     path = Path(os.path.join(PATH_FIG, "de_diag.pdf"))
     fig_de.savefig(path, dpi=250)
@@ -989,7 +1239,7 @@ if __name__ == "__main__":
 
     # scatterplot DE and KGE components inter-comparison
     sc = sns.scatterplot(beta_arr - 1, brel_mean_arr, color="black", s=60,
-                         ax=ax2)
+                          ax=ax2)
     sc1 = sns.scatterplot(
         alpha_arr - 1, b_slope_arr, color="red", s=30, marker="X", ax=ax2
     )
@@ -1006,13 +1256,13 @@ if __name__ == "__main__":
         rotation=90,
     )
     ax2.text(0.4, -0.22, r"$\alpha$ - 1 [-]", color="red",
-             transform=ax2.transAxes)
+              transform=ax2.transAxes)
     ax2.text(0.03, 0.93, "(b)", transform=ax2.transAxes)
     ax2.text(0.05, 0.1, "1:1", rotation=45, transform=ax2.transAxes)
 
     # scatterplot DE and KGE components intra-comparison
     sc = sns.scatterplot(b_slope_arr, brel_mean_arr, color="black", s=60,
-                         ax=ax3)
+                          ax=ax3)
     sc1 = sns.scatterplot(
         alpha_arr - 1, beta_arr - 1, color="red", s=30, marker="X", ax=ax3
     )
@@ -1029,7 +1279,7 @@ if __name__ == "__main__":
         rotation=90,
     )
     ax3.text(0.4, -0.23, r"$\alpha$ - 1 [-]", color="red",
-             transform=ax3.transAxes)
+              transform=ax3.transAxes)
     ax3.text(0.03, 0.93, "(c)", transform=ax3.transAxes)
     ax3.text(0.05, 0.1, "1:1", rotation=45, transform=ax3.transAxes)
 
@@ -1066,6 +1316,11 @@ if __name__ == "__main__":
         "b_dir",
         "b_slope",
         "phi",
+        "b_hf",
+        "b_lf",
+        "b_tot",
+        "err_hf",
+        "err_lf",
         "beta",
         "alpha",
         "kge",
@@ -1089,9 +1344,9 @@ if __name__ == "__main__":
 
     fig, axes = plt.subplots(3, 2, figsize=(10, 10), sharex="col")
     fig.text(0.06, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
-             rotation="vertical")
+              rotation="vertical")
     fig.text(0.5, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
-             rotation="vertical")
+              rotation="vertical")
     fig.text(0.25, 0.05, "Time [Years]", ha="center", va="center")
     fig.text(0.75, 0.05, "Exceedence probabilty [-]", ha="center", va="center")
     # format the ticks
@@ -1189,9 +1444,9 @@ if __name__ == "__main__":
 
     fig, axes = plt.subplots(3, 2, figsize=(10, 10), sharex="col")
     fig.text(0.06, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
-             rotation="vertical")
+              rotation="vertical")
     fig.text(0.5, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
-             rotation="vertical")
+              rotation="vertical")
     fig.text(0.25, 0.05, "2000", ha="center", va="center")
     fig.text(0.75, 0.05, "Exceedence probabilty [-]", ha="center", va="center")
     # format the ticks
@@ -1288,36 +1543,52 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_eff_cam.iloc[0, 0] = brel_mean
+    df_eff_cam.loc["05", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_eff_cam.iloc[0, 1] = b_area
+    df_eff_cam.loc["05", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_eff_cam.iloc[0, 2] = temp_cor
+    df_eff_cam.loc["05", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_eff_cam.iloc[0, 3] = de.calc_de(obs_arr, sim_arr)
+    df_eff_cam.loc["05", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    df_eff_cam.loc["05", "b_tot"] = de.calc_bias_tot(brel)
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_eff_cam.loc["05", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_eff_cam.loc["05", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_eff_cam.loc["05", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_eff_cam.loc["05", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_eff_cam.iloc[0, 4] = b_dir
+    df_eff_cam.loc["05", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_eff_cam.iloc[0, 5] = b_slope
+    df_eff_cam.loc["05", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_eff_cam.iloc[0, 6] = np.arctan2(brel_mean, b_slope)
+    df_eff_cam.loc["05", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_eff_cam.iloc[0, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_eff_cam.loc["05", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_eff_cam.iloc[0, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_eff_cam.loc["05", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE
-    df_eff_cam.iloc[0, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_eff_cam.loc["05", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_eff_cam.iloc[0, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_eff_cam.loc["05", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # make arrays
     obs_arr = df_cam2["Qobs"].values
@@ -1325,36 +1596,52 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_eff_cam.iloc[1, 0] = brel_mean
+    df_eff_cam.loc["48", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_eff_cam.iloc[1, 1] = b_area
+    df_eff_cam.loc["48", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_eff_cam.iloc[1, 2] = temp_cor
+    df_eff_cam.loc["48", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_eff_cam.iloc[1, 3] = de.calc_de(obs_arr, sim_arr)
+    df_eff_cam.loc["48", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    df_eff_cam.loc["48", "b_tot"] = de.calc_bias_tot(brel)
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_eff_cam.loc["48", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_eff_cam.loc["48", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_eff_cam.loc["48", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_eff_cam.loc["48", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_eff_cam.iloc[1, 4] = b_dir
+    df_eff_cam.loc["48", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_eff_cam.iloc[1, 5] = b_slope
+    df_eff_cam.loc["48", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_eff_cam.iloc[1, 6] = np.arctan2(brel_mean, b_slope)
+    df_eff_cam.loc["48", "phi"] = de.calc_phi(brel_mean, b_slope)
 
     # KGE beta
-    df_eff_cam.iloc[1, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_eff_cam.loc["48", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_eff_cam.iloc[1, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_eff_cam.loc["48", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE
-    df_eff_cam.iloc[1, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_eff_cam.loc["48", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_eff_cam.iloc[1, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_eff_cam.loc["48", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     # make arrays
     obs_arr = df_cam3["Qobs"].values
@@ -1362,36 +1649,53 @@ if __name__ == "__main__":
 
     # mean relative bias
     brel_mean = de.calc_brel_mean(obs_arr, sim_arr)
-    df_eff_cam.iloc[2, 0] = brel_mean
+    df_eff_cam.loc["94", "brel_mean"] = brel_mean
     # residual relative bias
     brel_res = de.calc_brel_res(obs_arr, sim_arr)
     # area of relative remaing bias
     b_area = de.calc_bias_area(brel_res)
-    df_eff_cam.iloc[2, 1] = b_area
+    df_eff_cam.loc["94", "b_area"] = b_area
     # temporal correlation
     temp_cor = de.calc_temp_cor(obs_arr, sim_arr)
-    df_eff_cam.iloc[2, 2] = temp_cor
+    df_eff_cam.loc["94", "temp_cor"] = temp_cor
     # diagnostic efficiency
-    df_eff_cam.iloc[2, 3] = de.calc_de(obs_arr, sim_arr)
+    df_eff_cam.loc["94", "de"] = de.calc_de(obs_arr, sim_arr)
+    # relative bias
+    brel = de.calc_brel(obs_arr, sim_arr)
+    # total bias
+    df_eff_cam.loc["94", "b_tot"] = de.calc_bias_tot(brel)
+    # bias of high flows
+    b_hf = de.calc_bias_hf(brel)
+    df_eff_cam.loc["94", "b_hf"] = b_hf
+    # contribution of high flow errors
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    df_eff_cam.loc["94", "err_hf"] = err_hf
+    # bias of low flows
+    b_lf = de.calc_bias_lf(brel)
+    df_eff_cam.loc["94", "b_lf"] = b_lf
+    # contribution of low flow errors
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    df_eff_cam.loc["94", "err_lf"] = err_lf
     # direction of bias
     b_dir = de.calc_bias_dir(brel_res)
-    df_eff_cam.iloc[2, 4] = b_dir
+    df_eff_cam.loc["94", "b_dir"] = b_dir
     # slope of bias
     b_slope = de.calc_bias_slope(b_area, b_dir)
-    df_eff_cam.iloc[2, 5] = b_slope
+    df_eff_cam.loc["94", "b_slope"] = b_slope
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    df_eff_cam.iloc[2, 6] = np.arctan2(brel_mean, b_slope)
+    df_eff_cam.loc["94", "phi"] = de.calc_phi(brel_mean, b_slope)
+
 
     # KGE beta
-    df_eff_cam.iloc[2, 7] = kge.calc_kge_beta(obs_arr, sim_arr)
+    df_eff_cam.loc["94", "beta"] = kge.calc_kge_beta(obs_arr, sim_arr)
     # KGE alpha
-    df_eff_cam.iloc[2, 8] = kge.calc_kge_alpha(obs_arr, sim_arr)
+    df_eff_cam.loc["94", "alpha"] = kge.calc_kge_alpha(obs_arr, sim_arr)
     # KGE
-    df_eff_cam.iloc[2, 9] = kge.calc_kge(obs_arr, sim_arr)
+    df_eff_cam.loc["94", "kge"] = kge.calc_kge(obs_arr, sim_arr)
 
     # NSE
-    df_eff_cam.iloc[2, 10] = nse.calc_nse(obs_arr, sim_arr)
+    df_eff_cam.loc["94", "nse"] = nse.calc_nse(obs_arr, sim_arr)
 
     path_csv = Path(os.path.join(
         PATH_FIG, "table_eff_real_case.csv"
@@ -1407,6 +1711,11 @@ if __name__ == "__main__":
     de_arr = df_eff_cam["de"].values
     phi_arr = df_eff_cam["phi"].values
     b_slope_arr = df_eff_cam["b_slope"].values
+    b_hf_arr = df_eff_cam["b_hf"].values
+    b_lf_arr = df_eff_cam["b_lf"].values
+    b_tot_arr = df_eff_cam["b_tot"].values
+    err_hf_arr = df_eff_cam["err_hf"].values
+    err_lf_arr = df_eff_cam["err_lf"].values
 
     fig_de = util.diag_polar_plot_multi_fc(
         brel_mean_arr,
@@ -1415,6 +1724,11 @@ if __name__ == "__main__":
         de_arr,
         b_dir_arr,
         phi_arr,
+        b_hf_arr,
+        b_lf_arr,
+        b_tot_arr,
+        err_hf_arr,
+        err_lf_arr,
         idx,
         ax_lim=0.6,
     )

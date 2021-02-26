@@ -277,7 +277,8 @@ def plot_obs_sim_ax(obs, sim, ax, fig_num):  # pragma: no cover
 
 
 def diag_polar_plot_multi_fc(
-    brel_mean, b_area, temp_cor, eff_de, b_dir, diag, fc, l=0.05, ax_lim=1.2
+    brel_mean, b_area, temp_cor, eff_de, b_dir, phi, b_hf, b_lf, b_tot,
+    err_hf, err_lf, fc, l=0.05, ax_lim=1.2
 ):  # pragma: no cover
     r"""Multiple polar plot of Diagnostic-Efficiency (DE)
 
@@ -298,8 +299,23 @@ def diag_polar_plot_multi_fc(
     b_dir : (N,)array_like
         direction of bias as 1-D array
 
-    diag : (N,)array_like
+    phi : (N,)array_like
         angle as 1-D array
+
+    b_hf : (N,)array_like
+        high flow bias
+
+    b_lf : (N,)array_like
+        low flow bias
+
+    b_tot : (N,)array_like
+        absolute total relative bias
+
+    err_hf : (N,)array_like
+        contribution of high flow errors
+
+    err_lf : (N,)array_like
+        contribution of low flow errors
 
     fc : list
         figure captions
@@ -321,11 +337,15 @@ def diag_polar_plot_multi_fc(
     de_max = np.min(eff_de)
 
     ll_brel_mean = brel_mean.tolist()
-    ll_b_dir = b_dir.tolist()
-    ll_b_area = b_area.tolist()
-    ll_eff = eff_de.tolist()
-    ll_diag = diag.tolist()
     ll_temp_cor = temp_cor.tolist()
+    ll_eff = eff_de.tolist()
+    ll_b_dir = b_dir.tolist()
+    ll_phi = phi.tolist()
+    ll_b_hf = b_hf.tolist()
+    ll_b_lf = b_lf.tolist()
+    ll_b_tot = b_tot.tolist()
+    ll_err_hf = err_hf.tolist()
+    ll_err_lf = err_lf.tolist()
 
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
@@ -335,6 +355,7 @@ def diag_polar_plot_multi_fc(
     # determine axis limits
     yy = np.arange(0.01, ax_lim, delta)
     c_levels = np.arange(0, ax_lim, 0.2)
+    off_max = 0.14 * ax_lim
 
     len_yy = 360
     # len_yy1 = 90
@@ -391,23 +412,46 @@ def diag_polar_plot_multi_fc(
     # threshold efficiency for FBM
     eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
     # loop over each data point
-    for (bm, bd, ba, r, eff, ang, txt) in zip(
-        ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_eff, ll_diag, fc
-    ):
-        # slope of bias
-        b_slope = de.calc_bias_slope(ba, bd)
+    zz = zip(ll_brel_mean, ll_temp_cor, ll_eff, ll_b_dir, ll_phi, ll_b_hf,
+             ll_b_lf, ll_b_tot, ll_err_hf, ll_err_lf, fc)
+    for (bm, r, eff, bd, ang, bhf, blf, btot, errhf, errlf, txt) in zz:
         # convert temporal correlation to color
         rgba_color = cm.plasma_r(norm(r))
-        # relation of b_dir which explains the error
-        if abs(ba) > 0:
-            exp_err = (abs(bd) * 2) / abs(ba)
-        elif abs(ba) == 0:
+        # relation of high flow errors and low flow errors which explain
+        # the total FDC error
+        if btot > 0:
+            exp_err = (abs(bhf) + abs(blf)) / btot
+        elif btot == 0:
             exp_err = 0
+
+        # scale marker size
+        s_max = 72
+        s_hf = s_max * abs(errhf)
+        s_lf = s_max * abs(errlf)
+
+        # marker offset
+        if bd != 0:
+            phi_off = np.arccos(1 - (off_max**2/(2*eff**2)))/2
+            if (ang > 0) & (ang <= np.pi/2):
+                phi_hf = ang + phi_off * abs(errhf)
+                phi_lf = ang - phi_off * abs(errlf)
+            elif (ang > np.pi/2) & (ang <= np.pi):
+                phi_hf = ang - phi_off * abs(errhf)
+                phi_lf = ang + phi_off * abs(errlf)
+            elif (ang >= -np.pi) & (ang < -np.pi/2):
+                phi_hf = ang - phi_off * abs(errhf)
+                phi_lf = ang + phi_off * abs(errlf)
+            elif (ang >= -np.pi/2) & (ang <= 0):
+                phi_hf = ang + phi_off * abs(errhf)
+                phi_lf = ang - phi_off * abs(errlf)
 
         # diagnose the error
         if abs(bm) <= l and exp_err > l and eff > eff_l:
-            c = ax.scatter(ang, eff, s=75, color=rgba_color, zorder=3)
+            c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
             d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
+            if bd != 0:
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
             ax.annotate(
                 txt,
                 xy=(ang, eff),
@@ -419,8 +463,11 @@ def diag_polar_plot_multi_fc(
                 va="center",
             )
         elif abs(bm) > l and exp_err <= l and eff > eff_l:
-            c = ax.scatter(ang, eff, s=75, color=rgba_color, zorder=3)
+            c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
             d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
+            if bd != 0:
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
             ax.annotate(
                 txt,
                 xy=(ang, eff),
@@ -432,8 +479,11 @@ def diag_polar_plot_multi_fc(
                 va="center",
             )
         elif abs(bm) > l and exp_err > l and eff > eff_l:
-            c = ax.scatter(ang, eff, s=75, color=rgba_color, zorder=3)
+            c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
             d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
+            if bd != 0:
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
             ax.annotate(
                 txt,
                 xy=(ang, eff),
@@ -444,6 +494,7 @@ def diag_polar_plot_multi_fc(
                 ha="center",
                 va="center",
             )
+
         # FBM
         elif abs(bm) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
@@ -472,7 +523,7 @@ def diag_polar_plot_multi_fc(
             )
         # FGM
         elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
-            c = ax.scatter(ang, eff, s=75, color=rgba_color, zorder=3)
+            c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
             d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
             ax.annotate(
                 txt,
@@ -484,6 +535,14 @@ def diag_polar_plot_multi_fc(
                 ha="center",
                 va="center",
             )
+
+    # legend for error contribution of high flows and low flows
+    ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
+    ax.scatter([], [], color='k', zorder=2, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
+    ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
+              frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
+              fontsize=11, handletextpad=0.1)
+
     ax.set_rticks([])  # turn default ticks off
     ax.set_rmin(0)
     ax.set_rmax(ax_lim)

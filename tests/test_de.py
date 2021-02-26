@@ -60,8 +60,57 @@ def test_bias_dir_for_arrays():
         obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
         sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
     )
-    b_dir = b_dir = de.calc_bias_dir(brel_res)
-    assert b_dir == pytest.approx(-0.014705882352941155, rel=1e-4)
+    b_dir = de.calc_bias_dir(brel_res)
+    assert b_dir == pytest.approx(1, rel=1e-4)
+
+
+def test_bias_tot_for_arrays():
+    brel = de.calc_brel(
+        obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
+        sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
+    )
+    b_tot = de.calc_bias_tot(brel)
+    assert b_tot == pytest.approx(0.14017973856209148, rel=1e-4)
+
+
+def test_bias_hf_for_arrays():
+    brel = de.calc_brel(
+        obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
+        sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
+    )
+    b_hf = de.calc_bias_hf(brel)
+    assert b_hf == pytest.approx(0.031944444444444456, rel=1e-4)
+
+
+def test_err_hf_for_arrays():
+    brel = de.calc_brel(
+        obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
+        sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
+    )
+    b_hf = de.calc_bias_hf(brel)
+    b_tot = de.calc_bias_tot(brel)
+    err_hf = de.calc_err_hf(b_hf, b_tot)
+    assert err_hf == pytest.approx(0.2278820375335122, rel=1e-4)
+
+
+def test_bias_lf_for_arrays():
+    brel = de.calc_brel(
+        obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
+        sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
+    )
+    b_lf = de.calc_bias_lf(brel)
+    assert b_lf == pytest.approx(0.07549019607843138, rel=1e-4)
+
+
+def test_err_lf_for_arrays():
+    brel = de.calc_brel(
+        obs=np.array([1.5, 1, 0.8, 0.85, 1.5, 2]),
+        sim=np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5]),
+    )
+    b_lf = de.calc_bias_lf(brel)
+    b_tot = de.calc_bias_tot(brel)
+    err_lf = de.calc_err_lf(b_lf, b_tot)
+    assert err_lf == pytest.approx(0.5385243035318803, rel=1e-4)
 
 
 def test_bias_slope_for_arrays():
@@ -119,7 +168,7 @@ def test_bias_dir_simulation_equals_obs_mean():
 
 def test_bias_dir_for_equal_arrays():
     brel_res = de.calc_brel_res(obs=np.array([1, 2, 3]), sim=np.array([1, 2, 3]))
-    b_dir = b_dir = de.calc_bias_dir(brel_res)
+    b_dir = de.calc_bias_dir(brel_res)
     assert b_dir == 0
 
 

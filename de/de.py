@@ -28,10 +28,9 @@ np.seterr(divide="ignore", invalid="ignore")
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
 sns.set_context("paper", font_scale=1.5)
 
-
-def calc_brel_mean(obs, sim, sort=True):
+def calc_brel(obs, sim, sort=True):
     r"""
-    Calculate arithmetic mean of relative bias.
+    Calculate relative bias.
 
     Parameters
     ----------
@@ -39,7 +38,60 @@ def calc_brel_mean(obs, sim, sort=True):
         observed time series as 1-D array
 
     sim : (N,)array_like
-        simulated time series
+        simulated time series as 1-D array
+
+    sort : boolean, optional
+        If True, time series are sorted by ascending order. If False, time
+        series are not sorted. The default is to sort.
+
+    Returns
+    ----------
+    brel : (N,)array_like
+        relative bias
+
+    Notes
+    ----------
+    .. math::
+
+        B_{rel} = \frac{Q_{sim}(i) - Q_{obs}(i)}{Q_{obs}(i)}
+
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import de
+    >>> import numpy as np
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
+    >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
+    >>> brel = de.calc_brel(obs, sim)
+    """
+    if len(obs) != len(sim):
+        raise AssertionError("Arrays are not of equal length!")
+
+    if sort:
+        obs = np.sort(obs)[::-1]
+        sim = np.sort(sim)[::-1]
+
+    sim_obs_diff = np.subtract(sim, obs)
+    brel = np.divide(sim_obs_diff, obs)
+    brel[sim_obs_diff == 0] = 0
+    brel = brel[np.isfinite(brel)]
+
+    return brel
+
+
+def calc_brel_mean(obs, sim, sort=True):
+    r"""
+    Calculate the arithmetic mean of the relative bias.
+
+    Parameters
+    ----------
+    obs : (N,)array_like
+        observed time series as 1-D array
+
+    sim : (N,)array_like
+        simulated time series as 1-D array
 
     sort : boolean, optional
         If True, time series are sorted by ascending order. If False, time
@@ -81,12 +133,16 @@ def calc_brel_mean(obs, sim, sort=True):
     brel = brel[np.isfinite(brel)]
     brel_mean = np.mean(brel)
 
+    # set numerical artefacts to zero
+    if abs(brel_mean) < 0.001:
+        brel_mean = 0
+
     return brel_mean
 
 
 def calc_brel_res(obs, sim, sort=True):
     r"""
-    Subtract arithmetic mean of relative bias from relative bias.
+    Subtracting arithmetic mean of the relative bias from the relative bias.
 
     Parameters
     ----------
@@ -102,14 +158,14 @@ def calc_brel_res(obs, sim, sort=True):
 
     Returns
     ----------
-    brel_res : array_like
+    brel_res : (N,)array_like
         remaining relative bias
 
     Notes
     ----------
     .. math::
 
-        B_{rest}(i) = B_{rel}(i) - \overline{B_{rel}}
+        B_{res}(i) = B_{rel}(i) - \overline{B_{rel}}
 
     Examples
     --------
@@ -141,7 +197,7 @@ def calc_brel_res(obs, sim, sort=True):
 
 def calc_bias_area(brel_res):
     r"""
-    Calculate absolute bias area for entire flow duration curve.
+    Calculate the integrated residual bias for the entire flow duration curve.
 
     Parameters
     ----------
@@ -157,7 +213,7 @@ def calc_bias_area(brel_res):
     ----------
     .. math::
 
-        \vert B_{area}\vert = \int_{0}^{1}\vert B_{rest}(i)\vert di
+        \vert B_{area}\vert = \int_{0}^{1}\vert B_{res}(i)\vert di
 
     Examples
     --------
@@ -169,7 +225,7 @@ def calc_bias_area(brel_res):
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
     >>> b_res = de.calc_brel_res(obs, sim)
     >>> de.calc_bias_area(b_res)
-    0.11
+    0.1112908496732026
 
     See Also
     --------
@@ -179,17 +235,259 @@ def calc_bias_area(brel_res):
     # area of absolute bias
     b_area = integrate.simps(abs(brel_res), perc)
 
+    # set numerical artefacts to zero
+    if abs(b_area) < 0.001:
+        b_area = 0
+
     return b_area
 
 
+def calc_bias_tot(brel):
+    r"""
+    Calculate the integrated relative bias for the entire flow duration curve.
+
+    Parameters
+    ----------
+    brel : (N,)array_like
+        relative bias as 1-D array
+
+    Returns
+    ----------
+    b_tot : float
+        bias area of the entire flow domain
+
+    Notes
+    ----------
+    .. math::
+
+        \vert B_{area}\vert = \int_{0}^{1}\vert B_{rel}(i)\vert di
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import de
+    >>> import numpy as np
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
+    >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
+    >>> b_rel = de.calc_brel(obs, sim)
+    >>> de.calc_bias_tot(b_rel)
+    0.14017973856209148
+
+    See Also
+    --------
+    de.calc_brel_res
+    """
+    perc = np.linspace(0, 1, len(brel))
+    # area of absolute bias
+    brel_abs = np.abs(brel)
+    b_tot = integrate.simps(brel_abs, perc)
+
+    # set numerical artefacts to zero
+    if abs(b_tot) < 0.001:
+        b_tot = 0
+
+    return b_tot
+
+
+def calc_bias_hf(brel):
+    r"""
+    Calculate the integrated relative bias for high flows.
+
+    Parameters
+    ----------
+    brel : (N,)array_like
+        relative bias as 1-D array
+
+    Returns
+    ----------
+    b_hf : float
+        absolute bias area of high flows (i.e. 0th percentile to 50th percentile)
+
+    Notes
+    ----------
+    .. math::
+
+        B_{hf} = \int_{0}^{0.5}B_{rel}(i) di
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import de
+    >>> import numpy as np
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
+    >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
+    >>> b_rel = de.calc_brel(obs, sim)
+    >>> de.calc_bias_hf(b_rel)
+    0.031944444444444456
+    """
+    mid_idx = int(len(brel) / 2)
+    # integral of relative bias < 50 %
+    n = len(brel[:mid_idx])
+    perc_hf = np.linspace(0, 0.5, n)
+    # direction of bias from high flows
+    b_hf = integrate.simps(brel[:mid_idx], perc_hf)
+
+    # set numerical artefacts to zero
+    if abs(b_hf) < 0.001:
+        b_hf = 0
+
+    return b_hf
+
+
+def calc_err_hf(b_hf, b_tot):
+    r"""
+    Calculate the error contribution of high flows.
+
+    Parameters
+    ----------
+    b_hf : float
+        absolute bias area of high flows (i.e. 0th percentile to 50th
+        percentile)
+
+    b_tot : float
+        bias area of the entire flow domain
+
+    Returns
+    ----------
+    err_hf : float
+        contribution of high flows to model error
+
+    Notes
+    ----------
+    .. math::
+
+        \epsilon_{hf} = \frac{B_{hf}}{B_{tot}}
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import de
+    >>> import numpy as np
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
+    >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
+    >>> b_rel = de.calc_brel(obs, sim)
+    >>> b_hf = de.calc_bias_hf(b_rel)
+    >>> b_tot = de.calc_bias_tot(b_rel)
+    >>> de.calc_err_hf(b_hf, b_tot)
+    0.2278820375335122
+    """
+    if b_tot > 0:
+        err_hf = b_hf / b_tot
+    else:
+        err_hf = 0
+
+    # set nan to zero
+    if err_hf == np.nan:
+        err_hf = 0
+
+    return err_hf
+
+
+def calc_bias_lf(brel):
+    r"""
+    Calculate the integrated relative for low flows.
+
+    Parameters
+    ----------
+    brel : (N,)array_like
+        relative bias as 1-D array
+
+    Returns
+    ----------
+    b_lf : float
+        absolute bias area of low flows (i.e. 50th percentile to 100th percentile)
+
+    Notes
+    ----------
+    .. math::
+
+        B_{lf} = \int_{0.5}^{1}B_{rel}(i) di
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import de
+    >>> import numpy as np
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
+    >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
+    >>> b_rel = de.calc_brel(obs, sim)
+    >>> de.calc_bias_lf(b_rel)
+    0.07549019607843138
+    """
+    mid_idx = int(len(brel) / 2)
+    # integral of relative bias < 50 %
+    n = len(brel[mid_idx:])
+    perc_low = np.linspace(0.5, 1, n)
+    # direction of bias from high flows
+    b_lf = integrate.simps(brel[mid_idx:], perc_low)
+
+    # set numerical artefacts to zero
+    if abs(b_lf) < 0.001:
+        b_lf = 0
+
+    return b_lf
+
+
+def calc_err_lf(b_lf, b_tot):
+    r"""
+    Calculate the error contribution of low flows.
+
+    Parameters
+    ----------
+    b_lf : float
+        absolute bias area of low flows (i.e. 50th percentile to 100th percentile)
+
+    b_tot : float
+        bias area of the entire flow domain
+
+    Returns
+    ----------
+    err_lf : float
+        contribution of low flows to dynamic error
+
+    Notes
+    ----------
+    .. math::
+
+        \epsilon_{lf} = \frac{B_{lf}}{B_{hf} + B_{lf}}
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import de
+    >>> import numpy as np
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
+    >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
+    >>> b_rel = de.calc_brel(obs, sim)
+    >>> b_lf = de.calc_bias_lf(b_rel)
+    >>> b_tot = de.calc_bias_tot(b_rel)
+    >>> de.calc_err_lf(b_lf, b_tot)
+    0.5385243035318803
+    """
+    if b_tot > 0:
+        err_lf = b_lf / b_tot
+    else:
+        err_lf = 0
+
+    # set nan to zero
+    if err_lf == np.nan:
+        err_lf = 0
+
+    return err_lf
+
 def calc_bias_dir(brel_res):
     r"""
-    Calculate absolute bias area for high flow and low flow.
+    Calculate the direction of the dynamic error.
 
     Parameters
     ----------
     brel_res : (N,)array_like
-        remaining relative bias as 1-D array
+        remaining relative bias
 
     Returns
     ----------
@@ -200,7 +498,12 @@ def calc_bias_dir(brel_res):
     ----------
     .. math::
 
-        B_{dir} = \int_{0}^{0.5}B_{rest}(i) di
+        B_{dir} =
+        \begin{cases}
+        -1 & \text{if } (B_{res-hf} > 0 & B_{lf} < 0) | (B_{res-hf} = 0 & B_{res-lf} < 0) | (B_{res-hf} > 0 & B_{res-lf} = 0) \\
+        1 & \text{if } (B_{res-hf} < 0 & B_{lf} > 0) | (B_{res-hf} = 0 & B_{res-lf} > 0) | (B_{res-hf} < 0 & B_{res-lf} = 0) \\
+        0  & \text{if } (B_{res-hf} > 0 & B_{lf} > 0) | (B_{res-hf} < 0 & B_{res-lf} < 0) | (B_{res-hf} = 0 & B_{res-lf} = 0)
+        \end{cases}
 
     Examples
     --------
@@ -210,27 +513,32 @@ def calc_bias_dir(brel_res):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> b_res = de.calc_brel_res(obs, sim)
-    >>> de.calc_bias_dir(b_res)
-    -0.015
+    >>> brel_res = de.calc_brel_res(obs, sim)
+    >>> de.calc_bias_dir(brel_res)
+    1
     """
-    mid_idx = int(len(brel_res) / 2)
-    # integral of relative bias < 50 %
-    perc = np.linspace(0, 0.5, mid_idx)
-    # direction of bias
-    b_dir = integrate.simps(brel_res[:mid_idx], perc)
+    b_res_hf = calc_bias_hf(brel_res)
+    b_res_lf = calc_bias_lf(brel_res)
+    if (b_res_hf > 0 and b_res_lf < 0) or (b_res_hf == 0 and b_res_lf < 0) or (b_res_hf > 0 and b_res_lf == 0):
+        b_dir = -1
+
+    elif (b_res_hf < 0 and b_res_lf > 0) or (b_res_hf == 0 and b_res_lf > 0) or (b_res_hf < 0 and b_res_lf == 0):
+        b_dir = 1
+
+    elif (b_res_hf > 0 and b_res_lf > 0) or (b_res_hf < 0 and b_res_lf < 0) or (b_res_hf == 0 and b_res_lf == 0):
+        b_dir = 0
 
     return b_dir
 
 
 def calc_bias_slope(b_area, b_dir):
     r"""
-    Calculate slope of bias balance.
+    Calculate the slope of the residual bias.
 
     Parameters
     ----------
     b_area : float
-        absolute area of remaining bias
+        absolute area of residual bias
 
     b_dir : float
         direction of bias
@@ -244,12 +552,7 @@ def calc_bias_slope(b_area, b_dir):
     ----------
     .. math::
 
-        B_{slope} =
-        \begin{cases}
-        \vert B_{area}\vert \times (-1) & \text{if } B_{dir} > 0 \\
-        \vert B_{area}\vert       & \text{if } B_{dir} < 0 \\
-        0       & \text{if } B_{dir} = 0
-        \end{cases}
+        B_{slope} = \vert B_{area}\vert \times B_{dir}
 
     Examples
     --------
@@ -259,20 +562,13 @@ def calc_bias_slope(b_area, b_dir):
     >>> import numpy as np
     >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
     >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
-    >>> b_res = de.calc_brel_res(obs, sim)
-    >>> b_dir = de.calc_bias_dir(b_res)
+    >>> brel_res = de.calc_brel(obs, sim)
+    >>> b_dir = de.calc_bias_dir(brel_res)
     >>> b_area = de.calc_bias_area(b_res)
     >>> de.calc_bias_slope(b_area, b_dir)
     0.11
     """
-    if b_dir > 0:
-        b_slope = b_area * (-1)
-
-    elif b_dir < 0:
-        b_slope = b_area
-
-    elif b_dir == 0:
-        b_slope = 0
+    b_slope = b_area * b_dir
 
     return b_slope
 
@@ -383,6 +679,56 @@ def calc_de(obs, sim, sort=True):
 
     return eff
 
+def calc_phi(brel_mean, b_slope):
+    """
+    Calculate trigonometric inverse tangent.
+
+    Parameters
+    ----------
+    brel_mean : float
+        average relative bias
+
+    b_slope : float
+        slope of bias
+
+    Returns
+    ----------
+    phi : float
+        trigonometric inverse tangent
+
+    Notes
+    ----------
+    .. math::
+
+        \varphi = arctan2(\overline{B_{rel}}, B_{slope})
+
+    Examples
+    --------
+    Provide arrays with equal length
+
+    >>> from de import de
+    >>> import numpy as np
+    >>> obs = np.array([1.5, 1, 0.8, 0.85, 1.5, 2])
+    >>> sim = np.array([1.6, 1.3, 1, 0.8, 1.2, 2.5])
+    >>> brel_mean = de.calc_brel_mean(obs, sim)
+    >>> brel_res = de.calc_brel(obs, sim)
+    >>> b_dir = de.calc_bias_dir(brel_res)
+    >>> b_area = de.calc_bias_area(brel_res)
+    >>> b_slope = de.calc_bias_slope(b_area, b_dir)
+    >>> de.calc_phi(brel_mean, b_slope)
+    1.5707963267948966
+    """
+    phi = np.arctan2(brel_mean, b_slope)
+    # set numerical artefacts to zero
+    if abs(phi) < 0.001:
+        phi = 0
+
+    # set numerical artefacts pi
+    if phi > 3.1414:
+        phi = 3.1414
+
+    return phi
+
 
 def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
     r"""
@@ -415,12 +761,6 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         Returns a single figure if extended=False and two figures if
         extended=True.
 
-    Notes
-    ----------
-    .. math::
-
-        \varphi = arctan2(\overline{B_{rel}}, B_{slope})
-
     Examples
     --------
     Provide arrays with equal length
@@ -433,10 +773,14 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
     """
     if len(obs) != len(sim):
         raise AssertionError("Arrays are not of equal length!")
+
+    # relative bias
+    brel = calc_brel(obs, sim, sort=sort)
+
     # mean relative bias
     brel_mean = calc_brel_mean(obs, sim, sort=sort)
 
-    # remaining relative bias
+    # residual relative bias
     brel_res = calc_brel_res(obs, sim, sort=sort)
     # area of relative remaing bias
     b_area = calc_bias_area(brel_res)
@@ -451,9 +795,20 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
     # slope of bias
     b_slope = calc_bias_slope(b_area, b_dir)
 
+    # total bias
+    b_tot = calc_bias_tot(brel)
+    # bias of high flows
+    b_hf = calc_bias_hf(brel)
+    # bias of low flows
+    b_lf = calc_bias_lf(brel)
+    # contribution of high flows to dyn. error
+    err_hf = calc_err_hf(b_hf, b_tot)
+    # contribution of low flows to dyn. error
+    err_lf = calc_err_lf(b_lf, b_tot)
+
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    phi = np.arctan2(brel_mean, b_slope)
+    phi = calc_phi(brel_mean, b_slope)
 
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
@@ -477,6 +832,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
     elif eff >= 3:
         raise AssertionError("Value of 'DE' is out of bounds for visualization!", eff)
 
+    off_max = 0.14 * ax_lim
     len_yy = len(yy)
 
     # arrays to plot contour lines of DE
@@ -531,24 +887,50 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
         eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
-        # relation of b_dir which explains the error
-        if abs(b_area) > 0:
-            exp_err = (abs(b_dir) * 2) / abs(b_area)
-        elif abs(b_area) == 0:
+        # relation of high flow errors and low flow errors which explain
+        # the total FDC error
+        if b_tot > 0:
+            exp_err = (abs(b_hf) + abs(b_lf)) / b_tot
+        elif b_tot == 0:
             exp_err = 0
+
+        # maximum marker size
+        s_max = 72
+        s_hf = s_max * abs(err_hf)
+        s_lf = s_max * abs(err_lf)
+
+        # marker offset
+        if b_dir != 0:
+            phi_off = np.arccos(1 - (off_max**2/(2*eff**2)))/2
+            if (phi > 0) & (phi <= np.pi/2):
+                phi_hf = phi + phi_off * abs(err_hf)
+                phi_lf = phi - phi_off * abs(err_lf)
+            elif (phi > np.pi/2) & (phi <= np.pi):
+                phi_hf = phi - phi_off * abs(err_hf)
+                phi_lf = phi + phi_off * abs(err_lf)
+            elif (phi >= -np.pi) & (phi < -np.pi/2):
+                phi_hf = phi - phi_off * abs(err_hf)
+                phi_lf = phi + phi_off * abs(err_lf)
+            elif (phi >= -np.pi/2) & (phi <= 0):
+                phi_hf = phi + phi_off * abs(err_hf)
+                phi_lf = phi - phi_off * abs(err_lf)
+
         # diagnose the error
         if abs(brel_mean) <= l and exp_err > l and eff > eff_l:
-            ax.annotate(
-                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
-            )
+            c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
+            if b_dir != 0:
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
         elif abs(brel_mean) > l and exp_err <= l and eff > eff_l:
-            ax.annotate(
-                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
-            )
+            c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
+            if b_dir != 0:
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
         elif abs(brel_mean) > l and exp_err > l and eff > eff_l:
-            ax.annotate(
-                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
-            )
+            c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
+            if b_dir != 0:
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
         # FBM
         elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
@@ -563,6 +945,14 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         # FGM
         elif abs(brel_mean) <= l and exp_err <= l and eff <= eff_l:
             c = ax.scatter(phi, eff, color=rgba_color)
+
+        # legend for error contribution of high flows and low flows
+        ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=2, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
+        ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
+                  frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
+                  fontsize=11, handletextpad=0.1)
+
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
         if eff <= 1:
@@ -698,7 +1088,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(0, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap="plasma_r")
-        # Clear axis
+        # clear axis
         ax.cla()
         # plot regions
         ax.plot(
@@ -738,24 +1128,51 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
         eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
-        # relation of b_dir which explains the error
-        if abs(b_area) > 0:
-            exp_err = (abs(b_dir) * 2) / abs(b_area)
-        elif abs(b_area) == 0:
+        # relation of high flow errors and low flow errors which explain
+        # the total FDC error
+        if b_tot > 0:
+            exp_err = (abs(b_hf) + abs(b_lf)) / b_tot
+        elif b_tot == 0:
             exp_err = 0
+
+        # maximum marker size
+        s_max = 72
+        s_hf = s_max * abs(err_hf)
+        s_lf = s_max * abs(err_lf)
+
+        # marker offset
+        if b_dir != 0:
+            phi_off = np.arccos(1 - (0.18**2/(2*eff**2)))/2
+            if (phi > 0) & (phi <= np.pi/2):
+                phi_hf = phi + phi_off * abs(err_hf)
+                phi_lf = phi - phi_off * abs(err_lf)
+            elif (phi > np.pi/2) & (phi <= np.pi):
+                phi_hf = phi - phi_off * abs(err_hf)
+                phi_lf = phi + phi_off * abs(err_lf)
+            elif (phi >= -np.pi) & (phi < -np.pi/2):
+                phi_hf = phi - phi_off * abs(err_hf)
+                phi_lf = phi + phi_off * abs(err_lf)
+            elif (phi >= -np.pi/2) & (phi <= 0):
+                phi_hf = phi + phi_off * abs(err_hf)
+                phi_lf = phi - phi_off * abs(err_lf)
+
         # diagnose the error
         if abs(brel_mean) <= l and exp_err > l and eff > eff_l:
-            ax.annotate(
-                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
-            )
+            c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
+            if b_dir != 0:
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
         elif abs(brel_mean) > l and exp_err <= l and eff > eff_l:
-            ax.annotate(
-                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
-            )
+            c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
+            if b_dir != 0:
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
         elif abs(brel_mean) > l and exp_err > l and eff > eff_l:
-            ax.annotate(
-                "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
-            )
+            c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
+            if b_dir != 0:
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+
         # FBM
         elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
@@ -770,6 +1187,14 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         # FGM
         elif abs(brel_mean) <= l and exp_err <= l and eff <= eff_l:
             c = ax.scatter(phi, eff, color=rgba_color)
+
+        # legend for error contribution of high flows and low flows
+        ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=2, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
+        ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
+                  frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
+                  fontsize=11, handletextpad=0.1)
+
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
         if eff <= 1:
@@ -895,7 +1320,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         cbar.set_ticklabels(["1", "0.5", "<0"])
         cbar.ax.tick_params(direction="in")
 
-        # plot B_rest
+        # plot residual bias
         # calculate exceedence probability
         prob = np.linspace(0, 1, len(brel_res))
         ax1.axhline(y=0, color="slategrey")
@@ -903,14 +1328,14 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         ax1.plot(prob, brel_res, color="black")
         ax1.fill_between(prob, brel_res, where=0 < brel_res, facecolor="purple")
         ax1.fill_between(prob, brel_res, where=0 > brel_res, facecolor="red")
-        ax1.set(ylabel=r"$B_{rest}$ [-]", xlabel="Exceedence probabilty [-]")
+        ax1.set(ylabel=r"$B_{res}$ [-]", xlabel="Exceedence probabilty [-]")
 
         return fig
 
 
 def diag_polar_plot_multi(
-    brel_mean, b_area, temp_cor, eff_de, b_dir, phi, l=0.05, extended=False
-):
+    brel_mean, temp_cor, eff_de, b_dir, phi, b_hf, b_lf, b_tot, err_hf,
+    err_lf, l=0.05, extended=False):
     r"""
     Diagnostic polar plot of Diagnostic efficiency (DE) for multiple
     evaluations.
@@ -936,7 +1361,22 @@ def diag_polar_plot_multi(
         direction of bias as 1-D array
 
     phi : (N,)array_like
-        angle as 1-D array
+        angle as 1-D array (in radians)
+
+    b_hf : (N,)array_like
+        high flow bias
+
+    b_lf : (N,)array_like
+        low flow bias
+
+    b_tot : (N,)array_like
+        absolute total relative bias
+
+    err_hf : (N,)array_like
+        contribution of high flow errors
+
+    err_lf : (N,)array_like
+        contribution of low flow errors
 
     l : float, optional
         Deviation of metric terms used to calculate the threshold of DE for
@@ -968,19 +1408,28 @@ def diag_polar_plot_multi(
     >>> b_area = np.array([0.15, 0.1, 0.2, 0.1, 0.1, 0.2])
     >>> temp_cor = np.array([0.9, 0.85, 0.8, 0.9, 0.85, 0.9])
     >>> eff_de = np.array([0.21, 0.24, 0.35, 0.18, 0.19, 0.27])
-    >>> b_dir = np.array([0.08, 0.05, 0.1, 0.05, 0.05, 0.1])
+    >>> b_dir = np.array([1, 1, 1, 1, 1, 1])
     >>> phi = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
+    >>> b_hf = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
+    >>> b_lf = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
+    >>> b_tot = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
+    >>> err_hf = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
+    >>> err_lf = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
     >>> de.diag_polar_plot_multi(brel_mean, b_area, temp_cor, eff_de, b_dir,
                                  phi)
     """
     eff_max = np.max(eff_de)
 
     ll_brel_mean = brel_mean.tolist()
-    ll_b_dir = b_dir.tolist()
-    ll_b_area = b_area.tolist()
-    ll_eff = eff_de.tolist()
-    ll_phi = phi.tolist()
     ll_temp_cor = temp_cor.tolist()
+    ll_eff = eff_de.tolist()
+    ll_b_dir = b_dir.tolist()
+    ll_phi = phi.tolist()
+    ll_b_hf = b_hf.tolist()
+    ll_b_lf = b_lf.tolist()
+    ll_b_tot = b_tot.tolist()
+    ll_err_hf = err_hf.tolist()
+    ll_err_lf = err_lf.tolist()
 
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
@@ -1003,6 +1452,8 @@ def diag_polar_plot_multi(
     elif eff_max > 3:
         raise ValueError("Some values of 'DE' are too large for visualization!", eff_max)
 
+    # maximal offset
+    off_max = 0.14 * ax_lim
     len_yy = len(yy)
 
     # arrays to plot contour lines of DE
@@ -1058,41 +1509,78 @@ def diag_polar_plot_multi(
         # threshold efficiency for FBM
         eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
         # loop over each data point
-        zz = zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_eff, ll_phi)
-        for (bm, bd, ba, r, eff, ang) in zz:
-            # slope of bias
-            b_slope = calc_bias_slope(ba, bd)
+        zz = zip(ll_brel_mean, ll_temp_cor, ll_eff, ll_b_dir, ll_phi, ll_b_hf,
+                 ll_b_lf, ll_b_tot, ll_err_hf, ll_err_lf)
+        for (bm, r, eff, bd, ang, bhf, blf, btot, errhf, errlf) in zz:
             # convert temporal correlation to color
             rgba_color = cm.plasma_r(norm(r))
-            # relation of b_dir which explains the error
-            if abs(ba) > 0:
-                exp_err = (abs(bd) * 2) / abs(ba)
-            elif abs(ba) == 0:
+            # relation of high flow errors and low flow errors which explain
+            # the total FDC error
+            if btot > 0:
+                exp_err = (abs(bhf) + abs(blf)) / btot
+            elif btot == 0:
                 exp_err = 0
+
+            # scale marker size
+            s_max = 72
+            s_hf = s_max * abs(errhf)
+            s_lf = s_max * abs(errlf)
+
+            # marker offset
+            if bd != 0:
+                phi_off = np.arccos(1 - (off_max**2/(2*eff**2)))/2
+                if (ang > 0) & (ang <= np.pi/2):
+                    phi_hf = ang + phi_off * abs(errhf)
+                    phi_lf = ang - phi_off * abs(errlf)
+                elif (ang > np.pi/2) & (ang <= np.pi):
+                    phi_hf = ang - phi_off * abs(errhf)
+                    phi_lf = ang + phi_off * abs(errlf)
+                elif (ang >= -np.pi) & (ang < -np.pi/2):
+                    phi_hf = ang - phi_off * abs(errhf)
+                    phi_lf = ang + phi_off * abs(errlf)
+                elif (ang >= -np.pi/2) & (ang <= 0):
+                    phi_hf = ang + phi_off * abs(errhf)
+                    phi_lf = ang - phi_off * abs(errlf)
+
             # diagnose the error
             if abs(bm) <= l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                if bd != 0:
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
             elif abs(bm) > l and exp_err <= l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                if bd != 0:
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
             elif abs(bm) > l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                if bd != 0:
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
             # FBM
             elif abs(bm) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
-                    "",
-                    xytext=(0, 0),
-                    xy=(0, eff),
-                    arrowprops=dict(facecolor=rgba_color),
-                )
+                    "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color),
+                    zorder=1)
                 ax.annotate(
                     "",
                     xytext=(0, 0),
                     xy=(np.pi, eff),
                     arrowprops=dict(facecolor=rgba_color),
+                    zorder=1
                 )
             # FGM
             elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+
+        # legend for error contribution of high flows and low flows
+        ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=2, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
+        ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
+                  frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
+                  fontsize=11, handletextpad=0.1)
+
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
         if eff_max <= 1:
@@ -1224,7 +1712,9 @@ def diag_polar_plot_multi(
         fig = plt.figure(figsize=(12, 6), constrained_layout=True)
         gs = fig.add_gridspec(1, 2)
         ax = fig.add_subplot(gs[0, 0], projection="polar")
-        ax1 = fig.add_axes([0.66, 0.3, 0.32, 0.32], frameon=True)
+        # add_axes([xmin,ymin,dx,dy])
+        ax1 = fig.add_axes([0.6, 0.2, 0.32, 0.32], frameon=True)
+        ax2 = fig.add_axes([0.6, 0.7, 0.32, 0.32], frameon=True)
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(0, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap="plasma_r")
@@ -1269,41 +1759,78 @@ def diag_polar_plot_multi(
         # threshold efficiency for FBM
         eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
         # loop over each data point
-        zz = zip(ll_brel_mean, ll_b_dir, ll_b_area, ll_temp_cor, ll_eff, ll_phi)
-        for (bm, bd, ba, r, eff, ang) in zz:
-            # slope of bias
-            b_slope = calc_bias_slope(ba, bd)
+        zz = zip(ll_brel_mean, ll_temp_cor, ll_eff, ll_b_dir, ll_phi, ll_b_hf,
+                 ll_b_lf, ll_b_tot, ll_err_hf, ll_err_lf)
+        for (bm, r, eff, bd, ang, bhf, blf, btot, errhf, errlf) in zz:
             # convert temporal correlation to color
             rgba_color = cm.plasma_r(norm(r))
-            # relation of b_dir which explains the error
-            if abs(ba) > 0:
-                exp_err = (abs(bd) * 2) / abs(ba)
-            elif abs(ba) == 0:
+            # relation of high flow errors and low flow errors which explain
+            # the total FDC error
+            if btot > 0:
+                exp_err = (abs(bhf) + abs(blf)) / btot
+            elif btot == 0:
                 exp_err = 0
+
+            # scale marker size
+            s_max = 72
+            s_hf = s_max * abs(errhf)
+            s_lf = s_max * abs(errlf)
+
+            # marker offset
+            if bd != 0:
+                phi_off = np.arccos(1 - (0.18**2/(2*eff**2)))/2
+                if (ang > 0) & (ang <= np.pi/2):
+                    phi_hf = ang + phi_off * abs(errhf)
+                    phi_lf = ang - phi_off * abs(errlf)
+                elif (ang > np.pi/2) & (ang <= np.pi):
+                    phi_hf = ang - phi_off * abs(errhf)
+                    phi_lf = ang + phi_off * abs(errlf)
+                elif (ang >= -np.pi) & (ang < -np.pi/2):
+                    phi_hf = ang - phi_off * abs(errhf)
+                    phi_lf = ang + phi_off * abs(errlf)
+                elif (ang >= -np.pi/2) & (ang <= 0):
+                    phi_hf = ang + phi_off * abs(errhf)
+                    phi_lf = ang - phi_off * abs(errlf)
+
             # diagnose the error
             if abs(bm) <= l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                if bd != 0:
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
             elif abs(bm) > l and exp_err <= l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                if bd != 0:
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
             elif abs(bm) > l and exp_err > l and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                if bd != 0:
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
             # FBM
             elif abs(bm) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
-                    "",
-                    xytext=(0, 0),
-                    xy=(0, eff),
-                    arrowprops=dict(facecolor=rgba_color),
-                )
+                    "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color),
+                    zorder=3)
                 ax.annotate(
                     "",
                     xytext=(0, 0),
                     xy=(np.pi, eff),
                     arrowprops=dict(facecolor=rgba_color),
+                    zorder=3
                 )
             # FGM
             elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+
+        # legend for error contribution of high flows and low flows
+        ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=2, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
+        ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
+                  frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
+                  fontsize=11, handletextpad=0.1)
+
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
         if eff_max <= 1:
@@ -1440,6 +1967,14 @@ def diag_polar_plot_multi(
         ax1.set_ylim(0,)
         ax1.set(ylabel="Density", xlabel=r"[$^\circ$]")
 
+        # error contribution of high flows and low flows
+        errc = pd.DataFrame(index=range(len(eff_de)), columns=['hf', 'lf'])
+        errc.loc[:, 'hf'] = err_hf
+        errc.loc[:, 'lf'] = err_lf
+        sns.violinplot(data=errc, ax=ax2, inner="quartile")
+        ax2.set_ylabel(r'$\epsilon$ [-]')
+        ax2.set_xticklabels(['high flows', 'low flows'])
+
         # 2-D density plot
         r_colors = cm.plasma_r(norm(temp_cor))
         g = sns.jointplot(
@@ -1510,7 +2045,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
     """
     # convert to radians
     # (y, x) Trigonometric inverse tangent
-    phi = np.arctan2(comp1, comp2)
+    phi = calc_phi(comp1, comp2)
 
     # convert metric component 3 to color
     norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
