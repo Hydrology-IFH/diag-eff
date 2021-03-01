@@ -1106,7 +1106,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(0, 1.1, 0.1)
         dummie_cax = ax.scatter(cs, cs, c=cs, cmap="plasma_r")
-        # clear axis
+        # Clear axis
         ax.cla()
         # plot regions
         ax.plot(
@@ -1160,7 +1160,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
 
         # marker offset
         if b_dir != 0:
-            phi_off = np.arccos(1 - (0.18**2/(2*eff**2)))/2
+            phi_off = np.arccos(1 - (off_max**2/(2*eff**2)))/2
             if (phi > 0) & (phi <= np.pi/2):
                 phi_hf = phi + phi_off * abs(err_hf)
                 phi_lf = phi - phi_off * abs(err_lf)
@@ -1190,7 +1190,6 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             if b_dir != 0:
                 c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=3, marker="^", s=s_hf)
                 c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=3, marker="v", s=s_lf)
-
         # FBM
         elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
@@ -1209,8 +1208,8 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
 
         # legend for error contribution of high flows and low flows
-        ax.scatter([], [], color='k', zorder=3, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
-        ax.scatter([], [], color='k', zorder=3, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=2, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
         ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
                   frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
                   fontsize=11, handletextpad=0.1)
@@ -1218,7 +1217,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
         if eff <= 1:
-            ax.set_rmax(0)
+            ax.set_rmax(1)
         elif eff > 1:
             ax.set_rmax(ax_lim)
         # turn labels and grid off

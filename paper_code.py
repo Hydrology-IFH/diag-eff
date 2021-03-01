@@ -1752,3 +1752,4 @@ if __name__ == "__main__":
         PATH_FIG, "kge_diag_real_case.pdf"
     ))
     fig_kge.savefig(path_pdf, dpi=250)
+    
