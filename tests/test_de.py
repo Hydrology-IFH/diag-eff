@@ -163,7 +163,7 @@ def test_bias_dir_simulation_equals_obs_mean():
         obs=np.array([1, 2, 3, 4, 5]), sim=np.array([3, 3, 3, 3, 3])
     )
     b_dir = de.calc_bias_dir(brel_res)
-    assert b_dir < 0
+    assert b_dir > 0
 
 
 def test_bias_dir_for_equal_arrays():

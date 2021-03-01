@@ -1557,6 +1557,7 @@ if __name__ == "__main__":
     # relative bias
     brel = de.calc_brel(obs_arr, sim_arr)
     # total bias
+    b_tot = de.calc_bias_tot(brel)
     df_eff_cam.loc["05", "b_tot"] = de.calc_bias_tot(brel)
     # bias of high flows
     b_hf = de.calc_bias_hf(brel)
@@ -1610,6 +1611,7 @@ if __name__ == "__main__":
     # relative bias
     brel = de.calc_brel(obs_arr, sim_arr)
     # total bias
+    b_tot = de.calc_bias_tot(brel)
     df_eff_cam.loc["48", "b_tot"] = de.calc_bias_tot(brel)
     # bias of high flows
     b_hf = de.calc_bias_hf(brel)
@@ -1663,6 +1665,7 @@ if __name__ == "__main__":
     # relative bias
     brel = de.calc_brel(obs_arr, sim_arr)
     # total bias
+    b_tot = de.calc_bias_tot(brel)
     df_eff_cam.loc["94", "b_tot"] = de.calc_bias_tot(brel)
     # bias of high flows
     b_hf = de.calc_bias_hf(brel)
