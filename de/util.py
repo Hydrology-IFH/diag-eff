@@ -447,11 +447,11 @@ def diag_polar_plot_multi_fc(
 
         # diagnose the error
         if abs(bm) <= l and exp_err > l and eff > eff_l:
-            c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+            c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
             d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
             if bd != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=5, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=5, marker="v", s=s_lf)
             ax.annotate(
                 txt,
                 xy=(ang, eff),
@@ -463,11 +463,11 @@ def diag_polar_plot_multi_fc(
                 va="center",
             )
         elif abs(bm) > l and exp_err <= l and eff > eff_l:
-            c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+            c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
             d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
             if bd != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=5, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=5, marker="v", s=s_lf)
             ax.annotate(
                 txt,
                 xy=(ang, eff),
@@ -479,11 +479,11 @@ def diag_polar_plot_multi_fc(
                 va="center",
             )
         elif abs(bm) > l and exp_err > l and eff > eff_l:
-            c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+            c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
             d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
             if bd != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=5, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=5, marker="v", s=s_lf)
             ax.annotate(
                 txt,
                 xy=(ang, eff),
@@ -523,7 +523,7 @@ def diag_polar_plot_multi_fc(
             )
         # FGM
         elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
-            c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+            c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
             d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
             ax.annotate(
                 txt,

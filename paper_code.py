@@ -77,7 +77,7 @@ if __name__ == "__main__":
         "(m)",
     ]
     fig_ts, axes_ts = plt.subplots(3, 5, sharey=True, sharex=True,
-                                   figsize=(14, 9))
+                                    figsize=(14, 9))
     fig_ts.text(0.5, 0.05, "Time [Years]", ha="center", va="center")
     fig_ts.text(
         0.08, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     yy_str_1 = '2000-1-1 00:00:00'  # start date
     yy_str_2 = '2000-12-31 00:00:00'  # end date
     fig_ts_yy, axes_ts_yy = plt.subplots(3, 5, sharey=True, sharex=True,
-                                         figsize=(14, 9))
+                                          figsize=(14, 9))
     fig_ts_yy.text(0.5, 0.05, "Time [Years]", ha="center", va="center")
     fig_ts_yy.text(
         0.08, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
@@ -194,11 +194,11 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[0, 0], fig_num_fdc[0]
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 0],
-                         fig_num_ts[0])
+                          fig_num_ts[0])
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[0, 0], fig_num_ts[0])
+                          axes_ts_yy[0, 0], fig_num_ts[0])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -268,11 +268,11 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[0, 1], fig_num_fdc[1]
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 1],
-                         fig_num_ts[1])
+                          fig_num_ts[1])
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[0, 1], fig_num_ts[1])
+                          axes_ts_yy[0, 1], fig_num_ts[1])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -342,11 +342,11 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[0, 2], fig_num_fdc[2]
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 2],
-                         fig_num_ts[2])
+                          fig_num_ts[2])
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[0, 2], fig_num_ts[2])
+                          axes_ts_yy[0, 2], fig_num_ts[2])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -416,11 +416,11 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[0, 3], fig_num_fdc[3]
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 3],
-                         fig_num_ts[3])
+                          fig_num_ts[3])
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[0, 3], fig_num_ts[3])
+                          axes_ts_yy[0, 3], fig_num_ts[3])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -490,11 +490,11 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[0, 4], fig_num_fdc[4]
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[0, 4],
-                         fig_num_ts[4])
+                          fig_num_ts[4])
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[0, 4], fig_num_ts[4])
+                          axes_ts_yy[0, 4], fig_num_ts[4])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -566,11 +566,11 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[1, 0], fig_num_fdc[5]
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 0],
-                         fig_num_ts[5])
+                          fig_num_ts[5])
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[1, 0], fig_num_ts[5])
+                          axes_ts_yy[1, 0], fig_num_ts[5])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -642,11 +642,11 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[1, 1], fig_num_fdc[6]
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 1],
-                         fig_num_ts[6])
+                          fig_num_ts[6])
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[1, 1], fig_num_ts[6])
+                          axes_ts_yy[1, 1], fig_num_ts[6])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -718,11 +718,11 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[1, 2], fig_num_fdc[7]
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 2],
-                         fig_num_ts[7])
+                          fig_num_ts[7])
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[1, 2], fig_num_ts[7])
+                          axes_ts_yy[1, 2], fig_num_ts[7])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -794,11 +794,11 @@ if __name__ == "__main__":
         obs_sim["Qobs"], obs_sim["Qsim"], axes_fdc[1, 3], fig_num_fdc[8]
     )
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 3],
-                         fig_num_ts[8])
+                          fig_num_ts[8])
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[1, 3], fig_num_ts[8])
+                          axes_ts_yy[1, 3], fig_num_ts[8])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -870,11 +870,11 @@ if __name__ == "__main__":
     tst = generate_errors.timing(tsn, shuffle=True)  # shuffling
     obs_sim.loc[:, "Qsim"] = tst.iloc[:, 0].values
     util.plot_obs_sim_ax(obs_sim["Qobs"], obs_sim["Qsim"], axes_ts[1, 4],
-                         fig_num_ts[9])
+                          fig_num_ts[9])
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[1, 4], fig_num_ts[9])
+                          axes_ts_yy[1, 4], fig_num_ts[9])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -951,7 +951,7 @@ if __name__ == "__main__":
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[2, 0], fig_num_ts[10])
+                          axes_ts_yy[2, 0], fig_num_ts[10])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -1028,7 +1028,7 @@ if __name__ == "__main__":
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[2, 1], fig_num_ts[11])
+                          axes_ts_yy[2, 1], fig_num_ts[11])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -1105,7 +1105,7 @@ if __name__ == "__main__":
 
     obs_sim_yy = obs_sim.loc[yy_str_1:yy_str_2, :]
     util.plot_obs_sim_ax(obs_sim_yy["Qobs"], obs_sim_yy["Qsim"],
-                         axes_ts_yy[2, 2], fig_num_ts[12])
+                          axes_ts_yy[2, 2], fig_num_ts[12])
 
     # make arrays
     obs_arr = obs_sim["Qobs"].values
@@ -1300,7 +1300,7 @@ if __name__ == "__main__":
     df_es_t.to_csv(path_csv, header=True, index=True, sep=";")
     df_es_t = df_es_t.loc[["de", "kge", "nse"], :]
     df_es_t = df_es_t.round(2)
-    path_csv = Path(os.path.join(PATH_FIG, "table_eff_eff.csv"))
+    path_csv = Path(os.path.join(PATH_FIG, "table_eff.csv"))
     df_es_t.to_csv(path_csv, header=True, index=True, sep=";")
 
     # ==========================================================

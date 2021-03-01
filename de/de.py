@@ -276,7 +276,7 @@ def calc_bias_tot(brel):
 
     See Also
     --------
-    de.calc_brel_res
+    de.calc_brel
     """
     perc = np.linspace(0, 1, len(brel))
     # area of absolute bias
@@ -309,6 +309,10 @@ def calc_bias_hf(brel):
     .. math::
 
         B_{hf} = \int_{0}^{0.5}B_{rel}(i) di
+
+    See Also
+    --------
+    de.calc_brel
 
     Examples
     --------
@@ -359,6 +363,10 @@ def calc_err_hf(b_hf, b_tot):
     .. math::
 
         \epsilon_{hf} = \frac{B_{hf}}{B_{tot}}
+
+    See Also
+    --------
+    de.calc_bias_hf and de.calc_bias_tot
 
     Examples
     --------
@@ -453,7 +461,11 @@ def calc_err_lf(b_lf, b_tot):
     ----------
     .. math::
 
-        \epsilon_{lf} = \frac{B_{lf}}{B_{hf} + B_{lf}}
+        \epsilon_{lf} = \frac{B_{lf}}{B_{tot}}
+
+    See Also
+    --------
+    de.calc_bias_hf and de.calc_bias_tot
 
     Examples
     --------
@@ -553,6 +565,10 @@ def calc_bias_slope(b_area, b_dir):
     .. math::
 
         B_{slope} = \vert B_{area}\vert \times B_{dir}
+
+    See Also
+    --------
+    de.calc_bias_area and de.calc_bias_dir
 
     Examples
     --------
@@ -832,7 +848,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
     elif eff >= 3:
         raise AssertionError("Value of 'DE' is out of bounds for visualization!", eff)
 
-    off_max = 0.14 * ax_lim
+    off_max = 0.11 * ax_lim
     len_yy = len(yy)
 
     # arrays to plot contour lines of DE
@@ -919,32 +935,34 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         if abs(brel_mean) <= l and exp_err > l and eff > eff_l:
             c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
             if b_dir != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=3, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=3, marker="v", s=s_lf)
         elif abs(brel_mean) > l and exp_err <= l and eff > eff_l:
             c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
             if b_dir != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=3, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=3, marker="v", s=s_lf)
         elif abs(brel_mean) > l and exp_err > l and eff > eff_l:
             c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
             if b_dir != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=3, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=3, marker="v", s=s_lf)
         # FBM
         elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
-                "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
+                "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color),
+                zorder=2
             )
             ax.annotate(
                 "",
                 xytext=(0, 0),
                 xy=(np.pi, eff),
                 arrowprops=dict(facecolor=rgba_color),
+                zorder=2
             )
         # FGM
         elif abs(brel_mean) <= l and exp_err <= l and eff <= eff_l:
-            c = ax.scatter(phi, eff, color=rgba_color)
+            c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
 
         # legend for error contribution of high flows and low flows
         ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
@@ -1160,37 +1178,39 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         if abs(brel_mean) <= l and exp_err > l and eff > eff_l:
             c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
             if b_dir != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=3, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=3, marker="v", s=s_lf)
         elif abs(brel_mean) > l and exp_err <= l and eff > eff_l:
             c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
             if b_dir != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=3, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=3, marker="v", s=s_lf)
         elif abs(brel_mean) > l and exp_err > l and eff > eff_l:
             c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
             if b_dir != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=3, marker="^", s=s_hf)
+                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=3, marker="v", s=s_lf)
 
         # FBM
         elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
             ax.annotate(
-                "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
+                "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color),
+                zorder=2
             )
             ax.annotate(
                 "",
                 xytext=(0, 0),
                 xy=(np.pi, eff),
                 arrowprops=dict(facecolor=rgba_color),
+                zorder=2
             )
         # FGM
         elif abs(brel_mean) <= l and exp_err <= l and eff <= eff_l:
-            c = ax.scatter(phi, eff, color=rgba_color)
+            c = ax.scatter(phi, eff, color=rgba_color, zorder=2)
 
         # legend for error contribution of high flows and low flows
-        ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
-        ax.scatter([], [], color='k', zorder=2, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=3, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=3, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
         ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
                   frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
                   fontsize=11, handletextpad=0.1)
@@ -1348,9 +1368,6 @@ def diag_polar_plot_multi(
     brel_mean : (N,)array_like
         relative mean bias as 1-D array
 
-    b_area : (N,)array_like
-        bias area as 1-D array
-
     temp_cor : (N,)array_like
         temporal correlation as 1-D array
 
@@ -1404,19 +1421,18 @@ def diag_polar_plot_multi(
 
     >>> from de import de
     >>> import numpy as np
-    >>> brel_mean = np.array([0.1, 0.15, 0.2, 0.1, 0.05, 0.15])
-    >>> b_area = np.array([0.15, 0.1, 0.2, 0.1, 0.1, 0.2])
-    >>> temp_cor = np.array([0.9, 0.85, 0.8, 0.9, 0.85, 0.9])
-    >>> eff_de = np.array([0.21, 0.24, 0.35, 0.18, 0.19, 0.27])
-    >>> b_dir = np.array([1, 1, 1, 1, 1, 1])
-    >>> phi = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
-    >>> b_hf = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
-    >>> b_lf = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
-    >>> b_tot = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
-    >>> err_hf = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
-    >>> err_lf = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
-    >>> de.diag_polar_plot_multi(brel_mean, b_area, temp_cor, eff_de, b_dir,
-                                 phi)
+    >>> brel_mean = np.array([0.1, 0.15, 0.2])
+    >>> temp_cor = np.array([0.9, 0.85, 0.8])
+    >>> eff_de = np.array([0.21, 0.24, 0.35])
+    >>> b_dir = np.array([1, 1, 1])
+    >>> phi = np.array([0.58, 0.98, 0.78)
+    >>> b_hf = np.array([0.2, 0.15, 0.2])
+    >>> b_lf = np.array([0.2, 0.05, 0.3])
+    >>> b_tot = np.array([0.4, 0.2, 0.5])
+    >>> err_hf = np.array([0.5, 0.75, 0.4])
+    >>> err_lf = np.array([0.5, 0.25, 0.6])
+    >>> de.diag_polar_plot_multi(brel_mean, temp_cor, eff_de, b_dir,
+                                 phi, b_hf, b_lf, b_tot, err_hf, err_lf)
     """
     eff_max = np.max(eff_de)
 
@@ -1453,7 +1469,7 @@ def diag_polar_plot_multi(
         raise ValueError("Some values of 'DE' are too large for visualization!", eff_max)
 
     # maximal offset
-    off_max = 0.14 * ax_lim
+    off_max = 0.11 * ax_lim
     len_yy = len(yy)
 
     # arrays to plot contour lines of DE
@@ -1544,39 +1560,39 @@ def diag_polar_plot_multi(
 
             # diagnose the error
             if abs(bm) <= l and exp_err > l and eff > eff_l:
-                c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
                 if bd != 0:
-                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=4, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=4, marker="v", s=s_lf)
             elif abs(bm) > l and exp_err <= l and eff > eff_l:
-                c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
                 if bd != 0:
-                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=4, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=4, marker="v", s=s_lf)
             elif abs(bm) > l and exp_err > l and eff > eff_l:
-                c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
                 if bd != 0:
-                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=4, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=4, marker="v", s=s_lf)
             # FBM
             elif abs(bm) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
                     "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color),
-                    zorder=1)
+                    zorder=2)
                 ax.annotate(
                     "",
                     xytext=(0, 0),
                     xy=(np.pi, eff),
                     arrowprops=dict(facecolor=rgba_color),
-                    zorder=1
+                    zorder=2
                 )
             # FGM
             elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
-                c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
 
         # legend for error contribution of high flows and low flows
-        ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
-        ax.scatter([], [], color='k', zorder=2, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=4, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=4, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
         ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
                   frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
                   fontsize=11, handletextpad=0.1)
@@ -1794,39 +1810,39 @@ def diag_polar_plot_multi(
 
             # diagnose the error
             if abs(bm) <= l and exp_err > l and eff > eff_l:
-                c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
                 if bd != 0:
-                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=4, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=4, marker="v", s=s_lf)
             elif abs(bm) > l and exp_err <= l and eff > eff_l:
-                c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
                 if bd != 0:
-                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=4, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=4, marker="v", s=s_lf)
             elif abs(bm) > l and exp_err > l and eff > eff_l:
-                c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
                 if bd != 0:
-                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=2, marker="^", s=s_hf)
-                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=2, marker="v", s=s_lf)
+                    c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=4, marker="^", s=s_hf)
+                    c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=4, marker="v", s=s_lf)
             # FBM
             elif abs(bm) <= l and exp_err <= l and eff > eff_l:
                 ax.annotate(
                     "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color),
-                    zorder=3)
+                    zorder=2)
                 ax.annotate(
                     "",
                     xytext=(0, 0),
                     xy=(np.pi, eff),
                     arrowprops=dict(facecolor=rgba_color),
-                    zorder=3
+                    zorder=2
                 )
             # FGM
             elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
-                c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
+                c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
 
         # legend for error contribution of high flows and low flows
-        ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
-        ax.scatter([], [], color='k', zorder=2, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=4, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
+        ax.scatter([], [], color='k', zorder=4, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
         ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
                   frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
                   fontsize=11, handletextpad=0.1)

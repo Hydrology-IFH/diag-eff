@@ -215,11 +215,16 @@ def test_single_diag_polar_plot():
     baseline_dir=baseline_dir_multi, tolerance=DEFAULT_TOLERANCE
 )
 def test_multi_diag_polar_plot():
-    brel_mean = np.array([0.1, 0.15, 0.2, 0.1, 0.05, 0.15])
-    b_area = np.array([0.15, 0.1, 0.2, 0.1, 0.1, 0.2])
-    temp_cor = np.array([0.9, 0.85, 0.8, 0.9, 0.85, 0.9])
-    eff_de = np.array([0.21, 0.24, 0.35, 0.18, 0.19, 0.27])
-    b_dir = np.array([0.08, 0.05, 0.1, 0.05, 0.05, 0.1])
-    phi = np.array([0.58, 0.98, 0.78, 0.78, 0.46, 0.64])
-    fig = de.diag_polar_plot_multi(brel_mean, b_area, temp_cor, eff_de, b_dir, phi)
+    brel_mean = np.array([0.1, 0.15, 0.2])
+    temp_cor = np.array([0.9, 0.85, 0.8])
+    eff_de = np.array([0.21, 0.24, 0.35])
+    b_dir = np.array([1, 1, 1])
+    phi = np.array([0.58, 0.98, 0.78])
+    b_hf = np.array([0.2, 0.15, 0.2])
+    b_lf = np.array([0.2, 0.05, 0.3])
+    b_tot = np.array([0.4, 0.2, 0.5])
+    err_hf = np.array([0.5, 0.75, 0.4])
+    err_lf = np.array([0.5, 0.25, 0.6])
+    fig = de.diag_polar_plot_multi(brel_mean, temp_cor, eff_de, b_dir,
+                                   phi, b_hf, b_lf, b_tot, err_hf, err_lf)
     return fig
