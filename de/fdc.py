@@ -28,6 +28,31 @@ _q_lab = _mmd
 _sim_lab = "Simulated"
 
 
+def calc_fdc(ts, prob):
+    """
+    Calculate numeric values of the flow duration curve for a single
+    hydrologic time series.
+
+    Parameters
+    ----------
+    ts : (N,)array_like
+        hydrologic time series
+
+    prob : (N,)array_like
+        Quantile or sequence of quantiles to compute.
+
+    Returns
+    ----------
+    fdc_vals : (N,)array_like
+        numeric values to plot flow duration curve
+    """
+    data = ts[np.logical_not(np.isnan(ts))]
+    data = np.sort(data)  # sort values by ascending order
+    fdc_vals = np.quantile(data, prob)[::-1]
+
+    return fdc_vals
+
+
 def fdc(ts):
     """
     Flow duration curve for a single hydrologic time series.

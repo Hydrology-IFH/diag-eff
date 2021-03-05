@@ -216,8 +216,10 @@ def fdc_obs_sim_ax(obs, sim, ax, fig_num):  # pragma: no cover
     ----------
     obs : series
         observed time series
+
     sim : series
         simulated time series
+
     ax : axes
         Axes object to draw the plot onto
     fig_num : string
@@ -252,10 +254,13 @@ def plot_obs_sim_ax(obs, sim, ax, fig_num):  # pragma: no cover
     ----------
     obs : series
         observed time series
+
     sim : series
         simulated time series
+
     ax : axes
         Axes object to draw the plot onto
+
     fig_num : string
         string object for figure caption
     """
@@ -355,7 +360,6 @@ def diag_polar_plot_multi_fc(
     # determine axis limits
     yy = np.arange(0.01, ax_lim, delta)
     c_levels = np.arange(0, ax_lim, 0.2)
-    off_max = 0.14 * ax_lim
 
     len_yy = 360
     # len_yy1 = 90
@@ -424,34 +428,28 @@ def diag_polar_plot_multi_fc(
         elif btot == 0:
             exp_err = 0
 
-        # scale marker size
-        s_max = 72
-        s_hf = s_max * abs(errhf)
-        s_lf = s_max * abs(errlf)
+        # calculate pies to display error contribution of high flows and low
+        # flows
+        # calculate the points of the first pie marker
+        # these are just the origin (0, 0) + some (cos, sin) points on a circle
+        r1 = abs(errhf)/2
+        x1 = np.cos(2 * np.pi * np.linspace(0.25 - r1/2, 0.25 + r1/2))
+        y1 = np.sin(2 * np.pi * np.linspace(0.25 - r1/2, 0.25 + r1/2))
+        xy1 = np.row_stack([[0, 0], np.column_stack([x1, y1])])
+        s1 = np.abs(xy1).max()
 
-        # marker offset
-        if bd != 0:
-            phi_off = np.arccos(1 - (off_max**2/(2*eff**2)))/2
-            if (ang > 0) & (ang <= np.pi/2):
-                phi_hf = ang + phi_off * abs(errhf)
-                phi_lf = ang - phi_off * abs(errlf)
-            elif (ang > np.pi/2) & (ang <= np.pi):
-                phi_hf = ang - phi_off * abs(errhf)
-                phi_lf = ang + phi_off * abs(errlf)
-            elif (ang >= -np.pi) & (ang < -np.pi/2):
-                phi_hf = ang - phi_off * abs(errhf)
-                phi_lf = ang + phi_off * abs(errlf)
-            elif (ang >= -np.pi/2) & (ang <= 0):
-                phi_hf = ang + phi_off * abs(errhf)
-                phi_lf = ang - phi_off * abs(errlf)
+        r2 = abs(errlf)/2
+        x2 = np.cos(2 * np.pi * np.linspace(0.75 - r2/2, 0.75 + r2/2))
+        y2 = np.sin(2 * np.pi * np.linspace(0.75 - r2/2, 0.75 + r2/2))
+        xy2 = np.row_stack([[0, 0], np.column_stack([x2, y2])])
+        s2 = np.abs(xy2).max()
 
         # diagnose the error
         if abs(bm) <= l and exp_err > l and eff > eff_l:
-            c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
-            if bd != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=5, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=5, marker="v", s=s_lf)
+            c0 = ax.scatter(ang, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
+            c1 = ax.scatter(ang, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
+            c = ax.scatter(ang, eff, s=36, facecolor=rgba_color, zorder=3)
+            c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
             ax.annotate(
                 txt,
                 xy=(ang, eff),
@@ -463,11 +461,10 @@ def diag_polar_plot_multi_fc(
                 va="center",
             )
         elif abs(bm) > l and exp_err <= l and eff > eff_l:
-            c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
-            if bd != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=5, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=5, marker="v", s=s_lf)
+            c0 = ax.scatter(ang, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
+            c1 = ax.scatter(ang, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
+            c = ax.scatter(ang, eff, s=36, facecolor=rgba_color, zorder=3)
+            c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
             ax.annotate(
                 txt,
                 xy=(ang, eff),
@@ -479,11 +476,10 @@ def diag_polar_plot_multi_fc(
                 va="center",
             )
         elif abs(bm) > l and exp_err > l and eff > eff_l:
-            c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
-            d = ax.scatter(ang, eff, color="grey", marker=".", zorder=4)
-            if bd != 0:
-                c0 = ax.scatter(phi_hf, eff, color=rgba_color, zorder=5, marker="^", s=s_hf)
-                c1 = ax.scatter(phi_lf, eff, color=rgba_color, zorder=5, marker="v", s=s_lf)
+            c0 = ax.scatter(ang, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
+            c1 = ax.scatter(ang, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
+            c = ax.scatter(ang, eff, s=36, facecolor=rgba_color, zorder=3)
+            c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
             ax.annotate(
                 txt,
                 xy=(ang, eff),
@@ -537,8 +533,19 @@ def diag_polar_plot_multi_fc(
             )
 
     # legend for error contribution of high flows and low flows
-    ax.scatter([], [], color='k', zorder=2, marker="^", s=36, label=r'high flows ($\epsilon_{hf}=0.5$)')
-    ax.scatter([], [], color='k', zorder=2, marker="v", s=36, label=r'low flows ($\epsilon_{lf}=0.5$)')
+    rl1 = 1/2
+    xl1 = np.cos(2 * np.pi * np.linspace(0.25 - rl1/2, 0.25 + rl1/2))
+    yl1 = np.sin(2 * np.pi * np.linspace(0.25 - rl1/2, 0.25 + rl1/2))
+    xyl1 = np.row_stack([[0, 0], np.column_stack([xl1, yl1])])
+    sl1 = np.abs(xyl1).max()
+
+    rl2 = 1/2
+    xl2 = np.cos(2 * np.pi * np.linspace(0.75 - rl2/2, 0.75 + rl2/2))
+    yl2 = np.sin(2 * np.pi * np.linspace(0.75 - rl2/2, 0.75 + rl2/2))
+    xyl2 = np.row_stack([[0, 0], np.column_stack([xl2, yl2])])
+    sl2 = np.abs(xyl2).max()
+    ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1**2 * 200, label=r'high flows ($\epsilon_{hf}=1$)')
+    ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2**2 * 200, label=r'low flows ($\epsilon_{lf}=1$)')
     ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
               frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
               fontsize=11, handletextpad=0.1)
