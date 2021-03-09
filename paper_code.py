@@ -29,19 +29,19 @@ if __name__ == "__main__":
     # ==========================================================
     # 619.11 km2; AI: 0.82
     area = 619.11
-    path = Path(os.path.join(os.getcwd(), "examples/13331500_streamflow_qc.txt"))
+    path = PATH / "examples" / "13331500_streamflow_qc.txt"
     ## 191.55 km2; AI: 2.04
     # area = 191.55
-    # path = os.path.join(os.getcwd(),
-    #                     'examples/06332515_streamflow_qc.txt')
+    # path = PATH / "examples" / "06332515_streamflow_qc.txt"
+    #
     ## 190.65 km2; AI: 2.98
     # area = 190.65
-    # path = os.path.join(os.getcwd(),
-    #                     'examples/09512280_streamflow_qc.txt')
+    # path = PATH / "examples" / "09512280_streamflow_qc.txt"
+    #
     ## 66.57 km2; AI: 0.27
     # area = 66.57
-    # path = os.path.join(os.getcwd(),
-    #                     'examples/12114500_streamflow_qc.txt')
+    # path = PATH / "examples" / "12114500_streamflow_qc.txt"
+    #
 
     # import observed time series
     df_ts = util.import_camels_ts(path, sep=r"\s+", catch_area=area)
@@ -1181,7 +1181,6 @@ if __name__ == "__main__":
     idx = ["0", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
     ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     brel_mean_arr = df_es["brel_mean"].values[ids]
-    b_area_arr = df_es["b_area"].values[ids]
     temp_cor_arr = df_es["temp_cor"].values[ids]
     b_dir_arr = df_es["b_dir"].values[ids]
     de_arr = df_es["de"].values[ids]
@@ -1194,7 +1193,7 @@ if __name__ == "__main__":
     err_lf_arr = df_es["err_lf"].values[ids]
 
     fig_de = util.diag_polar_plot_multi_fc(
-        brel_mean_arr, b_area_arr, temp_cor_arr, de_arr, b_dir_arr, phi_arr,
+        brel_mean_arr, temp_cor_arr, de_arr, b_dir_arr, phi_arr,
         b_hf_arr, b_lf_arr, b_tot_arr, err_hf_arr, err_lf_arr, idx
     )
     path = Path(os.path.join(PATH_FIG, "de_diag.pdf"))
@@ -1708,7 +1707,6 @@ if __name__ == "__main__":
     ### multi diagnostic polar plot ###
     # make arrays
     brel_mean_arr = df_eff_cam["brel_mean"].values
-    b_area_arr = df_eff_cam["b_area"].values
     temp_cor_arr = df_eff_cam["temp_cor"].values
     b_dir_arr = df_eff_cam["b_dir"].values
     de_arr = df_eff_cam["de"].values
@@ -1722,7 +1720,6 @@ if __name__ == "__main__":
 
     fig_de = util.diag_polar_plot_multi_fc(
         brel_mean_arr,
-        b_area_arr,
         temp_cor_arr,
         de_arr,
         b_dir_arr,
@@ -1752,4 +1749,3 @@ if __name__ == "__main__":
         PATH_FIG, "kge_diag_real_case.pdf"
     ))
     fig_kge.savefig(path_pdf, dpi=250)
-        

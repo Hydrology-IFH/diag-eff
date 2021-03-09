@@ -1098,7 +1098,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         cbar = fig.colorbar(
             dummie_cax, ax=ax, orientation="horizontal", ticks=[1, 0.5, 0], shrink=0.8
         )
-        cbar.set_label("r [-]", labelpad=4)
+        cbar.set_label("r [-]\nTiming error", labelpad=4)
         cbar.set_ticklabels(["1", "0.5", "<0"])
         cbar.ax.tick_params(direction="in")
 
@@ -1348,7 +1348,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         cbar = fig.colorbar(
             dummie_cax, ax=ax, orientation="horizontal", ticks=[1, 0.5, 0], shrink=0.8
         )
-        cbar.set_label("r [-]", labelpad=4)
+        cbar.set_label("r [-]\nTiming error", labelpad=4)
         cbar.set_ticklabels(["1", "0.5", "<0"])
         cbar.ax.tick_params(direction="in")
 
@@ -1735,7 +1735,7 @@ def diag_polar_plot_multi(
         cbar = fig.colorbar(
             dummie_cax, ax=ax, orientation="horizontal", ticks=[1, 0.5, 0], shrink=0.8
         )
-        cbar.set_label("r [-]", labelpad=4)
+        cbar.set_label("r [-]\nTiming error", labelpad=4)
         cbar.set_ticklabels(["1", "0.5", "<0"])
         cbar.ax.tick_params(direction="in")
 
@@ -1992,7 +1992,7 @@ def diag_polar_plot_multi(
         cbar = fig.colorbar(
             dummie_cax, ax=ax, orientation="horizontal", ticks=[1, 0.5, 0], shrink=0.8
         )
-        cbar.set_label("r [-]", labelpad=4)
+        cbar.set_label("r [-]\nTiming error", labelpad=4)
         cbar.set_ticklabels(["1", "0.5", "<0"])
         cbar.ax.tick_params(direction="in")
 

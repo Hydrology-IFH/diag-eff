@@ -282,7 +282,7 @@ def plot_obs_sim_ax(obs, sim, ax, fig_num):  # pragma: no cover
 
 
 def diag_polar_plot_multi_fc(
-    brel_mean, b_area, temp_cor, eff_de, b_dir, phi, b_hf, b_lf, b_tot,
+    brel_mean, temp_cor, eff_de, b_dir, phi, b_hf, b_lf, b_tot,
     err_hf, err_lf, fc, l=0.05, ax_lim=1.2
 ):  # pragma: no cover
     r"""Multiple polar plot of Diagnostic-Efficiency (DE)
@@ -291,9 +291,6 @@ def diag_polar_plot_multi_fc(
     ----------
     brel_mean : (N,)array_like
         relative mean bias as 1-D array
-
-    b_area : (N,)array_like
-        bias area as 1-D array
 
     temp_cor : (N,)array_like
         temporal correlation as 1-D array
@@ -665,7 +662,7 @@ def diag_polar_plot_multi_fc(
     cbar = fig.colorbar(
         dummie_cax, ax=ax, orientation="horizontal", ticks=[1, 0.5, 0], shrink=0.8
     )
-    cbar.set_label(r"r [-]", fontsize=12, labelpad=8)
+    cbar.set_label("r [-]\nTiming error", labelpad=4)
     cbar.set_ticklabels(["1", "0.5", "<0"])
     cbar.ax.tick_params(direction="in", labelsize=10)
 
@@ -880,7 +877,7 @@ def polar_plot_multi_fc(
     cbar = fig.colorbar(
         dummie_cax, ax=ax, orientation="horizontal", ticks=[1, 0.5, 0], shrink=0.8
     )
-    cbar.set_label(r"r [-]", fontsize=12, labelpad=8)
+    cbar.set_label("r [-]\nTiming error", labelpad=4)
     cbar.set_ticklabels(["1", "0.5", "<0"])
     cbar.ax.tick_params(direction="in", labelsize=10)
 
