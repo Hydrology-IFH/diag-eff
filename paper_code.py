@@ -1168,10 +1168,16 @@ if __name__ == "__main__":
 
     path_png = Path(os.path.join(PATH_FIG, "fdc_errors.png"))
     fig_fdc.savefig(path_png, dpi=250)
+    path_pdf = Path(os.path.join(PATH_FIG, "fdc_errors.pdf"))
+    fig_fdc.savefig(path_pdf, dpi=250)
     path_png = Path(os.path.join(PATH_FIG, "ts_errors.png"))
     fig_ts.savefig(path_png, dpi=250)
+    path_pdf = Path(os.path.join(PATH_FIG, "ts_errors.pdf"))
+    fig_ts.savefig(path_pdf, dpi=250)
     path_png = Path(os.path.join(PATH_FIG, "ts_errors_yy.png"))
     fig_ts_yy.savefig(path_png, dpi=250)
+    path_pdf = Path(os.path.join(PATH_FIG, "ts_errors_yy.pdf"))
+    fig_ts_yy.savefig(path_pdf, dpi=250)
 
     # -----------------------------------------------------------------
     # diagnostic plolar plot
@@ -1285,6 +1291,8 @@ if __name__ == "__main__":
     fig.subplots_adjust(wspace=0.45, bottom=0.2)
     path_png = Path(os.path.join(PATH_FIG, "scatter_eff_comp.png"))
     fig.savefig(path_png, dpi=250)
+    path_pdf = Path(os.path.join(PATH_FIG, "scatter_eff_comp.pdf"))
+    fig.savefig(path_pdf, dpi=250)
     # for i, txt in enumerate(df_es.index):
     #     ax.annotate(txt, (alpha_arr[i] - 1, brel_mean_arr[i]), color='black',
     #                 fontsize=15)

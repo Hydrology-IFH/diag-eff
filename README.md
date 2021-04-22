@@ -9,6 +9,7 @@ Info: `diag-eff` needs Python >= 3.6!
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/schwemro/diag-eff/3a4185022087729fdcd517e705114f923701601b)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+[![Requirements Status](https://requires.io/github/schwemro/diag-eff/requirements.svg?branch=master)](https://requires.io/github/schwemro/diag-eff/requirements/?branch=master)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4590174.svg)](https://doi.org/10.5281/zenodo.4590174)
 
 
@@ -18,9 +19,9 @@ In case you use `diag-eff` in other software or scientific publications,
 please reference this package. It is published and has a DOI. It can be cited
 as:
 
-    Schwemmle, R., Demand, D., and Weiler, M.: Diagnostic efficiency – specific
-    evaluation of model performance, Hydrol. Earth Syst. Sci. Discuss.,
-    https://doi.org/10.5194/hess-2020-237, in review, 2020.
+    Schwemmle, R., Demand, D., and Weiler, M.: Technical note: Diagnostic
+    efficiency – specific evaluation of model performance, Hydrol. Earth Syst.
+    Sci., 25, 2187–2198, https://doi.org/10.5194/hess-25-2187-2021, 2021. 
 
 ## Full Documentation
 

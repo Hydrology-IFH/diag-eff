@@ -1889,7 +1889,7 @@ def diag_polar_plot_multi(
         ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", r"0$^{\circ}$ (360$^{\circ}$)", "", ""])
         ax.text(
-            -0.14,
+            -0.16,
             0.5,
             "High flow overestimation -",
             va="center",
@@ -1899,7 +1899,7 @@ def diag_polar_plot_multi(
             transform=ax.transAxes,
         )
         ax.text(
-            -0.09,
+            -0.11,
             0.5,
             "Low flow underestimation",
             va="center",
@@ -1909,7 +1909,7 @@ def diag_polar_plot_multi(
             transform=ax.transAxes,
         )
         ax.text(
-            -0.04,
+            -0.05,
             0.5,
             r"$B_{slope}$ < 0",
             va="center",
@@ -1919,7 +1919,7 @@ def diag_polar_plot_multi(
             transform=ax.transAxes,
         )
         ax.text(
-            1.14,
+            1.16,
             0.5,
             "High flow underestimation -",
             va="center",
@@ -1929,7 +1929,7 @@ def diag_polar_plot_multi(
             transform=ax.transAxes,
         )
         ax.text(
-            1.09,
+            1.11,
             0.5,
             "Low flow overestimation",
             va="center",
@@ -1939,7 +1939,7 @@ def diag_polar_plot_multi(
             transform=ax.transAxes,
         )
         ax.text(
-            1.04,
+            1.05,
             0.5,
             r"$B_{slope}$ > 0",
             va="center",
@@ -1950,7 +1950,7 @@ def diag_polar_plot_multi(
         )
         ax.text(
             0.5,
-            -0.09,
+            -0.11,
             "Constant negative offset",
             va="center",
             ha="center",
@@ -1960,7 +1960,7 @@ def diag_polar_plot_multi(
         )
         ax.text(
             0.5,
-            -0.04,
+            -0.05,
             r"$\overline{B_{rel}}$ < 0",
             va="center",
             ha="center",
@@ -1970,7 +1970,7 @@ def diag_polar_plot_multi(
         )
         ax.text(
             0.5,
-            1.09,
+            1.11,
             "Constant positive offset",
             va="center",
             ha="center",
@@ -1980,7 +1980,7 @@ def diag_polar_plot_multi(
         )
         ax.text(
             0.5,
-            1.04,
+            1.05,
             r"$\overline{B_{rel}}$ > 0",
             va="center",
             ha="center",
@@ -2039,7 +2039,7 @@ def diag_polar_plot_multi(
         kde_xx = kde_data[0]
         kde_yy = kde_data[1]
         norm = matplotlib.colors.Normalize(vmin=0, vmax=ax_lim)
-        colors = cm.Reds_r(norm(kde_yy))
+        colors = cm.Greens_r(norm(kde_yy))
         npts = len(kde_xx)
         for i in range(npts - 1):
             g.ax_marg_y.fill_betweenx(
@@ -2665,7 +2665,7 @@ def gdiag_polar_plot_multi(
         kde_xx = kde_data[0]
         kde_yy = kde_data[1]
         norm = matplotlib.colors.Normalize(vmin=0, vmax=ax_lim)
-        colors = cm.Reds_r(norm(kde_yy))
+        colors = cm.Greens_r(norm(kde_yy))
         npts = len(kde_xx)
         for i in range(npts - 1):
             g.ax_marg_y.fill_betweenx(
