@@ -7,7 +7,7 @@ from pathlib import Path
 
 PATH = Path(__file__).parent
 sys.path.append(str(PATH))
-PATH_FIG = PATH.parent / "technical_note" / "figures"
+PATH_FIG = PATH.parent.parent / "diagnostic_efficiency" / "figures"
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
