@@ -22,7 +22,7 @@ The most recent version from GitHub can be installed like:
 
 .. code-block:: bash
 
-    git clone https://github.com/schwemro/diag-eff.git
+    git clone https://github.com/Hydrology-IFH/diag-eff.git
     cd diag-eff
     pip install -r requirements.txt
     pip install -e .

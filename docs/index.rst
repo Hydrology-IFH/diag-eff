@@ -1,5 +1,5 @@
-Welcome to diag-eff's documentation!
-========================================
+Diagnostic efficiency – specific evaluation of model performance
+================================================================
 
 `diag-eff` is a package for diagnostic evaluation of hydrologic simulations. It
 includes one main module `de`. The module provides functions for calculating

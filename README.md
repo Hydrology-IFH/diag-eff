@@ -2,14 +2,14 @@
 
 Info: `diag-eff` needs Python >= 3.6!
 
-[![Build Status](https://travis-ci.com/schwemro/diag-eff.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master)](https://travis-ci.com/schwemro/diag-eff)
+[![Build Status](https://travis-ci.com/Hydrology-IFH/diag-eff.svg?token=xpMVcD4f5rphE6dVCxpb&branch=master)](https://travis-ci.com/Hydrology-IFH/diag-eff)
 [![Documentation Status](https://readthedocs.org/projects/diag-eff/badge/?version=latest)](https://diag-eff.readthedocs.io/en/latest/?badge=latest)
-[![codecov](https://codecov.io/gh/schwemro/diag-eff/branch/master/graph/badge.svg?token=AmLX6d2FuR)](https://codecov.io/gh/schwemro/diag-eff)
+[![codecov](https://codecov.io/gh/Hydrology-IFH/diag-eff/branch/master/graph/badge.svg?token=AmLX6d2FuR)](https://codecov.io/gh/Hydrology-IFH/diag-eff)
 [![PyPI version shields.io](https://img.shields.io/pypi/v/diag-eff.svg)](https://pypi.python.org/pypi/diag-eff/)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
-[![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/schwemro/diag-eff/3a4185022087729fdcd517e705114f923701601b)
+[![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Hydrology-IFH/diag-eff/3a4185022087729fdcd517e705114f923701601b)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
-[![Requirements Status](https://requires.io/github/schwemro/diag-eff/requirements.svg?branch=master)](https://requires.io/github/schwemro/diag-eff/requirements/?branch=master)
+[![Requirements Status](https://requires.io/github/Hydrology-IFH/diag-eff/requirements.svg?branch=master)](https://requires.io/github/Hydrology-IFH/diag-eff/requirements/?branch=master)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4590174.svg)](https://doi.org/10.5281/zenodo.4590174)
 
 
@@ -21,7 +21,7 @@ as:
 
     Schwemmle, R., Demand, D., and Weiler, M.: Technical note: Diagnostic
     efficiency – specific evaluation of model performance, Hydrol. Earth Syst.
-    Sci., 25, 2187–2198, https://doi.org/10.5194/hess-25-2187-2021, 2021. 
+    Sci., 25, 2187–2198, https://doi.org/10.5194/hess-25-2187-2021, 2021.
 
 ## Full Documentation
 
@@ -52,7 +52,7 @@ pip install diag-eff
 GIT:
 
 ```bash
-git clone https://github.com/schwemro/diag-eff.git
+git clone https://github.com/Hydrology-IFH/diag-eff.git
 cd diag-eff
 pip install -r requirements.txt
 pip install -e .
