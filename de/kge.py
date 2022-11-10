@@ -11,19 +11,19 @@ error vs. variability error vs. timing error)
 """
 
 import numpy as np
-import matplotlib
 from matplotlib import cm
-import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import scipy as sp
+import matplotlib
 import seaborn as sns
+matplotlib.use("agg")
+import matplotlib.pyplot as plt  # noqa: E402
 
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
 np.seterr(divide="ignore", invalid="ignore")
 
 # controlling figure aesthetics
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
-sns.set_context("paper", font_scale=1.5)
 
 
 def calc_temp_cor(obs, sim, r="pearson"):
@@ -517,7 +517,7 @@ def polar_plot(obs, sim, r="pearson", var="std"):
 
         # diagnostic polar plot
         fig, ax = plt.subplots(
-            figsize=(6, 6), subplot_kw=dict(projection="polar"), constrained_layout=True
+            figsize=(3, 3), subplot_kw=dict(projection="polar"), constrained_layout=True
         )
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(0, 1.1, 0.1)
@@ -529,7 +529,7 @@ def polar_plot(obs, sim, r="pearson", var="std"):
             (1, np.deg2rad(45)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -537,7 +537,7 @@ def polar_plot(obs, sim, r="pearson", var="std"):
             (1, np.deg2rad(135)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -545,7 +545,7 @@ def polar_plot(obs, sim, r="pearson", var="std"):
             (1, np.deg2rad(225)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -553,13 +553,13 @@ def polar_plot(obs, sim, r="pearson", var="std"):
             (1, np.deg2rad(315)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
         # contours of KGE
-        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-        cl = ax.clabel(cp, inline=1, fontsize=10, fmt="%1.1f", colors="dimgrey")
+        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+        cl = ax.clabel(cp, inline=1, fmt="%1.1f", colors="dimgrey")
         # diagnose the error
         if eff < 0.9:
             ax.annotate(
@@ -715,7 +715,7 @@ def polar_plot(obs, sim, r="pearson", var="std"):
 
         # diagnostic polar plot
         fig, ax = plt.subplots(
-            figsize=(6, 6), subplot_kw=dict(projection="polar"), constrained_layout=True
+            figsize=(3, 3), subplot_kw=dict(projection="polar"), constrained_layout=True
         )
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(0, 1.1, 0.1)
@@ -727,7 +727,7 @@ def polar_plot(obs, sim, r="pearson", var="std"):
             (1, np.deg2rad(45)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -735,7 +735,7 @@ def polar_plot(obs, sim, r="pearson", var="std"):
             (1, np.deg2rad(135)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -743,7 +743,7 @@ def polar_plot(obs, sim, r="pearson", var="std"):
             (1, np.deg2rad(225)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -751,13 +751,13 @@ def polar_plot(obs, sim, r="pearson", var="std"):
             (1, np.deg2rad(315)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
         # contours of KGE
-        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-        cl = ax.clabel(cp, inline=1, fontsize=10, fmt="%1.1f", colors="dimgrey")
+        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+        cl = ax.clabel(cp, inline=1, fmt="%1.1f", colors="dimgrey")
         # diagnose the error
         if eff < 0.9:
             ax.annotate(
@@ -966,7 +966,7 @@ def polar_plot_multi(
     # diagnostic polar plot
     if not extended:
         fig, ax = plt.subplots(
-            figsize=(6, 6), subplot_kw=dict(projection="polar"), constrained_layout=True
+            figsize=(3, 3), subplot_kw=dict(projection="polar"), constrained_layout=True
         )
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(0, 1.1, 0.1)
@@ -978,7 +978,7 @@ def polar_plot_multi(
             (1, np.deg2rad(45)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -986,7 +986,7 @@ def polar_plot_multi(
             (1, np.deg2rad(135)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -994,7 +994,7 @@ def polar_plot_multi(
             (1, np.deg2rad(225)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1002,13 +1002,13 @@ def polar_plot_multi(
             (1, np.deg2rad(315)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
         # contours of KGE
-        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
+        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+        cl = ax.clabel(cp, inline=True, fmt="%1.1f", colors="dimgrey")
         # loop over each data point
         for (b, ag, r, eff) in zip(ll_kge_beta, ll_ag, ll_kge_r, ll_eff):
             ang = np.arctan2(b - 1, ag - 1)
@@ -1123,7 +1123,7 @@ def polar_plot_multi(
         return fig
 
     elif extended:
-        fig = plt.figure(figsize=(12, 6), constrained_layout=True)
+        fig = plt.figure(figsize=(6, 3), constrained_layout=True)
         gs = fig.add_gridspec(1, 2)
         ax = fig.add_subplot(gs[0, 0], projection="polar")
         ax1 = fig.add_axes([0.64, 0.3, 0.33, 0.33], frameon=True)
@@ -1137,7 +1137,7 @@ def polar_plot_multi(
             (1, np.deg2rad(45)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1145,7 +1145,7 @@ def polar_plot_multi(
             (1, np.deg2rad(135)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1153,7 +1153,7 @@ def polar_plot_multi(
             (1, np.deg2rad(225)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1161,13 +1161,13 @@ def polar_plot_multi(
             (1, np.deg2rad(315)),
             (1, np.min(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
         # contours of KGE
-        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
+        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+        cl = ax.clabel(cp, inline=True, fmt="%1.1f", colors="dimgrey")
         # loop over each data point
         for (b, ag, r, eff) in zip(ll_kge_beta, ll_ag, ll_kge_r, ll_eff):
             ang = np.arctan2(b - 1, ag - 1)

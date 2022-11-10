@@ -14,19 +14,19 @@ error contributions (dynamic errors vs. constant erros vs. timing errors)
 import numpy as np
 import matplotlib
 from matplotlib import cm
-import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import pandas as pd
 import scipy as sp
 import scipy.integrate as integrate
 import seaborn as sns
+matplotlib.use("agg")
+import matplotlib.pyplot as plt  # noqa: E402
 
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
 np.seterr(divide="ignore", invalid="ignore")
 
 # controlling figure aesthetics
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
-sns.set_context("paper", font_scale=1.5)
 
 
 def calc_brel(obs, sim, sort=True):
@@ -696,6 +696,7 @@ def calc_de(obs, sim, sort=True):
 
     return eff
 
+
 def calc_phi(brel_mean, b_slope):
     """
     Calculate trigonometric inverse tangent.
@@ -747,7 +748,7 @@ def calc_phi(brel_mean, b_slope):
     return phi
 
 
-def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
+def diag_polar_plot(obs, sim, sort=True, limit=0.05, extended=False):
     r"""
     Diagnostic polar plot of Diagnostic efficiency (DE) for a single
     evaluation.
@@ -764,7 +765,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         If True, time series are sorted by ascending order. If False, time
         series are not sorted. The default is to sort.
 
-    l : float, optional
+    limit : float, optional
         Threshold for which diagnosis can be made. The default is 0.05.
 
     extended : boolean, optional
@@ -829,7 +830,8 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
 
     # convert temporal correlation to color
     norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
-    rgba_color = cm.plasma_r(norm(temp_cor))
+    cmap = cm.get_cmap('plasma_r')
+    rgba_color = cmap(norm(temp_cor))
 
     delta = 0.01  # for spacing
 
@@ -858,7 +860,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
     # diagnostic polar plot
     if not extended:
         fig, ax = plt.subplots(
-            figsize=(6, 6), subplot_kw=dict(projection="polar"), constrained_layout=True
+            figsize=(3, 3), subplot_kw=dict(projection="polar"), constrained_layout=True
         )
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(0, 1.1, 0.1)
@@ -870,7 +872,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             (0, np.deg2rad(45)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -878,7 +880,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             (0, np.deg2rad(135)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -886,7 +888,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             (0, np.deg2rad(225)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -894,15 +896,15 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             (0, np.deg2rad(315)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
         # contours of DE
-        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
+        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+        cl = ax.clabel(cp, inline=True, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((limit) ** 2 + (limit) ** 2 + (limit) ** 2)
         # relation of high flow errors and low flow errors which explain
         # the total FDC error
         if b_tot > 0:
@@ -927,23 +929,23 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         s2 = np.abs(xy2).max()
 
         # diagnose the error
-        if abs(brel_mean) <= l and exp_err > l and eff > eff_l:
-            c0 = ax.scatter(phi, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=2)
-            c1 = ax.scatter(phi, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=2)
-            c = ax.scatter(phi, eff, s=36, facecolor=rgba_color, zorder=2)
-            c2 = ax.scatter(phi, eff, s=4, facecolor='grey', zorder=2)
-        elif abs(brel_mean) > l and exp_err <= l and eff > eff_l:
-            c0 = ax.scatter(phi, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=2)
-            c1 = ax.scatter(phi, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=2)
-            c = ax.scatter(phi, eff, s=36, facecolor=rgba_color, zorder=2)
-            c2 = ax.scatter(phi, eff, s=4, facecolor='grey', zorder=2)
-        elif abs(brel_mean) > l and exp_err > l and eff > eff_l:
-            c0 = ax.scatter(phi, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=2)
-            c1 = ax.scatter(phi, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=2)
-            c = ax.scatter(phi, eff, s=36, facecolor=rgba_color, zorder=2)
-            c2 = ax.scatter(phi, eff, s=4, facecolor='grey', zorder=2)
+        if abs(brel_mean) <= limit and exp_err > limit and eff > eff_l:
+            c0 = ax.scatter(phi, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=2)
+            c1 = ax.scatter(phi, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=2)
+            c = ax.scatter(phi, eff, s=4, facecolor=rgba_color, zorder=2)
+            c2 = ax.scatter(phi, eff, s=1, facecolor='grey', zorder=2)
+        elif abs(brel_mean) > limit and exp_err <= limit and eff > eff_l:
+            c0 = ax.scatter(phi, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=2)
+            c1 = ax.scatter(phi, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=2)
+            c = ax.scatter(phi, eff, s=4, facecolor=rgba_color, zorder=2)
+            c2 = ax.scatter(phi, eff, s=1, facecolor='grey', zorder=2)
+        elif abs(brel_mean) > limit and exp_err > limit and eff > eff_l:
+            c0 = ax.scatter(phi, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=2)
+            c1 = ax.scatter(phi, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=2)
+            c = ax.scatter(phi, eff, s=4, facecolor=rgba_color, zorder=2)
+            c2 = ax.scatter(phi, eff, s=1, facecolor='grey', zorder=2)
         # FBM
-        elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
+        elif abs(brel_mean) <= limit and exp_err <= limit and eff > eff_l:
             ax.annotate(
                 "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color),
                 zorder=2
@@ -956,9 +958,9 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
                 zorder=2
             )
         # FGM
-        elif abs(brel_mean) <= l and exp_err <= l and eff <= eff_l:
-            c = ax.scatter(phi, eff, s=36, facecolor=rgba_color, zorder=2)
-            c2 = ax.scatter(phi, eff, s=4, facecolor='grey', zorder=2)
+        elif abs(brel_mean) <= limit and exp_err <= limit and eff <= eff_l:
+            c = ax.scatter(phi, eff, s=4, facecolor=rgba_color, zorder=2)
+            c2 = ax.scatter(phi, eff, s=1, facecolor='grey', zorder=2)
 
         # legend for error contribution of high flows and low flows
         rl1 = 1/2
@@ -972,11 +974,10 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         yl2 = np.sin(2 * np.pi * np.linspace(0.75 - rl2/2, 0.75 + rl2/2))
         xyl2 = np.row_stack([[0, 0], np.column_stack([xl2, yl2])])
         sl2 = np.abs(xyl2).max()
-        ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1**2 * 200, label=r'high flows ($\epsilon_{hf}=1$)')
-        ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2**2 * 200, label=r'low flows ($\epsilon_{lf}=1$)')
+        ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1 * 50, label=r'high values ($\epsilon_{hf}=1$)')
+        ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2 * 50, label=r'low values ($\epsilon_{lf}=1$)')
         ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
-                  frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
-                  fontsize=11, handletextpad=0.1)
+                  frameon=False, bbox_to_anchor=(1.45, 1.2), handletextpad=0.2)
 
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
@@ -996,9 +997,9 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         ax.text(
-            -0.14,
+            -0.16,
             0.5,
-            "High flow overestimation -",
+            "High value overestimation -",
             va="center",
             ha="center",
             rotation=90,
@@ -1006,9 +1007,9 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             transform=ax.transAxes,
         )
         ax.text(
-            -0.09,
+            -0.11,
             0.5,
-            "Low flow underestimation",
+            "Low value underestimation",
             va="center",
             ha="center",
             rotation=90,
@@ -1016,7 +1017,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             transform=ax.transAxes,
         )
         ax.text(
-            -0.04,
+            -0.06,
             0.5,
             r"$B_{slope}$ < 0",
             va="center",
@@ -1026,9 +1027,9 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             transform=ax.transAxes,
         )
         ax.text(
-            1.14,
+            1.16,
             0.5,
-            "High flow underestimation -",
+            "High value underestimation -",
             va="center",
             ha="center",
             rotation=90,
@@ -1036,9 +1037,9 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             transform=ax.transAxes,
         )
         ax.text(
-            1.09,
+            1.11,
             0.5,
-            "Low flow overestimation",
+            "Low value overestimation",
             va="center",
             ha="center",
             rotation=90,
@@ -1046,7 +1047,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             transform=ax.transAxes,
         )
         ax.text(
-            1.04,
+            1.06,
             0.5,
             r"$B_{slope}$ > 0",
             va="center",
@@ -1057,7 +1058,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         )
         ax.text(
             0.5,
-            -0.09,
+            -0.12,
             "Constant negative offset",
             va="center",
             ha="center",
@@ -1067,7 +1068,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         )
         ax.text(
             0.5,
-            -0.04,
+            -0.06,
             r"$\overline{B_{rel}}$ < 0",
             va="center",
             ha="center",
@@ -1077,7 +1078,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         )
         ax.text(
             0.5,
-            1.09,
+            1.12,
             "Constant positive offset",
             va="center",
             ha="center",
@@ -1087,7 +1088,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         )
         ax.text(
             0.5,
-            1.04,
+            1.06,
             r"$\overline{B_{rel}}$ > 0",
             va="center",
             ha="center",
@@ -1103,10 +1104,26 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         cbar.set_ticklabels(["1", "0.5", "<0"])
         cbar.ax.tick_params(direction="in")
 
+        if (obs == 0).any():
+            N_obs0 = np.sum(obs == 0)
+            N_sim0 = np.sum(sim == 0)
+            share0 = N_obs0 / obs.size
+            a0 = np.round(1 - (N_sim0 / N_obs0), 2)
+            ax.text(
+                1.4,
+                0.1,
+                f"Share of zero values [-]: {share0}\n Agreement of zero values [-]: {a0}",
+                va="center",
+                ha="center",
+                rotation=0,
+                rotation_mode="anchor",
+                transform=ax.transAxes,
+            )
+
         return fig
 
     elif extended:
-        fig = plt.figure(figsize=(12, 6), constrained_layout=True)
+        fig = plt.figure(figsize=(6, 3), constrained_layout=True)
         gs = fig.add_gridspec(1, 2)
         ax = fig.add_subplot(gs[0, 0], projection="polar")
         ax1 = fig.add_axes([0.65, 0.3, 0.33, 0.33], frameon=True)
@@ -1120,7 +1137,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             (0, np.deg2rad(45)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1128,7 +1145,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             (0, np.deg2rad(135)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1136,7 +1153,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             (0, np.deg2rad(225)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1144,15 +1161,15 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             (0, np.deg2rad(315)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
         # contours of DE
-        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
+        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+        cl = ax.clabel(cp, inline=True, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((limit) ** 2 + (limit) ** 2 + (limit) ** 2)
         # relation of high flow errors and low flow errors which explain
         # the total FDC error
         if b_tot > 0:
@@ -1177,23 +1194,23 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         s2 = np.abs(xy2).max()
 
         # diagnose the error
-        if abs(brel_mean) <= l and exp_err > l and eff > eff_l:
-            c0 = ax.scatter(phi, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
-            c1 = ax.scatter(phi, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
-            c = ax.scatter(phi, eff, s=36, facecolor=rgba_color, zorder=3)
-            c2 = ax.scatter(phi, eff, s=4, facecolor='grey', zorder=3)
-        elif abs(brel_mean) > l and exp_err <= l and eff > eff_l:
-            c0 = ax.scatter(phi, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
-            c1 = ax.scatter(phi, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
-            c = ax.scatter(phi, eff, s=36, facecolor=rgba_color, zorder=3)
-            c2 = ax.scatter(phi, eff, s=4, facecolor='grey', zorder=3)
-        elif abs(brel_mean) > l and exp_err > l and eff > eff_l:
-            c0 = ax.scatter(phi, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
-            c1 = ax.scatter(phi, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
-            c = ax.scatter(phi, eff, s=36, facecolor=rgba_color, zorder=3)
-            c2 = ax.scatter(phi, eff, s=4, facecolor='grey', zorder=3)
+        if abs(brel_mean) <= limit and exp_err > limit and eff > eff_l:
+            c0 = ax.scatter(phi, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=3)
+            c1 = ax.scatter(phi, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=3)
+            c = ax.scatter(phi, eff, s=4, facecolor=rgba_color, zorder=3)
+            c2 = ax.scatter(phi, eff, s=1, facecolor='grey', zorder=3)
+        elif abs(brel_mean) > limit and exp_err <= limit and eff > eff_l:
+            c0 = ax.scatter(phi, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=3)
+            c1 = ax.scatter(phi, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=3)
+            c = ax.scatter(phi, eff, s=4, facecolor=rgba_color, zorder=3)
+            c2 = ax.scatter(phi, eff, s=1, facecolor='grey', zorder=3)
+        elif abs(brel_mean) > limit and exp_err > limit and eff > eff_l:
+            c0 = ax.scatter(phi, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=3)
+            c1 = ax.scatter(phi, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=3)
+            c = ax.scatter(phi, eff, s=4, facecolor=rgba_color, zorder=3)
+            c2 = ax.scatter(phi, eff, s=1, facecolor='grey', zorder=3)
         # FBM
-        elif abs(brel_mean) <= l and exp_err <= l and eff > eff_l:
+        elif abs(brel_mean) <= limit and exp_err <= limit and eff > eff_l:
             ax.annotate(
                 "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color),
                 zorder=2
@@ -1206,9 +1223,9 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
                 zorder=2
             )
         # FGM
-        elif abs(brel_mean) <= l and exp_err <= l and eff <= eff_l:
+        elif abs(brel_mean) <= limit and exp_err <= limit and eff <= eff_l:
             c = ax.scatter(phi, eff, color=rgba_color, zorder=3)
-            c2 = ax.scatter(phi, eff, s=4, facecolor='grey', zorder=3)
+            c2 = ax.scatter(phi, eff, s=1, facecolor='grey', zorder=3)
 
         # legend for error contribution of high flows and low flows
         rl1 = 1/2
@@ -1222,11 +1239,10 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         yl2 = np.sin(2 * np.pi * np.linspace(0.75 - rl2/2, 0.75 + rl2/2))
         xyl2 = np.row_stack([[0, 0], np.column_stack([xl2, yl2])])
         sl2 = np.abs(xyl2).max()
-        ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1**2 * 200, label=r'high flows ($\epsilon_{hf}=1$)')
-        ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2**2 * 200, label=r'low flows ($\epsilon_{lf}=1$)')
+        ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1 * 50, label=r'high values ($\epsilon_{hf}=1$)')
+        ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2 * 50, label=r'low values ($\epsilon_{lf}=1$)')
         ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
-                  frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
-                  fontsize=11, handletextpad=0.1)
+                  frameon=False, bbox_to_anchor=(1.3, 1.1), handletextpad=0.1)
 
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
@@ -1246,9 +1262,9 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
         ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         ax.text(
-            -0.14,
+            -0.16,
             0.5,
-            "High flow overestimation -",
+            "High value overestimation -",
             va="center",
             ha="center",
             rotation=90,
@@ -1256,9 +1272,9 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             transform=ax.transAxes,
         )
         ax.text(
-            -0.09,
+            -0.11,
             0.5,
-            "Low flow underestimation",
+            "Low value underestimation",
             va="center",
             ha="center",
             rotation=90,
@@ -1276,9 +1292,9 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             transform=ax.transAxes,
         )
         ax.text(
-            1.14,
+            1.17,
             0.5,
-            "High flow underestimation -",
+            "High value underestimation -",
             va="center",
             ha="center",
             rotation=90,
@@ -1286,9 +1302,9 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             transform=ax.transAxes,
         )
         ax.text(
-            1.09,
+            1.12,
             0.5,
-            "Low flow overestimation",
+            "Low value overestimation",
             va="center",
             ha="center",
             rotation=90,
@@ -1296,7 +1312,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
             transform=ax.transAxes,
         )
         ax.text(
-            1.04,
+            1.06,
             0.5,
             r"$B_{slope}$ > 0",
             va="center",
@@ -1368,7 +1384,7 @@ def diag_polar_plot(obs, sim, sort=True, l=0.05, extended=False):
 
 def diag_polar_plot_multi(
     brel_mean, temp_cor, eff_de, b_dir, phi, b_hf, b_lf, b_tot, err_hf,
-    err_lf, l=0.05, extended=False):
+    err_lf, a0=None, share0=None, limit=0.05, extended=False):
     r"""
     Diagnostic polar plot of Diagnostic efficiency (DE) for multiple
     evaluations.
@@ -1408,7 +1424,13 @@ def diag_polar_plot_multi(
     err_lf : (N,)array_like
         contribution of low flow errors
 
-    l : float, optional
+    a0 : (N,)array_like
+        agreement of zero values
+
+    share0 : float
+        share of zero values in observations
+
+    limit : float, optional
         Deviation of metric terms used to calculate the threshold of DE for
         which diagnosis is available. The default is 0.05.
 
@@ -1490,7 +1512,7 @@ def diag_polar_plot_multi(
     # diagnostic polar plot
     if not extended:
         fig, ax = plt.subplots(
-            figsize=(6, 6), subplot_kw=dict(projection="polar"), constrained_layout=True
+            figsize=(3, 3), subplot_kw=dict(projection="polar"), constrained_layout=True
         )
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(0, 1.1, 0.1)
@@ -1502,7 +1524,7 @@ def diag_polar_plot_multi(
             (0, np.deg2rad(45)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1510,7 +1532,7 @@ def diag_polar_plot_multi(
             (0, np.deg2rad(135)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1518,7 +1540,7 @@ def diag_polar_plot_multi(
             (0, np.deg2rad(225)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1526,21 +1548,22 @@ def diag_polar_plot_multi(
             (0, np.deg2rad(315)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
         # contours of DE
-        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
+        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+        cl = ax.clabel(cp, inline=True, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((limit) ** 2 + (limit) ** 2 + (limit) ** 2)
         # loop over each data point
         zz = zip(ll_brel_mean, ll_temp_cor, ll_eff, ll_b_dir, ll_phi, ll_b_hf,
                  ll_b_lf, ll_b_tot, ll_err_hf, ll_err_lf)
         for (bm, r, eff, bd, ang, bhf, blf, btot, errhf, errlf) in zz:
             # convert temporal correlation to color
-            rgba_color = cm.plasma_r(norm(r))
+            cmap = cm.get_cmap('plasma_r')
+            rgba_color = cmap(norm(r))
             # relation of high flow errors and low flow errors which explain
             # the total FDC error
             if btot > 0:
@@ -1565,23 +1588,23 @@ def diag_polar_plot_multi(
             s2 = np.abs(xy2).max()
 
             # diagnose the error
-            if abs(bm) <= l and exp_err > l and eff > eff_l:
-                c0 = ax.scatter(ang, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
-                c1 = ax.scatter(ang, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
-                c = ax.scatter(ang, eff, s=36, facecolor=rgba_color, zorder=3)
-                c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
-            elif abs(bm) > l and exp_err <= l and eff > eff_l:
-                c0 = ax.scatter(ang, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
-                c1 = ax.scatter(ang, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
-                c = ax.scatter(ang, eff, s=36, facecolor=rgba_color, zorder=3)
-                c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
-            elif abs(bm) > l and exp_err > l and eff > eff_l:
-                c0 = ax.scatter(ang, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
-                c1 = ax.scatter(ang, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
-                c = ax.scatter(ang, eff, s=36, facecolor=rgba_color, zorder=3)
-                c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
+            if abs(bm) <= limit and exp_err > limit and eff > eff_l:
+                c0 = ax.scatter(ang, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=3)
+                c1 = ax.scatter(ang, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=3)
+                c = ax.scatter(ang, eff, s=4, facecolor=rgba_color, zorder=3)
+                c2 = ax.scatter(ang, eff, s=1, facecolor='grey', zorder=3)
+            elif abs(bm) > limit and exp_err <= limit and eff > eff_l:
+                c0 = ax.scatter(ang, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=3)
+                c1 = ax.scatter(ang, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=3)
+                c = ax.scatter(ang, eff, s=4, facecolor=rgba_color, zorder=3)
+                c2 = ax.scatter(ang, eff, s=1, facecolor='grey', zorder=3)
+            elif abs(bm) > limit and exp_err > limit and eff > eff_l:
+                c0 = ax.scatter(ang, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=3)
+                c1 = ax.scatter(ang, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=3)
+                c = ax.scatter(ang, eff, s=4, facecolor=rgba_color, zorder=3)
+                c2 = ax.scatter(ang, eff, s=1, facecolor='grey', zorder=3)
             # FBM
-            elif abs(bm) <= l and exp_err <= l and eff > eff_l:
+            elif abs(bm) <= limit and exp_err <= limit and eff > eff_l:
                 ax.annotate(
                     "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color),
                     zorder=2)
@@ -1593,9 +1616,9 @@ def diag_polar_plot_multi(
                     zorder=2
                 )
             # FGM
-            elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
+            elif abs(bm) <= limit and exp_err <= limit and eff <= eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
-                c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
+                c2 = ax.scatter(ang, eff, s=1, facecolor='grey', zorder=3)
 
         # legend for error contribution of high flows and low flows
         rl1 = 1/2
@@ -1609,11 +1632,10 @@ def diag_polar_plot_multi(
         yl2 = np.sin(2 * np.pi * np.linspace(0.75 - rl2/2, 0.75 + rl2/2))
         xyl2 = np.row_stack([[0, 0], np.column_stack([xl2, yl2])])
         sl2 = np.abs(xyl2).max()
-        ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1**2 * 200, label=r'high flows ($\epsilon_{hf}=1$)')
-        ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2**2 * 200, label=r'low flows ($\epsilon_{lf}=1$)')
+        ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1 * 50, label=r'high values ($\epsilon_{hf}=1$)')
+        ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2 * 50, label=r'low values ($\epsilon_{lf}=1$)')
         ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
-                  frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
-                  fontsize=11, handletextpad=0.1)
+                  frameon=False, bbox_to_anchor=(1.45, 1.2), handletextpad=0.2)
 
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
@@ -1633,9 +1655,9 @@ def diag_polar_plot_multi(
         ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         ax.text(
-            -0.14,
+            -0.16,
             0.5,
-            "High flow overestimation -",
+            "High value overestimation -",
             va="center",
             ha="center",
             rotation=90,
@@ -1643,9 +1665,9 @@ def diag_polar_plot_multi(
             transform=ax.transAxes,
         )
         ax.text(
-            -0.09,
+            -0.11,
             0.5,
-            "Low flow underestimation",
+            "Low value underestimation",
             va="center",
             ha="center",
             rotation=90,
@@ -1663,9 +1685,9 @@ def diag_polar_plot_multi(
             transform=ax.transAxes,
         )
         ax.text(
-            1.14,
+            1.17,
             0.5,
-            "High flow underestimation -",
+            "High value underestimation -",
             va="center",
             ha="center",
             rotation=90,
@@ -1673,9 +1695,9 @@ def diag_polar_plot_multi(
             transform=ax.transAxes,
         )
         ax.text(
-            1.09,
+            1.12,
             0.5,
-            "Low flow overestimation",
+            "Low value overestimation",
             va="center",
             ha="center",
             rotation=90,
@@ -1683,7 +1705,7 @@ def diag_polar_plot_multi(
             transform=ax.transAxes,
         )
         ax.text(
-            1.04,
+            1.06,
             0.5,
             r"$B_{slope}$ > 0",
             va="center",
@@ -1694,7 +1716,7 @@ def diag_polar_plot_multi(
         )
         ax.text(
             0.5,
-            -0.09,
+            -0.12,
             "Constant negative offset",
             va="center",
             ha="center",
@@ -1704,7 +1726,7 @@ def diag_polar_plot_multi(
         )
         ax.text(
             0.5,
-            -0.04,
+            -0.05,
             r"$\overline{B_{rel}}$ < 0",
             va="center",
             ha="center",
@@ -1714,7 +1736,7 @@ def diag_polar_plot_multi(
         )
         ax.text(
             0.5,
-            1.09,
+            1.12,
             "Constant positive offset",
             va="center",
             ha="center",
@@ -1724,7 +1746,7 @@ def diag_polar_plot_multi(
         )
         ax.text(
             0.5,
-            1.04,
+            1.05,
             r"$\overline{B_{rel}}$ > 0",
             va="center",
             ha="center",
@@ -1740,10 +1762,38 @@ def diag_polar_plot_multi(
         cbar.set_ticklabels(["1", "0.5", "<0"])
         cbar.ax.tick_params(direction="in")
 
+        if a0 is not None and share0 is not None:
+            a0_avg = np.round(np.mean(a0), 2)
+            a0_std = np.round(np.std(a0), 2)
+            ax.text(
+                1.1,
+                0.0,
+                f"Share of zero values [-]: {share0}\nAgreement of zero values [-]: {a0_avg} ± {a0_std}",
+                va="center",
+                ha="center",
+                rotation=0,
+                rotation_mode="anchor",
+                transform=ax.transAxes,
+            )
+
+        elif a0 is not None and share0 is None:
+            a0_avg = np.round(np.mean(a0), 2)
+            a0_std = np.round(np.std(a0), 2)
+            ax.text(
+                1.1,
+                0.0,
+                f"Agreement of zero values [-]:\n {a0_avg} ± {a0_std}",
+                va="center",
+                ha="center",
+                rotation=0,
+                rotation_mode="anchor",
+                transform=ax.transAxes,
+            )
+
         return fig
 
     elif extended:
-        fig = plt.figure(figsize=(12, 6), constrained_layout=True)
+        fig = plt.figure(figsize=(6, 3), constrained_layout=True)
         gs = fig.add_gridspec(1, 2)
         ax = fig.add_subplot(gs[0, 0], projection="polar")
         # add_axes([xmin,ymin,dx,dy])
@@ -1759,7 +1809,7 @@ def diag_polar_plot_multi(
             (0, np.deg2rad(45)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1767,7 +1817,7 @@ def diag_polar_plot_multi(
             (0, np.deg2rad(135)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1775,7 +1825,7 @@ def diag_polar_plot_multi(
             (0, np.deg2rad(225)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -1783,21 +1833,22 @@ def diag_polar_plot_multi(
             (0, np.deg2rad(315)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
         # contours of DE
-        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
+        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+        cl = ax.clabel(cp, inline=True, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((limit) ** 2 + (limit) ** 2 + (limit) ** 2)
         # loop over each data point
         zz = zip(ll_brel_mean, ll_temp_cor, ll_eff, ll_b_dir, ll_phi, ll_b_hf,
                  ll_b_lf, ll_b_tot, ll_err_hf, ll_err_lf)
         for (bm, r, eff, bd, ang, bhf, blf, btot, errhf, errlf) in zz:
             # convert temporal correlation to color
-            rgba_color = cm.plasma_r(norm(r))
+            cmap = cm.get_cmap('plasma_r')
+            rgba_color = cmap(norm(r))
             # relation of high flow errors and low flow errors which explain
             # the total FDC error
             if btot > 0:
@@ -1822,23 +1873,23 @@ def diag_polar_plot_multi(
             s2 = np.abs(xy2).max()
 
             # diagnose the error
-            if abs(bm) <= l and exp_err > l and eff > eff_l:
-                c0 = ax.scatter(ang, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
-                c1 = ax.scatter(ang, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
-                c = ax.scatter(ang, eff, s=36, facecolor=rgba_color, zorder=3)
-                c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
-            elif abs(bm) > l and exp_err <= l and eff > eff_l:
-                c0 = ax.scatter(ang, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
-                c1 = ax.scatter(ang, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
-                c = ax.scatter(ang, eff, s=36, facecolor=rgba_color, zorder=3)
-                c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
-            elif abs(bm) > l and exp_err > l and eff > eff_l:
-                c0 = ax.scatter(ang, eff, marker=xy1, s=s1**2 * 200, facecolor=rgba_color, zorder=3)
-                c1 = ax.scatter(ang, eff, marker=xy2, s=s2**2 * 200, facecolor=rgba_color, zorder=3)
-                c = ax.scatter(ang, eff, s=36, facecolor=rgba_color, zorder=3)
-                c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
+            if abs(bm) <= limit and exp_err > limit and eff > eff_l:
+                c0 = ax.scatter(ang, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=3)
+                c1 = ax.scatter(ang, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=3)
+                c = ax.scatter(ang, eff, s=4, facecolor=rgba_color, zorder=3)
+                c2 = ax.scatter(ang, eff, s=1, facecolor='grey', zorder=3)
+            elif abs(bm) > limit and exp_err <= limit and eff > eff_l:
+                c0 = ax.scatter(ang, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=3)
+                c1 = ax.scatter(ang, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=3)
+                c = ax.scatter(ang, eff, s=4, facecolor=rgba_color, zorder=3)
+                c2 = ax.scatter(ang, eff, s=1, facecolor='grey', zorder=3)
+            elif abs(bm) > limit and exp_err > limit and eff > eff_l:
+                c0 = ax.scatter(ang, eff, marker=xy1, s=s1 * 50, facecolor=rgba_color, zorder=3)
+                c1 = ax.scatter(ang, eff, marker=xy2, s=s2 * 50, facecolor=rgba_color, zorder=3)
+                c = ax.scatter(ang, eff, s=4, facecolor=rgba_color, zorder=3)
+                c2 = ax.scatter(ang, eff, s=1, facecolor='grey', zorder=3)
             # FBM
-            elif abs(bm) <= l and exp_err <= l and eff > eff_l:
+            elif abs(bm) <= limit and exp_err <= limit and eff > eff_l:
                 ax.annotate(
                     "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color),
                     zorder=2)
@@ -1850,9 +1901,9 @@ def diag_polar_plot_multi(
                     zorder=2
                 )
             # FGM
-            elif abs(bm) <= l and exp_err <= l and eff <= eff_l:
+            elif abs(bm) <= limit and exp_err <= limit and eff <= eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=3)
-                c2 = ax.scatter(ang, eff, s=4, facecolor='grey', zorder=3)
+                c2 = ax.scatter(ang, eff, s=1, facecolor='grey', zorder=3)
 
         # legend for error contribution of high flows and low flows
         rl1 = 1/2
@@ -1866,11 +1917,10 @@ def diag_polar_plot_multi(
         yl2 = np.sin(2 * np.pi * np.linspace(0.75 - rl2/2, 0.75 + rl2/2))
         xyl2 = np.row_stack([[0, 0], np.column_stack([xl2, yl2])])
         sl2 = np.abs(xyl2).max()
-        ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1**2 * 200, label=r'high flows ($\epsilon_{hf}=1$)')
-        ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2**2 * 200, label=r'low flows ($\epsilon_{lf}=1$)')
+        ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1 * 50, label=r'high values ($\epsilon_{hf}=1$)')
+        ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2 * 50, label=r'low values ($\epsilon_{lf}=1$)')
         ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
-                  frameon=False, bbox_to_anchor=(1.3, 1.1), title_fontsize=11,
-                  fontsize=11, handletextpad=0.1)
+                  frameon=False, bbox_to_anchor=(1.3, 1.1), handletextpad=0.1)
 
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
@@ -1892,7 +1942,7 @@ def diag_polar_plot_multi(
         ax.text(
             -0.16,
             0.5,
-            "High flow overestimation -",
+            "High value overestimation -",
             va="center",
             ha="center",
             rotation=90,
@@ -1902,7 +1952,7 @@ def diag_polar_plot_multi(
         ax.text(
             -0.11,
             0.5,
-            "Low flow underestimation",
+            "Low value underestimation",
             va="center",
             ha="center",
             rotation=90,
@@ -1922,7 +1972,7 @@ def diag_polar_plot_multi(
         ax.text(
             1.16,
             0.5,
-            "High flow underestimation -",
+            "High value underestimation -",
             va="center",
             ha="center",
             rotation=90,
@@ -1932,7 +1982,7 @@ def diag_polar_plot_multi(
         ax.text(
             1.11,
             0.5,
-            "Low flow overestimation",
+            "Low value overestimation",
             va="center",
             ha="center",
             rotation=90,
@@ -2014,10 +2064,11 @@ def diag_polar_plot_multi(
         errc.loc[:, 'lf'] = err_lf
         sns.violinplot(data=errc, ax=ax2, inner="quartile")
         ax2.set_ylabel(r'$\epsilon$ [-]')
-        ax2.set_xticklabels(['high flows', 'low flows'])
+        ax2.set_xticklabels(['high values', 'low values'])
 
         # 2-D density plot
-        r_colors = cm.plasma_r(norm(temp_cor))
+        cmap = cm.get_cmap('plasma_r')
+        r_colors = cmap(norm(temp_cor))
         g = sns.jointplot(
             x=diag_deg,
             y=eff_de,
@@ -2051,7 +2102,7 @@ def diag_polar_plot_multi(
         return fig, g.fig
 
 
-def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
+def gdiag_polar_plot(eff, comp1, comp2, comp3, limit=0.05):  # pragma: no cover
     r"""
     Generic diagnostic polar plot for  single evaluation.
 
@@ -2069,7 +2120,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
     comp3 : float
         metric component 3
 
-    l : float, optional
+    limit : float, optional
         Deviation of metric terms used to calculate the threshold of DE for
         which diagnosis is available. The default is 0.05.
 
@@ -2090,7 +2141,8 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
 
     # convert metric component 3 to color
     norm = matplotlib.colors.Normalize(vmin=0, vmax=1.0)
-    rgba_color = cm.plasma_r(norm(comp3))
+    cmap = cm.get_cmap('plasma_r')
+    rgba_color = cmap(norm(comp3))
 
     delta = 0.01  # for spacing
 
@@ -2118,7 +2170,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
 
     # diagnostic polar plot
     fig, ax = plt.subplots(
-        figsize=(6, 6), subplot_kw=dict(projection="polar"), constrained_layout=True
+        figsize=(3, 3), subplot_kw=dict(projection="polar"), constrained_layout=True
     )
     # dummie plot for colorbar of temporal correlation
     cs = np.arange(0, 1.1, 0.1)
@@ -2130,7 +2182,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
         (0, np.deg2rad(45)),
         (0, np.max(yy)),
         color="lightgray",
-        linewidth=1.5,
+        linewidth=1,
         ls="--",
         zorder=0,
     )
@@ -2138,7 +2190,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
         (0, np.deg2rad(135)),
         (0, np.max(yy)),
         color="lightgray",
-        linewidth=1.5,
+        linewidth=1,
         ls="--",
         zorder=0,
     )
@@ -2146,7 +2198,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
         (0, np.deg2rad(225)),
         (0, np.max(yy)),
         color="lightgray",
-        linewidth=1.5,
+        linewidth=1,
         ls="--",
         zorder=0,
     )
@@ -2154,35 +2206,35 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
         (0, np.deg2rad(315)),
         (0, np.max(yy)),
         color="lightgray",
-        linewidth=1.5,
+        linewidth=1,
         ls="--",
         zorder=0,
     )
     # contours of DE
-    cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-    cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
+    cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+    cl = ax.clabel(cp, inline=True, fmt="%1.1f", colors="dimgrey")
     # threshold efficiency for FBM
-    eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+    eff_l = np.sqrt((limit) ** 2 + (limit) ** 2 + (limit) ** 2)
     # relation of b_dir which explains the error
     if abs(comp2) > 0:
         exp_err = comp2
     elif abs(comp2) == 0:
         exp_err = 0
     # diagnose the error
-    if abs(comp1) <= l and exp_err > l and eff > eff_l:
+    if abs(comp1) <= limit and exp_err > limit and eff > eff_l:
         ax.annotate(
             "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
         )
-    elif abs(comp1) > l and exp_err <= l and eff > eff_l:
+    elif abs(comp1) > limit and exp_err <= limit and eff > eff_l:
         ax.annotate(
             "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
         )
-    elif abs(comp1) > l and exp_err > l and eff > eff_l:
+    elif abs(comp1) > limit and exp_err > limit and eff > eff_l:
         ax.annotate(
             "", xytext=(0, 0), xy=(phi, eff), arrowprops=dict(facecolor=rgba_color)
         )
     # FBM
-    elif abs(comp1) <= l and exp_err <= l and eff > eff_l:
+    elif abs(comp1) <= limit and exp_err <= limit and eff > eff_l:
         ax.annotate(
             "", xytext=(0, 0), xy=(0, eff), arrowprops=dict(facecolor=rgba_color)
         )
@@ -2190,7 +2242,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
             "", xytext=(0, 0), xy=(np.pi, eff), arrowprops=dict(facecolor=rgba_color)
         )
     # FGM
-    elif abs(comp1) <= l and exp_err <= l and eff <= eff_l:
+    elif abs(comp1) <= limit and exp_err <= limit and eff <= eff_l:
         c = ax.scatter(phi, eff, color=rgba_color)
     ax.set_rticks([])  # turn default ticks off
     ax.set_rmin(0)
@@ -2261,7 +2313,7 @@ def gdiag_polar_plot(eff, comp1, comp2, comp3, l=0.05):  # pragma: no cover
 
 
 def gdiag_polar_plot_multi(
-    eff, comp1, comp2, comp3, l=0.05, extended=True
+    eff, comp1, comp2, comp3, limit=0.05, extended=True
 ):  # pragma: no cover
     r"""
     Generic diagnostic polar plot for multiple evaluations.
@@ -2280,7 +2332,7 @@ def gdiag_polar_plot_multi(
     comp3 : (N,)array_like
         metric component 3
 
-    l : float, optional
+    limit : float, optional
         Deviation of metric terms used to calculate the threshold of DE for
         which diagnosis is available. The default is 0.05.
 
@@ -2339,7 +2391,7 @@ def gdiag_polar_plot_multi(
     # diagnostic polar plot
     if not extended:
         fig, ax = plt.subplots(
-            figsize=(6, 6), subplot_kw=dict(projection="polar"), constrained_layout=True
+            figsize=(3, 3), subplot_kw=dict(projection="polar"), constrained_layout=True
         )
         # dummie plot for colorbar of temporal correlation
         cs = np.arange(0, 1.1, 0.1)
@@ -2351,7 +2403,7 @@ def gdiag_polar_plot_multi(
             (0, np.deg2rad(45)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -2359,7 +2411,7 @@ def gdiag_polar_plot_multi(
             (0, np.deg2rad(135)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -2367,7 +2419,7 @@ def gdiag_polar_plot_multi(
             (0, np.deg2rad(225)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -2375,34 +2427,35 @@ def gdiag_polar_plot_multi(
             (0, np.deg2rad(315)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
         # contours of DE
-        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
+        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+        cl = ax.clabel(cp, inline=True, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((limit) ** 2 + (limit) ** 2 + (limit) ** 2)
         # loop over each data point
         for (c1, c2, c3, eff) in zip(ll_comp1, ll_comp2, ll_comp3, ll_eff):
             ang = np.arctan2(c1, c2)
             # convert temporal correlation to color
-            rgba_color = cm.plasma_r(norm(c3))
+            cmap = cm.get_cmap('plasma_r')
+            rgba_color = cmap(norm(c3))
             # relation of b_dir which explains the error
             if abs(c2) > 0:
                 exp_err = c2
             elif abs(c2) == 0:
                 exp_err = 0
             # diagnose the error
-            if abs(c1) <= l and exp_err > l and eff > eff_l:
+            if abs(c1) <= limit and exp_err > limit and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(c1) > l and exp_err <= l and eff > eff_l:
+            elif abs(c1) > limit and exp_err <= limit and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(c1) > l and exp_err > l and eff > eff_l:
+            elif abs(c1) > limit and exp_err > limit and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
             # FBM
-            elif abs(c1) <= l and exp_err <= l and eff > eff_l:
+            elif abs(c1) <= limit and exp_err <= limit and eff > eff_l:
                 ax.annotate(
                     "",
                     xytext=(0, 0),
@@ -2416,7 +2469,7 @@ def gdiag_polar_plot_multi(
                     arrowprops=dict(facecolor=rgba_color),
                 )
             # FGM
-            elif abs(c1) <= l and exp_err <= l and eff <= eff_l:
+            elif abs(c1) <= limit and exp_err <= limit and eff <= eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
@@ -2486,7 +2539,7 @@ def gdiag_polar_plot_multi(
         return fig
 
     elif extended:
-        fig = plt.figure(figsize=(12, 6), constrained_layout=True)
+        fig = plt.figure(figsize=(6, 3), constrained_layout=True)
         gs = fig.add_gridspec(1, 2)
         ax = fig.add_subplot(gs[0, 0], projection="polar")
         ax1 = fig.add_axes([0.66, 0.3, 0.32, 0.32], frameon=True)
@@ -2500,7 +2553,7 @@ def gdiag_polar_plot_multi(
             (0, np.deg2rad(45)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -2508,7 +2561,7 @@ def gdiag_polar_plot_multi(
             (0, np.deg2rad(135)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -2516,7 +2569,7 @@ def gdiag_polar_plot_multi(
             (0, np.deg2rad(225)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
@@ -2524,35 +2577,36 @@ def gdiag_polar_plot_multi(
             (0, np.deg2rad(315)),
             (0, np.max(yy)),
             color="lightgray",
-            linewidth=1.5,
+            linewidth=1,
             ls="--",
             zorder=0,
         )
         # contours of DE
-        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1)
-        cl = ax.clabel(cp, inline=True, fontsize=10, fmt="%1.1f", colors="dimgrey")
+        cp = ax.contour(theta, r, r, colors="darkgray", levels=c_levels, zorder=1, linewidths=1)
+        cl = ax.clabel(cp, inline=True, fmt="%1.1f", colors="dimgrey")
         # threshold efficiency for FBM
-        eff_l = np.sqrt((l) ** 2 + (l) ** 2 + (l) ** 2)
+        eff_l = np.sqrt((limit) ** 2 + (limit) ** 2 + (limit) ** 2)
         # loop over each data point
         for (c1, c2, c3, eff) in zip(ll_comp1, ll_comp2, ll_comp3, ll_eff):
             # normalize threshold with mean flow becnhmark
             ang = np.arctan2(c1, c2)
             # convert temporal correlation to color
-            rgba_color = cm.plasma_r(norm(c3))
+            cmap = cm.get_cmap('plasma_r')
+            rgba_color = cmap(norm(c3))
             # relation of b_dir which explains the error
             if abs(c2) > 0:
                 exp_err = c2
             elif abs(c2) == 0:
                 exp_err = 0
             # diagnose the error
-            if abs(c1) <= l and exp_err > l and eff > eff_l:
+            if abs(c1) <= limit and exp_err > limit and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(c1) > l and exp_err <= l and eff > eff_l:
+            elif abs(c1) > limit and exp_err <= limit and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
-            elif abs(c1) > l and exp_err > l and eff > eff_l:
+            elif abs(c1) > limit and exp_err > limit and eff > eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
             # FBM
-            elif abs(c1) <= l and exp_err <= l and eff > eff_l:
+            elif abs(c1) <= limit and exp_err <= limit and eff > eff_l:
                 ax.annotate(
                     "",
                     xytext=(0, 0),
@@ -2566,7 +2620,7 @@ def gdiag_polar_plot_multi(
                     arrowprops=dict(facecolor=rgba_color),
                 )
             # FGM
-            elif abs(c1) <= l and exp_err <= l and eff <= eff_l:
+            elif abs(c1) <= limit and exp_err <= limit and eff <= eff_l:
                 c = ax.scatter(ang, eff, color=rgba_color, zorder=2)
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
@@ -2646,7 +2700,8 @@ def gdiag_polar_plot_multi(
         ax1.set(ylabel="Density", xlabel=r"[$^\circ$]")
 
         # 2-D density plot
-        c3_colors = cm.plasma_r(norm(comp3))
+        cmap = cm.get_cmap('plasma_r')
+        c3_colors = cmap(norm(comp3))
         g = sns.jointplot(
             x=diag_deg,
             y=eff,

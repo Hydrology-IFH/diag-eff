@@ -1,12 +1,10 @@
-name: de-env
+name: diag-eff
 channels:
   - conda-forge
 dependencies:
-  - python=3.8
+  - python=3.9
   - numpy
   - pandas
   - scipy
   - matplotlib
   - seaborn
-  - pip:
-    - diag-eff>=1.0

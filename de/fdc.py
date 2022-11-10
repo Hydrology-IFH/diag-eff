@@ -9,17 +9,18 @@ Flow duration curve
 """
 
 import numpy as np
+import pandas as pd
+import scipy as sp
+import matplotlib
+import seaborn as sns
+matplotlib.use("agg")
+import matplotlib.pyplot as plt  # noqa: E402
 
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
 np.seterr(divide="ignore", invalid="ignore")
-import pandas as pd
-import scipy as sp
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # controlling figure aesthetics
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
-sns.set_context("paper", font_scale=1.5)
 
 
 _mmd = r"[mm $d^{-1}$]"

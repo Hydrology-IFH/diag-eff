@@ -13,10 +13,10 @@ Generate three different error types:
 
 import numpy as np
 import random
+import pandas as pd
 
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
 np.seterr(divide="ignore", invalid="ignore")
-import pandas as pd
 
 
 def constant(ts, offset=1.5):

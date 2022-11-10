@@ -14,6 +14,7 @@ import numpy as np
 # RunTimeWarning will not be displayed (division by zeros or NaN values)
 np.seterr(divide="ignore", invalid="ignore")
 
+
 def calc_nse(obs, sim):
     r"""
     Calculate Nash-Sutcliffe-Efficiency (NSE).

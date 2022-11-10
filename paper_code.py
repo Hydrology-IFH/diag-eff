@@ -1,27 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 import os  # load modules first before importing .spydata
 from pathlib import Path
-
-PATH = Path(__file__).parent
-sys.path.append(str(PATH))
-PATH_FIG = PATH.parent.parent / "diagnostic_efficiency" / "figures"
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from de import de
 from de import generate_errors
 from de import kge
 from de import nse
 from de import util
+import matplotlib
 import seaborn as sns
+matplotlib.use("agg")
+import matplotlib.pyplot as plt  # noqa: E402
 
 # controlling figure aesthetics
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
 sns.set_context("paper", font_scale=1.5)
+
+PATH_FIG = Path(__file__).parent.parent / "diagnostic_efficiency" / "figures"
 
 if __name__ == "__main__":
     # ==========================================================
@@ -29,18 +28,18 @@ if __name__ == "__main__":
     # ==========================================================
     # 619.11 km2; AI: 0.82
     area = 619.11
-    path = PATH / "examples" / "13331500_streamflow_qc.txt"
+    path = Path(__file__).parent / "examples" / "13331500_streamflow_qc.txt"
     ## 191.55 km2; AI: 2.04
     # area = 191.55
-    # path = PATH / "examples" / "06332515_streamflow_qc.txt"
+    # path = Path(__file__).parent / "examples" / "06332515_streamflow_qc.txt"
     #
     ## 190.65 km2; AI: 2.98
     # area = 190.65
-    # path = PATH / "examples" / "09512280_streamflow_qc.txt"
+    # path = Path(__file__).parent / "examples" / "09512280_streamflow_qc.txt"
     #
     ## 66.57 km2; AI: 0.27
     # area = 66.57
-    # path = PATH / "examples" / "12114500_streamflow_qc.txt"
+    # path = Path(__file__).parent / "examples" / "12114500_streamflow_qc.txt"
     #
 
     # import observed time series
@@ -54,7 +53,7 @@ if __name__ == "__main__":
     # ==========================================================
     # prepare figures
     fig_num_fdc = ["(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)"]
-    fig_fdc, axes_fdc = plt.subplots(2, 5, sharey=True, sharex=True, figsize=(14, 6))
+    fig_fdc, axes_fdc = plt.subplots(2, 5, sharey=True, sharex=True, figsize=(6, 2))
     fig_fdc.text(0.5, 0.02, "Exceedence probabilty [-]", ha="center", va="center")
     fig_fdc.text(
         0.08, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
@@ -77,7 +76,7 @@ if __name__ == "__main__":
         "(m)",
     ]
     fig_ts, axes_ts = plt.subplots(3, 5, sharey=True, sharex=True,
-                                    figsize=(14, 9))
+                                    figsize=(6, 3))
     fig_ts.text(0.5, 0.05, "Time [Years]", ha="center", va="center")
     fig_ts.text(
         0.08, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
@@ -89,7 +88,7 @@ if __name__ == "__main__":
     yy_str_1 = '2000-1-1 00:00:00'  # start date
     yy_str_2 = '2000-12-31 00:00:00'  # end date
     fig_ts_yy, axes_ts_yy = plt.subplots(3, 5, sharey=True, sharex=True,
-                                          figsize=(14, 9))
+                                          figsize=(6, 3))
     fig_ts_yy.text(0.5, 0.05, "Time [Years]", ha="center", va="center")
     fig_ts_yy.text(
         0.08, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center", rotation="vertical"
@@ -1226,7 +1225,7 @@ if __name__ == "__main__":
     b_slope_arr = df_es["b_slope"].values
     de_arr = df_es["de"].values
 
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(16, 5))
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(6, 1.2))
     # scatterplots DE, KGE and NSE
     sc = sns.scatterplot(kge_arr, de_arr, color="black", s=60, ax=ax1)
     sc1 = sns.scatterplot(nse_arr, de_arr, color="red", s=30, marker="X",
@@ -1349,7 +1348,7 @@ if __name__ == "__main__":
     df_cam2 = util.import_camels_obs_sim(path_cam2)
     df_cam3 = util.import_camels_obs_sim(path_cam3)
 
-    fig, axes = plt.subplots(3, 2, figsize=(10, 10), sharex="col")
+    fig, axes = plt.subplots(3, 2, figsize=(6, 6), sharex="col")
     fig.text(0.06, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
               rotation="vertical")
     fig.text(0.5, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
@@ -1449,7 +1448,7 @@ if __name__ == "__main__":
     df_cam2_yy = df_cam2.loc[yy_str_1:yy_str_2, :]
     df_cam3_yy = df_cam3.loc[yy_str_1:yy_str_2, :]
 
-    fig, axes = plt.subplots(3, 2, figsize=(10, 10), sharex="col")
+    fig, axes = plt.subplots(3, 2, figsize=(6, 6), sharex="col")
     fig.text(0.06, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
               rotation="vertical")
     fig.text(0.5, 0.5, r"Q [mm $d^{-1}$]", ha="center", va="center",
