@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import scipy as sp
 import seaborn as sns
-from de import de
 
 # controlling figure aesthetics
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
@@ -336,8 +335,6 @@ def diag_polar_plot_multi_fc(
 
         \varphi = arctan2(\overline{B_{rel}}, B_{slope})
     """
-    de_max = np.min(eff_de)
-
     ll_brel_mean = brel_mean.tolist()
     ll_temp_cor = temp_cor.tolist()
     ll_eff = eff_de.tolist()
@@ -697,8 +694,6 @@ def polar_plot_multi_fc(
     fig : Figure
         diagnostic polar plot
     """
-    de_max = np.min(sig_kge)
-
     ll_kge_beta = kge_beta.tolist()
     ll_ag = alpha_or_gamma.tolist()
     ll_kge_r = kge_r.tolist()

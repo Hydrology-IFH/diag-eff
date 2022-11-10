@@ -28,6 +28,7 @@ np.seterr(divide="ignore", invalid="ignore")
 sns.set_style("ticks", {"xtick.major.size": 8, "ytick.major.size": 8})
 sns.set_context("paper", font_scale=1.5)
 
+
 def calc_brel(obs, sim, sort=True):
     r"""
     Calculate relative bias.
