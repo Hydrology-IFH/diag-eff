@@ -1632,10 +1632,10 @@ def diag_polar_plot_multi(
         yl2 = np.sin(2 * np.pi * np.linspace(0.75 - rl2/2, 0.75 + rl2/2))
         xyl2 = np.row_stack([[0, 0], np.column_stack([xl2, yl2])])
         sl2 = np.abs(xyl2).max()
-        ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1 * 50, label=r'high values ($\epsilon_{hf}=1$)')
-        ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2 * 50, label=r'low values ($\epsilon_{lf}=1$)')
-        ax.legend(loc='upper right', title="Error contribution of", fancybox=False,
-                  frameon=False, bbox_to_anchor=(1.45, 1.2), handletextpad=0.2)
+        ax.scatter([], [], color='k', zorder=2, marker=xyl1, s=sl1 * 50, label=r'$\epsilon_{hf}=1$')
+        ax.scatter([], [], color='k', zorder=2, marker=xyl2, s=sl2 * 50, label=r'$\epsilon_{lf}=1$')
+        ax.legend(loc='upper right', fancybox=False,
+                  frameon=False, bbox_to_anchor=(1.2, 1.12), handletextpad=0.2)
 
         ax.set_rticks([])  # turn default ticks off
         ax.set_rmin(0)
@@ -1655,7 +1655,7 @@ def diag_polar_plot_multi(
         ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
         ax.set_xticklabels(["", "", "", "", "", "", "", ""])
         ax.text(
-            -0.16,
+            -0.17,
             0.5,
             "High value overestimation -",
             va="center",
@@ -1685,7 +1685,7 @@ def diag_polar_plot_multi(
             transform=ax.transAxes,
         )
         ax.text(
-            1.17,
+            1.18,
             0.5,
             "High value underestimation -",
             va="center",
@@ -1766,11 +1766,11 @@ def diag_polar_plot_multi(
             a0_avg = np.round(np.mean(a0), 2)
             a0_std = np.round(np.std(a0), 2)
             ax.text(
-                1.1,
-                0.0,
-                f"Share of zero values [-]: {share0}\nAgreement of zero values [-]: {a0_avg} ± {a0_std}",
+                0.8,
+                0.03,
+                f"$s_0$ [-]: {share0}\n$a_0$ [-]: {a0_avg} ± {a0_std}",
                 va="center",
-                ha="center",
+                ha="left",
                 rotation=0,
                 rotation_mode="anchor",
                 transform=ax.transAxes,
@@ -1780,11 +1780,11 @@ def diag_polar_plot_multi(
             a0_avg = np.round(np.mean(a0), 2)
             a0_std = np.round(np.std(a0), 2)
             ax.text(
-                1.1,
-                0.0,
-                f"Agreement of zero values [-]:\n {a0_avg} ± {a0_std}",
+                0.8,
+                0.03,
+                f"$a_0$ [-]:\n {a0_avg} ± {a0_std}",
                 va="center",
-                ha="center",
+                ha="left",
                 rotation=0,
                 rotation_mode="anchor",
                 transform=ax.transAxes,

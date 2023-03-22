@@ -146,7 +146,7 @@ def plot_ts(ts):
     """
     fig, ax = plt.subplots()
     ax.plot(ts.index, ts.values, color="blue")
-    ax.set(ylabel=_q_lab, xlabel="Time [Years]")
+    ax.set(ylabel=_q_lab, xlabel="Time [Year]")
     ax.set_ylim(0,)
     ax.set_xlim(ts.index[0], ts.index[-1])
     years_5 = mdates.YearLocator(5)
@@ -188,7 +188,7 @@ def plot_obs_sim(obs, sim):
     >>> ts_sim = pd.Series(data=sim, index=date_rng)
     >>> util.plot_obs_sim(ts_obs, ts_sim)
     """
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(3, 1.2))
     # observed time series
     ax.plot(obs.index, obs, lw=2, color="blue", label="Observed", alpha=0.8)
     # simulated time series
